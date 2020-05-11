@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.model
+package com.basso.gerenciadorinvestimentos
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
