@@ -35,10 +35,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-rest</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.basso</groupId>
             <artifactId>repository</artifactId>
         </dependency>

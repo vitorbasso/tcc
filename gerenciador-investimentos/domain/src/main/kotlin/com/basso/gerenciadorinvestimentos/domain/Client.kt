@@ -12,6 +12,8 @@ data class Client (
         @Id
         val email: String,
 
+        val cpf: String,
+
         val name: String,
 
         val avatarImage: String,

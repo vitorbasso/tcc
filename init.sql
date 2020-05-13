@@ -2,6 +2,7 @@ use `gerenciamento_investimento`;
 
 create table if not exists `client`(
 	`email` varchar(255) not null,
+    `cpf` varchar(20) not null unique,
 	`name` varchar(255) not null,
     `avatar_image` varchar(255),
     primary key (`email`)
@@ -23,9 +24,9 @@ create table if not exists `wallet`(
     `loss` decimal(13,2),
     `balance_daytrade` decimal(13,2),
     `balance` decimal(13,2),
-    `client_email` varchar(255) not null,
+    `client_cpf` varchar(255) not null,
     primary key (`id`),
-    foreign key (`client_email`) references `client` (`email`)
+    foreign key (`client_cpf`) references `client` (`cpf`)
 )engine=InnoDB;
 
 create table if not exists `stock` (
