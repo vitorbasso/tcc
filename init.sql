@@ -8,10 +8,9 @@ create table if not exists `client`(
 )engine=InnoDB;
 
 create table if not exists `user`(
-	`email` varchar(255) not null,
     `password` varchar(255) not null,
-    primary key (`email`),
-    foreign key (`email`) references `client` (`email`)
+    `client_email` varchar(255) not null,
+    foreign key (`client_email`) references `client` (`email`)
 )engine=InnoDB;
 
 create table if not exists `wallet`(

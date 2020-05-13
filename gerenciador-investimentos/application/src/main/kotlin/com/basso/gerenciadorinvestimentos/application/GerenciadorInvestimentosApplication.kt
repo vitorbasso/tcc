@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos
+package com.basso.gerenciadorinvestimentos.application
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
