@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.application
+package com.basso.gerenciadorinvestimentos.domain
 
 import javax.persistence.CascadeType
 import javax.persistence.Entity

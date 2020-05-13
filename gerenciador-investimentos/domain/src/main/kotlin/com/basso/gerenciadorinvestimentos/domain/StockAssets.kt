@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.application
+package com.basso.gerenciadorinvestimentos.domain
 
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -13,8 +13,8 @@ import javax.persistence.OneToOne
 data class StockAssets (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Int,
-        val averageCost: Long,
+        val id: Long,
+        val averageCost: java.math.BigDecimal,
         val amount: Int,
 
         @OneToOne(fetch = FetchType.LAZY)

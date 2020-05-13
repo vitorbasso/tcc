@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.application
+package com.basso.gerenciadorinvestimentos.domain
 
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -13,13 +13,13 @@ import javax.persistence.OneToOne
 data class Wallet(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Int,
+        val id: Long,
         val name: String,
         val broker: String,
-        val lossDaytrade: Long,
-        val loss: Long,
-        val balanceDaytrade: Long,
-        val balance: Long,
+        val lossDaytrade: java.math.BigDecimal,
+        val loss: java.math.BigDecimal,
+        val balanceDaytrade: java.math.BigDecimal,
+        val balance: java.math.BigDecimal,
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "client_email", referencedColumnName = "email")

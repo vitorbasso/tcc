@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.application
+package com.basso.gerenciadorinvestimentos.domain
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -8,9 +8,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @SpringBootApplication(scanBasePackages = ["com.basso.gerenciadorinvestimentos"])
+@EnableFeignClients("com.basso.gerenciadorinvestimentos.integration")
 @EntityScan("com.basso.gerenciadorinvestimentos.domain")
 @EnableJpaRepositories("com.basso.gerenciadorinvestimentos.repository")
-@EnableFeignClients("com.basso.gerenciadorinvestimentos.integration")
 class GerenciadorInvestimentosApplication : SpringBootServletInitializer()
 
 fun main(args: Array<String>) {

@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.application
+package com.basso.gerenciadorinvestimentos.domain
 
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -8,12 +8,12 @@ import javax.persistence.OneToMany
 data class Stock (
         @Id
         val symbol: String,
-        val currentValue: Long,
+        val currentValue: java.math.BigDecimal,
         val type: Char,
         val name: String,
         val corporation: String,
         val businessArea: String,
 
         @OneToMany(mappedBy = "stock")
-        val stockAssets: StockAssets
+        val stockAssets: MutableList<StockAssets> = mutableListOf()
 )

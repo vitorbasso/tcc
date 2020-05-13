@@ -34,8 +34,10 @@ CREATE TABLE stock_assets (
 
 --changeset vitor:1589381413369-4
 CREATE TABLE user (
+    id BIGINT NOT NULL,
     password VARCHAR(255) NOT NULL,
-    client_email VARCHAR(255) NOT NULL
+    client_email VARCHAR(255) NOT NULL,
+    CONSTRAINT PK_USER PRIMARY KEY (id)
 );
 --rollback DROP TABLE user;
 
