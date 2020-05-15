@@ -1,5 +1,6 @@
-package com.basso.gerenciadorinvestimentos.domain
+package com.basso.gerenciadorinvestimentos.domain.concrete
 
+import java.io.Serializable
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.OneToMany
@@ -16,4 +17,4 @@ data class Stock (
 
         @OneToMany(mappedBy = "stock")
         val stockAssets: MutableList<StockAssets> = mutableListOf()
-)
+) : Serializable

@@ -1,5 +1,6 @@
-package com.basso.gerenciadorinvestimentos.domain
+package com.basso.gerenciadorinvestimentos.domain.concrete
 
+import java.sql.Timestamp
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -7,7 +8,7 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
-import javax.persistence.OneToOne
+import javax.persistence.OneToMany
 
 @Entity
 data class Wallet(
@@ -25,6 +26,10 @@ data class Wallet(
         @JoinColumn(name = "client_cpf", referencedColumnName = "cpf")
         val client: Client,
 
-        @OneToOne(mappedBy = "wallet")
-        val stockAssets: StockAssets
-)
+        @OneToMany(mappedBy = "wallet")
+        val stockAssets: List<StockAssets> = listOf(),
+
+        @Transient
+        val dateUpdate: Timestamp? = null
+
+) : BaseEntity()
