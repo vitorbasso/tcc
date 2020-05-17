@@ -1,5 +1,9 @@
 package com.basso.gerenciadorinvestimentos.application.service.concrete
 
+import com.basso.gerenciadorinvestimentos.application.enum.ManagerErrorCode
+import com.basso.gerenciadorinvestimentos.application.exception.CustomBadRequestException
+import com.basso.gerenciadorinvestimentos.application.exception.CustomEntityNotFoundException
+import com.basso.gerenciadorinvestimentos.application.exception.CustomManagerException
 import com.basso.gerenciadorinvestimentos.application.request.ClientUpdateRequest
 import com.basso.gerenciadorinvestimentos.domain.concrete.Client
 import com.basso.gerenciadorinvestimentos.repository.ClientRepository
@@ -10,13 +14,15 @@ internal class ClientService (
         val clientRepository: ClientRepository
 ) {
 
-    fun getClient(cpf: String)
-            = if(exists(cpf)) clientRepository.findByCpf(cpf)
-            else throw RuntimeException("getClient - not found")
+    fun getClient(
+            cpf: String,
+            exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_04)
+    )
+            = if(exists(cpf)) clientRepository.findByCpf(cpf) else throw exception
 
     fun saveClient(clientToSave: Client)
             = if(!exists(clientToSave.cpf)) this.clientRepository.save(clientToSave)
-            else throw java.lang.RuntimeException("saveClient - already exists")
+            else throw CustomBadRequestException(ManagerErrorCode.MANAGER_05)
 
     fun updateClient(clientToUpdate: Client, updateRequest: ClientUpdateRequest)
             = this.clientRepository.save(
