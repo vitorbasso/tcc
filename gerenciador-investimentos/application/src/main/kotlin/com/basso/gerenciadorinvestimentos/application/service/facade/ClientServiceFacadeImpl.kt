@@ -10,7 +10,7 @@ import com.basso.gerenciadorinvestimentos.domain.concrete.Client
 import org.springframework.stereotype.Service
 
 @Service
-internal class ClientServiceFacade(
+internal class ClientServiceFacadeImpl(
         private val clientService: ClientService
 ) : IClientService {
 
@@ -22,7 +22,7 @@ internal class ClientServiceFacade(
             = this.clientService.updateClient(
             this.clientService.getClient(
                     cpf,
-                    CustomBadRequestException(ManagerErrorCode.MANAGER_06)
+                    CustomBadRequestException(ManagerErrorCode.MANAGER_05)
             ),
             clientUpdateRequest
     )
@@ -31,7 +31,7 @@ internal class ClientServiceFacade(
             = this.clientService.deleteClient(
                     this.clientService.getClient(
                             cpf,
-                            CustomBadRequestException(ManagerErrorCode.MANAGER_07)
+                            CustomBadRequestException(ManagerErrorCode.MANAGER_06)
                     )
             )
 }

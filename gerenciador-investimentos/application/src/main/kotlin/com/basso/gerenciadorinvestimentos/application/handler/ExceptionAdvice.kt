@@ -44,7 +44,7 @@ class ExceptionAdvice (
         is CustomBadRequestException -> ApiErrorDto(ex, ::getLocalizedMessage)
         is MethodArgumentNotValidException -> ApiErrorDto(
                 ex = ex,
-                errorEnum = ManagerErrorCode.MANAGER_08,
+                errorEnum = ManagerErrorCode.MANAGER_07,
                 getMessage = ::getMethodArgumentNotValidExceptionMessage
         )
         else -> ApiErrorDto(ManagerErrorCode.MANAGER_01, ::getLocalizedMessage)

@@ -16,13 +16,13 @@ internal class ClientService (
 
     fun getClient(
             cpf: String,
-            exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_04)
+            exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     )
             = if(exists(cpf)) clientRepository.findByCpf(cpf) else throw exception
 
     fun saveClient(clientToSave: Client)
             = if(!exists(clientToSave.cpf)) this.clientRepository.save(clientToSave)
-            else throw CustomBadRequestException(ManagerErrorCode.MANAGER_05)
+            else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
     fun updateClient(clientToUpdate: Client, updateRequest: ClientUpdateRequest)
             = this.clientRepository.save(

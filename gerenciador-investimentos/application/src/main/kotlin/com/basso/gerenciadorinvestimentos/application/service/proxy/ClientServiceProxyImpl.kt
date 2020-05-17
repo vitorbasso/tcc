@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 @Primary
 class ClientServiceProxyImpl (
-        @Qualifier("clientServiceFacade")
+        @Qualifier("clientServiceFacadeImpl")
         private val clientService: IClientService
 ) : IClientService {
 
