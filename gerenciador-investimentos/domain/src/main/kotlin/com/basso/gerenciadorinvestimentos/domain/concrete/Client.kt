@@ -1,7 +1,6 @@
 package com.basso.gerenciadorinvestimentos.domain.concrete
 
 import com.basso.gerenciadorinvestimentos.domain.IClient
-import java.sql.Timestamp
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -29,9 +28,6 @@ data class Client (
         val user: User,
 
         @OneToMany(mappedBy = "client",  cascade = [CascadeType.ALL])
-        val wallet: List<Wallet> = listOf(),
-
-        @Transient
-        val dateUpdate: Timestamp? = null
+        val wallet: List<Wallet> = listOf()
 
 ) : BaseEntity(), IClient

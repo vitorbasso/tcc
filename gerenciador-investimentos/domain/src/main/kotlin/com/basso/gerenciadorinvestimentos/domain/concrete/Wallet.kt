@@ -1,6 +1,5 @@
 package com.basso.gerenciadorinvestimentos.domain.concrete
 
-import java.sql.Timestamp
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -27,9 +26,6 @@ data class Wallet(
         val client: Client,
 
         @OneToMany(mappedBy = "wallet")
-        val stockAssets: List<StockAssets> = listOf(),
-
-        @Transient
-        val dateUpdate: Timestamp? = null
+        val stockAssets: List<StockAssets> = listOf()
 
 ) : BaseEntity()

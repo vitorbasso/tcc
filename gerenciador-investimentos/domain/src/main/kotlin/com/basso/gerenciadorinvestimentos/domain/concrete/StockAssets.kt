@@ -1,6 +1,5 @@
 package com.basso.gerenciadorinvestimentos.domain.concrete
 
-import java.sql.Timestamp
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -23,8 +22,6 @@ data class StockAssets (
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "stock_symbol", referencedColumnName = "symbol")
-        val stock: Stock,
+        val stock: Stock
 
-        @Transient
-        val dateUpdate: Timestamp? = null
 ) : BaseEntity()

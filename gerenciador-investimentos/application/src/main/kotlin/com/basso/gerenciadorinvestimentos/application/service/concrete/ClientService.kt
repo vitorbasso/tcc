@@ -4,7 +4,6 @@ import com.basso.gerenciadorinvestimentos.application.request.ClientUpdateReques
 import com.basso.gerenciadorinvestimentos.domain.concrete.Client
 import com.basso.gerenciadorinvestimentos.repository.ClientRepository
 import org.springframework.stereotype.Service
-import java.sql.Timestamp
 
 @Service
 internal class ClientService (
@@ -28,8 +27,7 @@ internal class ClientService (
                     lastName = updateRequest.lastName ?: clientToUpdate.lastName,
                     avatarImage = updateRequest.avatarImage ?: clientToUpdate.avatarImage,
                     user = clientToUpdate.user,
-                    wallet = clientToUpdate.wallet,
-                    dateUpdate = Timestamp(java.util.Date().time)
+                    wallet = clientToUpdate.wallet
             )
     )
 

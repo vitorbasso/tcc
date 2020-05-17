@@ -1,6 +1,5 @@
 package com.basso.gerenciadorinvestimentos.domain.concrete
 
-import java.sql.Timestamp
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -16,9 +15,6 @@ data class User(
         val password: String,
 
         @OneToOne(mappedBy = "user")
-        val client: Client? = null,
-
-        @Transient
-        val dateUpdate: Timestamp? = null
+        val client: Client? = null
 
 ) : BaseEntity()

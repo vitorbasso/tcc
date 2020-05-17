@@ -43,8 +43,6 @@ create table if not exists `stock` (
     `name` varchar(255),
     `corporation` varchar(255),
     `business_area` varchar(255),
-    `date_created` timestamp not null,
-    `date_updated` timestamp,
     primary key (`symbol`)
 )engine=InnoDB;
 
