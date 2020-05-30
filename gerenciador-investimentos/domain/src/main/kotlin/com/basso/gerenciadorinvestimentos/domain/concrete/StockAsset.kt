@@ -1,6 +1,7 @@
 package com.basso.gerenciadorinvestimentos.domain.concrete
 
 import com.basso.gerenciadorinvestimentos.domain.BaseEntity
+import com.basso.gerenciadorinvestimentos.domain.IStockAsset
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -11,7 +12,7 @@ import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
 @Entity
-data class StockAssets (
+data class StockAsset (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long,
@@ -26,7 +27,7 @@ data class StockAssets (
         @JoinColumn(name = "stock_symbol", referencedColumnName = "symbol")
         val stock: Stock,
 
-        @OneToMany(mappedBy = "stockAssets")
+        @OneToMany(mappedBy = "stockAsset")
         val transactions: List<Transaction> = listOf()
 
-) : BaseEntity()
+) : BaseEntity(), IStockAsset
