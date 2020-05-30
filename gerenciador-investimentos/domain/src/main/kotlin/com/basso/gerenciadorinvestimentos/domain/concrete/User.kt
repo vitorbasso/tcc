@@ -1,5 +1,6 @@
 package com.basso.gerenciadorinvestimentos.domain.concrete
 
+import com.basso.gerenciadorinvestimentos.domain.BaseEntity
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
