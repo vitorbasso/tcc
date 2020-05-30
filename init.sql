@@ -9,15 +9,15 @@ create table if not exists `user`(
 )engine=InnoDB;
 
 create table if not exists `client`(
-	`email` varchar(255),
-    `cpf` varchar(20) not null unique,
+	`cpf` varchar(20),
+	`email` varchar(255) not null unique,
 	`first_name` varchar(255) not null,
     `last_name` varchar(255),
     `avatar_image` varchar(255),
     `user_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
-    primary key (`email`),
+    primary key (`cpf`),
     foreign key (`user_id`) references `user` (`id`)
 )engine=InnoDB;
 
@@ -37,7 +37,7 @@ create table if not exists `wallet`(
 )engine=InnoDB;
 
 create table if not exists `stock` (
-	`symbol` varchar(6) not null,
+	`symbol` varchar(6),
     `current_value` decimal(13,2) not null,
     `type` char,
     `name` varchar(255),
@@ -57,4 +57,18 @@ create table if not exists `stock_assets`(
     primary key (`id`),
     foreign key (`wallet_id`) references `wallet` (`id`),
     foreign key (`stock_symbol`) references `stock` (`symbol`)
+)engine=InnoDB;
+
+create table if not exists `transaction`(
+	`id` bigint auto_increment,
+	`type` varchar(3) not null,
+    `quantity` int,
+    `value` decimal(13,2),
+    `stock_symbol` varchar(6) not null,
+    `stock_assets_id` bigint not null,
+    `date_created` timestamp not null,
+    `date_updated` timestamp,
+    primary key (`id`),
+    foreign key (`stock_symbol`) references `stock` (`symbol`),
+    foreign key (`stock_assets_id`) references `stock_assets` (`id`) 
 )engine=InnoDB;

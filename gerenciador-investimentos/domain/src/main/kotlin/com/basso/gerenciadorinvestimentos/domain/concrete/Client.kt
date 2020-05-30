@@ -1,5 +1,6 @@
 package com.basso.gerenciadorinvestimentos.domain.concrete
 
+import com.basso.gerenciadorinvestimentos.domain.BaseEntity
 import com.basso.gerenciadorinvestimentos.domain.IClient
 import javax.persistence.CascadeType
 import javax.persistence.Entity
@@ -13,9 +14,9 @@ import javax.persistence.OneToOne
 data class Client (
 
         @Id
-        val email: String,
-
         val cpf: String,
+
+        val email: String,
 
         val firstName: String,
 

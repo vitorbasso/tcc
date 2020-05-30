@@ -8,25 +8,26 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
 
 @Entity
-data class StockAssets (
+data class Transaction(
+
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long,
-        val averageCost: java.math.BigDecimal,
-        val amount: Int,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "wallet_id", referencedColumnName = "id")
-        val wallet: Wallet,
+        val type: String,
+
+        val quantity: Int,
+
+        val value: java.math.BigDecimal,
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "stock_symbol", referencedColumnName = "symbol")
         val stock: Stock,
 
-        @OneToMany(mappedBy = "stockAssets")
-        val transactions: List<Transaction> = listOf()
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "stock_assets_id", referencedColumnName = "id")
+        val stockAssets: StockAssets
 
 ) : BaseEntity()

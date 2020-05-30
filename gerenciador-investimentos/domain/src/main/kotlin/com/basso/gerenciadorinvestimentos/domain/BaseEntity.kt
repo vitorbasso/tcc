@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.domain.concrete
+package com.basso.gerenciadorinvestimentos.domain
 
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -10,8 +10,9 @@ import javax.persistence.MappedSuperclass
 @MappedSuperclass
 abstract class BaseEntity (
         @field:CreationTimestamp
-        @Column(updatable = false)
+        @Column(updatable = false, nullable = false)
         val dateCreated: LocalDateTime = LocalDateTime.now(),
         @field:UpdateTimestamp
+        @Column(nullable = false)
         val dateUpdated: LocalDateTime = LocalDateTime.now()
 ) : Serializable
