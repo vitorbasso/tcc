@@ -15,7 +15,7 @@ data class StockAssets (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long,
-        val averageCost: java.math.BigDecimal,
+        val averageCost: java.math.BigDecimal = java.math.BigDecimal(0),
         val amount: Int,
 
         @ManyToOne(fetch = FetchType.LAZY)

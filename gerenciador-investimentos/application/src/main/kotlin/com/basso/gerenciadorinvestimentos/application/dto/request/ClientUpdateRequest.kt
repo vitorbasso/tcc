@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.application.request
+package com.basso.gerenciadorinvestimentos.application.dto.request
 
 import javax.validation.constraints.Size
 

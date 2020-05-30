@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.application.dto
+package com.basso.gerenciadorinvestimentos.application.dto.response
 
 import com.basso.gerenciadorinvestimentos.domain.IClient
 

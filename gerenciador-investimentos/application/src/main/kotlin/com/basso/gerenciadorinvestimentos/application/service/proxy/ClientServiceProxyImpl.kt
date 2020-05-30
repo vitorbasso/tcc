@@ -1,12 +1,20 @@
 package com.basso.gerenciadorinvestimentos.application.service.proxy
 
-import com.basso.gerenciadorinvestimentos.application.dto.ClientDto
-import com.basso.gerenciadorinvestimentos.application.request.ClientRequest
-import com.basso.gerenciadorinvestimentos.application.request.ClientUpdateRequest
+import com.basso.gerenciadorinvestimentos.application.dto.request.ClientRequest
+import com.basso.gerenciadorinvestimentos.application.dto.request.ClientUpdateRequest
+import com.basso.gerenciadorinvestimentos.application.dto.request.WalletRequest
+import com.basso.gerenciadorinvestimentos.application.dto.request.WalletUpdateRequest
+import com.basso.gerenciadorinvestimentos.application.dto.response.ClientDto
+import com.basso.gerenciadorinvestimentos.application.dto.response.StockAssetDto
+import com.basso.gerenciadorinvestimentos.application.dto.response.WalletDto
 import com.basso.gerenciadorinvestimentos.application.service.IClientService
 import com.basso.gerenciadorinvestimentos.domain.IClient
+import com.basso.gerenciadorinvestimentos.domain.IStockAsset
+import com.basso.gerenciadorinvestimentos.domain.IWallet
 import com.basso.gerenciadorinvestimentos.domain.concrete.Client
+import com.basso.gerenciadorinvestimentos.domain.concrete.StockAsset
 import com.basso.gerenciadorinvestimentos.domain.concrete.User
+import com.basso.gerenciadorinvestimentos.domain.concrete.Wallet
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
@@ -18,16 +26,37 @@ class ClientServiceProxyImpl (
         private val clientService: IClientService
 ) : IClientService {
 
-    override fun getClient(cpf: String) = this.clientService.getClient(cpf).getDto()
+    override fun getClient(cpf: String)
+            = this.clientService.getClient(cpf).getDto()
 
-    override fun saveClient(clientRequest: IClient)
-            = this.clientService.saveClient(clientRequest.getEntity()).getDto()
+    override fun saveClient(clientToSave: IClient)
+            = this.clientService.saveClient(clientToSave.getEntity()).getDto()
 
     override fun updateClient(cpf: String, clientUpdateRequest: ClientUpdateRequest)
             = this.clientService.updateClient(cpf, clientUpdateRequest).getDto()
 
     override fun deleteClient(cpf: String) {
         this.clientService.deleteClient(cpf)
+    }
+
+    override fun getWalletCollection(cpf: String)
+            = this.clientService.getWalletCollection(cpf).map { it.getDto() }
+
+    override fun getWallet(cpf: String, broker: String)
+            = this.clientService.getWallet(cpf, broker).getDto()
+
+    override fun saveWallet(cpf: String, walletToSave: IWallet)
+            = this.clientService.saveWallet(cpf, walletToSave.getEntity()).getDto()
+
+    override fun updateWallet(cpf: String, broker: String, walletUpdateRequest: WalletUpdateRequest)
+            = this.clientService.updateWallet(
+            cpf = cpf,
+            broker = broker,
+            walletUpdateRequest = walletUpdateRequest
+    ).getDto()
+
+    override fun deleteWallet(cpf: String, broker: String) {
+        this.clientService.deleteWallet(cpf, broker)
     }
 }
 
@@ -46,4 +75,26 @@ private fun IClient.getEntity() = Client(
         lastName = this.lastName,
         avatarImage = this.avatarImage,
         user = User(password = this.password)
+)
+
+private fun IWallet.getEntity() = Wallet(
+        name = (this as WalletRequest).name,
+        broker = this.broker,
+        client = Client()
+)
+
+private fun IWallet.getDto() = WalletDto(
+        name = (this as Wallet).name,
+        broker = this.broker,
+        lossDaytrade = this.lossDaytrade,
+        loss = this.loss,
+        balanceDaytrade = this.balanceDaytrade,
+        balance = this.balance,
+        stockAsset = this.stockAsset.map { it.getDto() }
+)
+
+private fun IStockAsset.getDto() = StockAssetDto(
+        stockSymbol = (this as StockAsset).stock.symbol,
+        averageCost = this.averageCost,
+        amount = this.amount
 )
