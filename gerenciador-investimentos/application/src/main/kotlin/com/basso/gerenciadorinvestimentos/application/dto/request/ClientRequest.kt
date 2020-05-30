@@ -1,4 +1,4 @@
-package com.basso.gerenciadorinvestimentos.application.request
+package com.basso.gerenciadorinvestimentos.application.dto.request
 
 import com.basso.gerenciadorinvestimentos.domain.IClient
 import org.hibernate.validator.constraints.br.CPF

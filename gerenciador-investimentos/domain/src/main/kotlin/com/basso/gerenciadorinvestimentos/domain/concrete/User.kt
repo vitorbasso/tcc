@@ -13,7 +13,7 @@ data class User(
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long = 0L,
 
-        val password: String,
+        val password: String = "",
 
         @OneToOne(mappedBy = "user")
         val client: Client? = null

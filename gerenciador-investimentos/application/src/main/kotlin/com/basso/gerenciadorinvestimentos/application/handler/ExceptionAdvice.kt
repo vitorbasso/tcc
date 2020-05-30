@@ -1,6 +1,6 @@
 package com.basso.gerenciadorinvestimentos.application.handler
 
-import com.basso.gerenciadorinvestimentos.application.dto.ApiErrorDto
+import com.basso.gerenciadorinvestimentos.application.dto.response.ApiErrorDto
 import com.basso.gerenciadorinvestimentos.application.enum.ManagerErrorCode
 import com.basso.gerenciadorinvestimentos.application.exception.CustomBadRequestException
 import com.basso.gerenciadorinvestimentos.application.exception.CustomEntityNotFoundException

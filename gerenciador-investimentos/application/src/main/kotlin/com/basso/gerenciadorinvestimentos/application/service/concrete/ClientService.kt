@@ -1,17 +1,17 @@
 package com.basso.gerenciadorinvestimentos.application.service.concrete
 
+import com.basso.gerenciadorinvestimentos.application.dto.request.ClientUpdateRequest
 import com.basso.gerenciadorinvestimentos.application.enum.ManagerErrorCode
 import com.basso.gerenciadorinvestimentos.application.exception.CustomBadRequestException
 import com.basso.gerenciadorinvestimentos.application.exception.CustomEntityNotFoundException
 import com.basso.gerenciadorinvestimentos.application.exception.CustomManagerException
-import com.basso.gerenciadorinvestimentos.application.request.ClientUpdateRequest
 import com.basso.gerenciadorinvestimentos.domain.concrete.Client
 import com.basso.gerenciadorinvestimentos.repository.ClientRepository
 import org.springframework.stereotype.Service
 
 @Service
 internal class ClientService (
-        val clientRepository: ClientRepository
+        private val clientRepository: ClientRepository
 ) {
 
     fun getClient(

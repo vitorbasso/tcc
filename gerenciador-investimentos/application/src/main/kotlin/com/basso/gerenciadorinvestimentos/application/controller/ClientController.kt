@@ -1,7 +1,9 @@
 package com.basso.gerenciadorinvestimentos.application.controller
 
-import com.basso.gerenciadorinvestimentos.application.request.ClientRequest
-import com.basso.gerenciadorinvestimentos.application.request.ClientUpdateRequest
+import com.basso.gerenciadorinvestimentos.application.dto.request.ClientRequest
+import com.basso.gerenciadorinvestimentos.application.dto.request.ClientUpdateRequest
+import com.basso.gerenciadorinvestimentos.application.dto.request.WalletRequest
+import com.basso.gerenciadorinvestimentos.application.dto.request.WalletUpdateRequest
 import com.basso.gerenciadorinvestimentos.application.service.IClientService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -22,7 +24,8 @@ class ClientController(
 ) {
 
     @GetMapping("/{cpf}")
-    fun getClient(@PathVariable cpf: String) = this.clientService.getClient(cpf)
+    fun getClient(@PathVariable cpf: String)
+            = this.clientService.getClient(cpf)
 
     @PostMapping
     fun saveClient(@RequestBody @Valid clientRequest: ClientRequest)
@@ -37,5 +40,32 @@ class ClientController(
     fun deleteClient(@PathVariable cpf: String){
         this.clientService.deleteClient(cpf)
     }
+
+    @GetMapping("/{cpf}/wallets")
+    fun getWallets(@PathVariable cpf: String)
+            = this.clientService.getWalletCollection(cpf)
+
+    @GetMapping("/{cpf}/wallets/{broker}")
+    fun getWallet(@PathVariable cpf: String, @PathVariable broker: String)
+            = this.clientService.getWallet(cpf, broker)
+
+    @PostMapping("/{cpf}/wallets")
+    fun saveWallet(@PathVariable cpf: String, @RequestBody walletRequest: WalletRequest)
+            = this.clientService.saveWallet(cpf, walletRequest)
+
+    @PutMapping("/{cpf}/wallets/{broker}")
+    fun updateWallet(
+            @PathVariable cpf: String,
+            @PathVariable broker: String,
+            @RequestBody walletUpdateRequest: WalletUpdateRequest
+    ) = this.clientService.updateWallet(
+            cpf = cpf,
+            broker = broker,
+            walletUpdateRequest = walletUpdateRequest
+    )
+
+    @DeleteMapping("/{cpf}/wallets/{broker}")
+    fun deleteWallet(@PathVariable cpf: String, @PathVariable broker: String)
+            = this.clientService.deleteWallet(cpf, broker)
 
 }
