@@ -9,5 +9,5 @@ data class WalletDto (
         val loss: java.math.BigDecimal,
         val balanceDaytrade: java.math.BigDecimal,
         val balance: java.math.BigDecimal,
-        val stockAsset: List<StockAssetDto>
+        val stockAsset: List<AssetDto>
 ) : IWallet

@@ -46,7 +46,7 @@ create table if not exists `stock` (
     primary key (`symbol`)
 )engine=InnoDB;
 
-create table if not exists `stock_asset`(
+create table if not exists `asset`(
 	`id` bigint auto_increment,
     `wallet_id` bigint not null,
     `stock_symbol` varchar(6) not null,
@@ -65,10 +65,10 @@ create table if not exists `transaction`(
     `quantity` int,
     `value` decimal(13,2),
     `stock_symbol` varchar(6) not null,
-    `stock_asset_id` bigint not null,
+    `asset_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
     primary key (`id`),
     foreign key (`stock_symbol`) references `stock` (`symbol`),
-    foreign key (`stock_asset_id`) references `stock_asset` (`id`) 
+    foreign key (`asset_id`) references `asset` (`id`) 
 )engine=InnoDB;

@@ -1,3 +1,3 @@
 package com.basso.gerenciadorinvestimentos.domain
 
-interface IStockAsset
+interface IAsset

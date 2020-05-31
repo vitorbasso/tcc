@@ -28,6 +28,6 @@ data class Wallet(
         val client: Client,
 
         @OneToMany(mappedBy = "wallet")
-        val stockAsset: List<StockAsset> = listOf()
+        val asset: List<Asset> = listOf()
 
 ) : BaseEntity(), IWallet

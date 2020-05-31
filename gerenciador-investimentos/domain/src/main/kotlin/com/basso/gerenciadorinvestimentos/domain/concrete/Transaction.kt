@@ -27,7 +27,7 @@ data class Transaction(
         val stock: Stock,
 
         @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "stock_asset_id", referencedColumnName = "id")
-        val stockAsset: StockAsset
+        @JoinColumn(name = "asset_id", referencedColumnName = "id")
+        val asset: Asset
 
 ) : BaseEntity()

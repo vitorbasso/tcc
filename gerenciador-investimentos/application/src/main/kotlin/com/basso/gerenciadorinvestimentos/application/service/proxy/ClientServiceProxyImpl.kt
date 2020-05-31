@@ -5,14 +5,15 @@ import com.basso.gerenciadorinvestimentos.application.dto.request.ClientUpdateRe
 import com.basso.gerenciadorinvestimentos.application.dto.request.WalletRequest
 import com.basso.gerenciadorinvestimentos.application.dto.request.WalletUpdateRequest
 import com.basso.gerenciadorinvestimentos.application.dto.response.ClientDto
-import com.basso.gerenciadorinvestimentos.application.dto.response.StockAssetDto
+import com.basso.gerenciadorinvestimentos.application.dto.response.AssetDto
 import com.basso.gerenciadorinvestimentos.application.dto.response.WalletDto
+import com.basso.gerenciadorinvestimentos.application.dto.response.WalletSmallDto
 import com.basso.gerenciadorinvestimentos.application.service.IClientService
 import com.basso.gerenciadorinvestimentos.domain.IClient
-import com.basso.gerenciadorinvestimentos.domain.IStockAsset
+import com.basso.gerenciadorinvestimentos.domain.IAsset
 import com.basso.gerenciadorinvestimentos.domain.IWallet
 import com.basso.gerenciadorinvestimentos.domain.concrete.Client
-import com.basso.gerenciadorinvestimentos.domain.concrete.StockAsset
+import com.basso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.basso.gerenciadorinvestimentos.domain.concrete.User
 import com.basso.gerenciadorinvestimentos.domain.concrete.Wallet
 import org.springframework.beans.factory.annotation.Qualifier
@@ -40,7 +41,7 @@ class ClientServiceProxyImpl (
     }
 
     override fun getWalletCollection(cpf: String)
-            = this.clientService.getWalletCollection(cpf).map { it.getDto() }
+            = this.clientService.getWalletCollection(cpf).map { it.getSmallDto() }
 
     override fun getWallet(cpf: String, broker: String)
             = this.clientService.getWallet(cpf, broker).getDto()
@@ -90,11 +91,16 @@ private fun IWallet.getDto() = WalletDto(
         loss = this.loss,
         balanceDaytrade = this.balanceDaytrade,
         balance = this.balance,
-        stockAsset = this.stockAsset.map { it.getDto() }
+        stockAsset = this.asset.map { it.getDto() }
 )
 
-private fun IStockAsset.getDto() = StockAssetDto(
-        stockSymbol = (this as StockAsset).stock.symbol,
+private fun IWallet.getSmallDto() = WalletSmallDto(
+        name = (this as WalletRequest).name,
+        broker = this.broker
+)
+
+private fun IAsset.getDto() = AssetDto(
+        stockSymbol = (this as Asset).stock.symbol,
         averageCost = this.averageCost,
         amount = this.amount
 )

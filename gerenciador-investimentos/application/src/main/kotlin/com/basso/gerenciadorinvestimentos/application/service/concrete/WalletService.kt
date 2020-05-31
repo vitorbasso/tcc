@@ -45,7 +45,7 @@ internal class WalletService(
             balanceDaytrade = walletToUpdate.balanceDaytrade,
             balance = walletToUpdate.balance,
             client = walletToUpdate.client,
-            stockAsset = walletToUpdate.stockAsset
+            asset = walletToUpdate.asset
     ))
 
     fun deleteWallet(wallet: Wallet) {
