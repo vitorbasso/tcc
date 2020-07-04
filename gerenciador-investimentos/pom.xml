@@ -50,6 +50,7 @@
         <kotlin.version>1.3.71</kotlin.version>
         <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
         <mockk.version>1.10.0</mockk.version>
+        <detekt-maven-plugin.version>1.9.1</detekt-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -170,6 +171,24 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.ozsie</groupId>
+                <artifactId>detekt-maven-plugin</artifactId>
+                <version>${detekt-maven-plugin.version}</version>
+                <configuration>
+                    <config>./default-detekt-config.yml</config>
+                    <failFast>true</failFast>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
