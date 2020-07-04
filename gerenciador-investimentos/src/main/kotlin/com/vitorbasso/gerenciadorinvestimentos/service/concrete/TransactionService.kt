@@ -6,6 +6,4 @@ import org.springframework.stereotype.Service
 @Service
 class TransactionService(
         val transactionRepository: TransactionRepository
-) {
-
-}
+)

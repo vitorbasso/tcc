@@ -1,0 +1,24 @@
+name: Gerenciador de Investimentos PULL REQUEST
+
+on:
+  pull_request:
+    branches: [develop, release, main]
+
+jobs:
+  pr-verification:
+    name: PR Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: build
+        run: mvn verify

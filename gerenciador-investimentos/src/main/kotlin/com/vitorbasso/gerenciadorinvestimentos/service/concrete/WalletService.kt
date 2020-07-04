@@ -20,7 +20,7 @@ internal class WalletService(
             broker: String,
             exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     )
-            = if(exists(cpf, broker)) this.walletRepository.findByBrokerAndClient_Cpf(broker, cpf)
+            = if(exists(cpf, broker)) this.walletRepository.findByBrokerAndClientCpf(broker, cpf)
             else throw exception
 
     fun saveWallet(client: Client, walletToSave: Wallet): Wallet {
@@ -53,6 +53,6 @@ internal class WalletService(
     }
 
     private fun exists(cpf: String, broker: String)
-            = this.walletRepository.existsByBrokerAndClient_Cpf(broker, cpf)
+            = this.walletRepository.existsByBrokerAndClientCpf(broker, cpf)
 
 }
