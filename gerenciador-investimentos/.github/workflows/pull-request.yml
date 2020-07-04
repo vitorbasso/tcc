@@ -2,7 +2,7 @@ name: Gerenciador de Investimentos PULL REQUEST
 
 on:
   pull_request:
-    branches: [develop, release, main]
+    branches: [develop, release, master]
 
 jobs:
   pr-verification:
