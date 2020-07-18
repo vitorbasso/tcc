@@ -61,6 +61,10 @@ class ExceptionAdvice (
             )
 
     private fun getLocalizedMessage(cause: String?)
-            = this.messageSource.getMessage(cause ?: "", null, LocaleContextHolder.getLocale())
+            = try{
+        this.messageSource.getMessage(cause ?: "", null, LocaleContextHolder.getLocale())
+    } catch (e: Exception) {
+        cause?:""
+    }
 
 }

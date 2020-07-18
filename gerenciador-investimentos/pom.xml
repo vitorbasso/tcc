@@ -51,6 +51,7 @@
         <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
         <mockk.version>1.10.0</mockk.version>
         <detekt-maven-plugin.version>1.9.1</detekt-maven-plugin.version>
+        <jjwt.version>0.9.1</jjwt.version>
     </properties>
 
     <dependencyManagement>
@@ -91,6 +92,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
         </dependency>
 
         <!-- db related dependencies -->

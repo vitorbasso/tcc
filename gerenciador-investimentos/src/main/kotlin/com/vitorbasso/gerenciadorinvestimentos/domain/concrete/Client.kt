@@ -2,6 +2,8 @@ package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
 import com.vitorbasso.gerenciadorinvestimentos.domain.IClient
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -15,7 +17,7 @@ data class Client (
 
         val email: String = "",
 
-        val password: String = "",
+        private val password: String = "",
 
         val firstName: String = "",
 
@@ -26,4 +28,19 @@ data class Client (
         @OneToMany(mappedBy = "client",  cascade = [CascadeType.ALL])
         val wallet: List<Wallet> = listOf()
 
-) : BaseEntity(), IClient
+) : BaseEntity(), IClient, UserDetails {
+
+        override fun getUsername() = this.email
+
+        override fun getPassword() = this.password
+
+        override fun getAuthorities() = emptyList<GrantedAuthority>()
+
+        override fun isEnabled() = true
+
+        override fun isCredentialsNonExpired() = true
+
+        override fun isAccountNonExpired() = true
+
+        override fun isAccountNonLocked() = true
+}
