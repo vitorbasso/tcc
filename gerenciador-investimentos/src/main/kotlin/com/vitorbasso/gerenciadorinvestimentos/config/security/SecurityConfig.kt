@@ -1,5 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.config.security
 
+import com.vitorbasso.gerenciadorinvestimentos.filter.security.AuthenticationFilter
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.ClientDetailsService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -12,13 +13,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
         @Value("\${api-version}")
         private val apiVersion: String,
-        private val clientDetailsService: ClientDetailsService
+        private val clientDetailsService: ClientDetailsService,
+        private val authenticationFilter: AuthenticationFilter
 ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(auth: AuthenticationManagerBuilder) {
@@ -33,6 +36,7 @@ class SecurityConfig(
                 .antMatchers("${apiVersion}/authentication").permitAll()
                 .anyRequest().authenticated()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
     }
 
     @Bean

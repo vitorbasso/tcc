@@ -14,7 +14,8 @@ class AuthenticationService(
         private val authenticationManager: AuthenticationManager
 ) {
 
-    fun authenticate(authenticationRequest: AuthenticationRequest) = this.authenticationManager.authenticate(
+    fun authenticate(authenticationRequest: AuthenticationRequest)
+            = this.authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(authenticationRequest.username, authenticationRequest.password)
     ).let {
         AuthenticationDto(this.jwtUtil.generateToken(it.principal as Client))
