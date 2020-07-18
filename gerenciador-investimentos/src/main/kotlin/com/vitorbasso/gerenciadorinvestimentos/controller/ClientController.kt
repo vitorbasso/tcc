@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/\${api-version}/clients")
+@RequestMapping("\${api-version}/clients")
 class ClientController(
         val clientService: IClientService
 ) {

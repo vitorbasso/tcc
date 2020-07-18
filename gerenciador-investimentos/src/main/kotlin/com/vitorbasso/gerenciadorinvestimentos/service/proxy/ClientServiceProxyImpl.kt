@@ -5,7 +5,6 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.IClient
 import com.vitorbasso.gerenciadorinvestimentos.domain.IWallet
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Client
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.User
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.ClientRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.ClientUpdateRequest
@@ -70,12 +69,12 @@ private fun IClient.getDto() = ClientDto(
 )
 
 private fun IClient.getEntity() = Client(
-        email = (this as ClientRequest).email,
-        cpf = this.cpf,
+        cpf = (this as ClientRequest).cpf,
+        email = this.email,
+        password = this.password,
         firstName = this.firstName,
         lastName = this.lastName,
-        avatarImage = this.avatarImage,
-        user = User(password = this.password)
+        avatarImage = this.avatarImage
 )
 
 private fun IWallet.getEntity() = Wallet(

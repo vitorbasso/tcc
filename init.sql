@@ -1,24 +1,15 @@
 use `gerenciador_investimento`;
 
-create table if not exists `user`(
-	`id` bigint auto_increment,
-    `password` varchar(255) not null,
-    `date_created` timestamp not null,
-    `date_updated` timestamp,
-    primary key (`id`)
-)engine=InnoDB;
-
 create table if not exists `client`(
 	`cpf` varchar(20),
 	`email` varchar(255) not null unique,
+    `password` varchar(255) not null,
 	`first_name` varchar(255) not null,
     `last_name` varchar(255),
     `avatar_image` varchar(255),
-    `user_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
-    primary key (`cpf`),
-    foreign key (`user_id`) references `user` (`id`)
+    primary key (`cpf`)
 )engine=InnoDB;
 
 create table if not exists `wallet`(

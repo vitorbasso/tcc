@@ -27,12 +27,12 @@ internal class ClientService (
     fun updateClient(clientToUpdate: Client, updateRequest: ClientUpdateRequest)
             = this.clientRepository.save(
             Client(
-                    email = clientToUpdate.email,
                     cpf = clientToUpdate.cpf,
+                    email = clientToUpdate.email,
+                    password = clientToUpdate.password,
                     firstName = updateRequest.firstName ?: clientToUpdate.firstName,
                     lastName = updateRequest.lastName ?: clientToUpdate.lastName,
                     avatarImage = updateRequest.avatarImage ?: clientToUpdate.avatarImage,
-                    user = clientToUpdate.user,
                     wallet = clientToUpdate.wallet
             )
     )
