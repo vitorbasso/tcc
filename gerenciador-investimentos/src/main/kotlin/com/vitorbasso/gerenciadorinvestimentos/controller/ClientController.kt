@@ -1,11 +1,13 @@
 package com.vitorbasso.gerenciadorinvestimentos.controller
 
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Client
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.ClientRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.ClientUpdateRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletUpdateRequest
 import com.vitorbasso.gerenciadorinvestimentos.service.IClientService
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -23,49 +25,58 @@ class ClientController(
         val clientService: IClientService
 ) {
 
-    @GetMapping("/{cpf}")
-    fun getClient(@PathVariable cpf: String)
-            = this.clientService.getClient(cpf)
+    @GetMapping
+    fun getClient(@AuthenticationPrincipal clientDetails: Client)
+            = this.clientService.getClient(clientDetails.cpf)
 
     @PostMapping
     fun saveClient(@RequestBody @Valid clientRequest: ClientRequest)
             = this.clientService.saveClient(clientRequest)
 
-    @PutMapping("/{cpf}")
-    fun updateClient(@PathVariable cpf: String, @RequestBody @Valid clientUpdateRequest: ClientUpdateRequest)
-            = this.clientService.updateClient(cpf, clientUpdateRequest)
+    @PutMapping
+    fun updateClient(
+            @AuthenticationPrincipal clientDetails: Client,
+            @RequestBody @Valid clientUpdateRequest: ClientUpdateRequest
+    )
+            = this.clientService.updateClient(clientDetails.cpf, clientUpdateRequest)
 
-    @DeleteMapping("/{cpf}")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteClient(@PathVariable cpf: String){
-        this.clientService.deleteClient(cpf)
+    fun deleteClient(@AuthenticationPrincipal clientDetails: Client){
+        this.clientService.deleteClient(clientDetails.cpf)
     }
 
-    @GetMapping("/{cpf}/wallets")
-    fun getWallets(@PathVariable cpf: String)
-            = this.clientService.getWalletCollection(cpf)
+    @GetMapping("/wallets")
+    fun getWallets(@AuthenticationPrincipal clientDetails: Client)
+            = this.clientService.getWalletCollection(clientDetails.cpf)
 
-    @GetMapping("/{cpf}/wallets/{broker}")
-    fun getWallet(@PathVariable cpf: String, @PathVariable broker: String)
-            = this.clientService.getWallet(cpf, broker)
+    @GetMapping("/wallets/{broker}")
+    fun getWallet(
+            @AuthenticationPrincipal clientDetails: Client,
+            @PathVariable broker: String
+    )
+            = this.clientService.getWallet(clientDetails.cpf, broker)
 
-    @PostMapping("/{cpf}/wallets")
-    fun saveWallet(@PathVariable cpf: String, @RequestBody walletRequest: WalletRequest)
-            = this.clientService.saveWallet(cpf, walletRequest)
+    @PostMapping("/wallets")
+    fun saveWallet(
+            @AuthenticationPrincipal clientDetails: Client,
+            @RequestBody walletRequest: WalletRequest
+    )
+            = this.clientService.saveWallet(clientDetails.cpf, walletRequest)
 
-    @PutMapping("/{cpf}/wallets/{broker}")
+    @PutMapping("/wallets/{broker}")
     fun updateWallet(
-            @PathVariable cpf: String,
+            @AuthenticationPrincipal clientDetails: Client,
             @PathVariable broker: String,
             @RequestBody walletUpdateRequest: WalletUpdateRequest
     ) = this.clientService.updateWallet(
-            cpf = cpf,
+            cpf = clientDetails.cpf,
             broker = broker,
             walletUpdateRequest = walletUpdateRequest
     )
 
-    @DeleteMapping("/{cpf}/wallets/{broker}")
-    fun deleteWallet(@PathVariable cpf: String, @PathVariable broker: String)
-            = this.clientService.deleteWallet(cpf, broker)
+    @DeleteMapping("/wallets/{broker}")
+    fun deleteWallet(@AuthenticationPrincipal clientDetails: Client, @PathVariable broker: String)
+            = this.clientService.deleteWallet(clientDetails.cpf, broker)
 
 }

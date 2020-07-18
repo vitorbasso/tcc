@@ -20,7 +20,7 @@ internal class ClientService (
             cpf: String,
             exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     )
-            = if(exists(cpf)) clientRepository.findByCpf(cpf) else throw exception
+            = clientRepository.findByCpf(cpf) ?: throw exception
 
     fun saveClient(clientToSave: Client)
             = if(!exists(clientToSave.cpf))
