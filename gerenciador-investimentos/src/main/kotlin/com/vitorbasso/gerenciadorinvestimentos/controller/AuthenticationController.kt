@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("\${api-version}/authentication")
@@ -14,7 +15,7 @@ class AuthenticationController(
 ) {
 
     @PostMapping
-    fun authenticate(@RequestBody authenticationRequest: AuthenticationRequest)
+    fun authenticate(@RequestBody @Valid authenticationRequest: AuthenticationRequest)
             = this.authenticationService.authenticate(authenticationRequest)
 
 }

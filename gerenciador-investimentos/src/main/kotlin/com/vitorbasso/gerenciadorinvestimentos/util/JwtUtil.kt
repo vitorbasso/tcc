@@ -1,5 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.util
 
+import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
+import com.vitorbasso.gerenciadorinvestimentos.exception.CustomForbiddenException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
@@ -21,7 +23,11 @@ class JwtUtil(
 
     fun isTokenExpired(token: String) = getTokenBody(token).expiration.before(Date())
 
-    private fun getTokenBody(token: String) = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).body
+    private fun getTokenBody(token: String) = try {
+            Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).body
+        } catch (ex: Exception) {
+            throw CustomForbiddenException(ManagerErrorCode.MANAGER_09)
+        }
 
     private fun generateToken(claims: Map<String, Any>, userDetails: UserDetails)
             = Jwts.builder()

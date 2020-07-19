@@ -50,7 +50,7 @@ internal class ClientServiceFacadeImpl(
             this.walletService.getWallet(
                     client = getClientDetails(),
                     broker = broker,
-                    exception = CustomBadRequestException(ManagerErrorCode.MANAGER_09)
+                    exception = CustomBadRequestException(ManagerErrorCode.MANAGER_06)
             ),
             walletUpdateRequest
     )
@@ -60,7 +60,7 @@ internal class ClientServiceFacadeImpl(
                 this.walletService.getWallet(
                         client = getClientDetails(),
                         broker = broker,
-                        exception = CustomBadRequestException(ManagerErrorCode.MANAGER_10)
+                        exception = CustomBadRequestException(ManagerErrorCode.MANAGER_07)
                 )
         )
     }

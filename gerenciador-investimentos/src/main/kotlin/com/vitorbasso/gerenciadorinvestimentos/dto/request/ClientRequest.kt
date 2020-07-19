@@ -11,8 +11,8 @@ data class ClientRequest(
         @field:NotBlank(message = "error.request.body.fields.client.email.format")
         @field:Email(message = "error.request.body.fields.client.email.format")
         val email: String,
-        @field:NotBlank(message = "error.request.body.fields.password.not-blank")
-        @field:Size(message = "error.request.body.fields.password.size", min = 8, max = 30)
+        @field:NotBlank(message = "error.request.body.fields.password.format")
+        @field:Size(message = "error.request.body.fields.password.format", min = 8, max = 30)
         val password: String,
         @field:CPF(message = "error.request.body.fields.client.cpf")
         val cpf: String,
