@@ -2,6 +2,7 @@ package com.vitorbasso.gerenciadorinvestimentos.util
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
@@ -18,7 +19,11 @@ class JwtUtil(
 
     fun generateToken(userDetails: UserDetails) = generateToken(hashMapOf(), userDetails)
 
-    fun getTokenBody(token: String) = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).body
+    fun getTokenBody(token: String) = try{
+        Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).body
+    }catch (ex: MalformedJwtException) {
+        null
+    }
 
     fun isTokenValid(claims: Claims?) = claims != null && claims.expiration.after(Date())
 
