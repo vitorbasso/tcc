@@ -17,6 +17,7 @@ import com.vitorbasso.gerenciadorinvestimentos.dto.response.WalletSmallDto
 import com.vitorbasso.gerenciadorinvestimentos.service.IClientService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,37 +27,37 @@ class ClientServiceProxyImpl (
         private val clientService: IClientService
 ) : IClientService {
 
-    override fun getClient(cpf: String)
-            = this.clientService.getClient(cpf).getDto()
+    override fun getClient(id: Long)
+            = this.clientService.getClient(id).getDto()
 
     override fun saveClient(clientToSave: IClient)
             = this.clientService.saveClient(clientToSave.getEntity()).getDto()
 
-    override fun updateClient(cpf: String, clientUpdateRequest: ClientUpdateRequest)
-            = this.clientService.updateClient(cpf, clientUpdateRequest).getDto()
+    override fun updateClient(id: Long, clientUpdateRequest: ClientUpdateRequest)
+            = this.clientService.updateClient(id, clientUpdateRequest).getDto()
 
-    override fun deleteClient(cpf: String) {
-        this.clientService.deleteClient(cpf)
+    override fun deleteClient(id: Long) {
+        this.clientService.deleteClient(id)
     }
 
-    override fun getWalletCollection(cpf: String)
-            = this.clientService.getWalletCollection(cpf).map { it.getSmallDto() }
+    override fun getWalletCollection(id: Long)
+            = this.clientService.getWalletCollection(id).map { it.getSmallDto() }
 
-    override fun getWallet(cpf: String, broker: String)
-            = this.clientService.getWallet(cpf, broker).getDto()
+    override fun getWallet(id: Long, broker: String)
+            = this.clientService.getWallet(id, broker).getDto()
 
-    override fun saveWallet(cpf: String, walletToSave: IWallet)
-            = this.clientService.saveWallet(cpf, walletToSave.getEntity()).getDto()
+    override fun saveWallet(id: Long, walletToSave: IWallet)
+            = this.clientService.saveWallet(id, walletToSave.getEntity()).getDto()
 
-    override fun updateWallet(cpf: String, broker: String, walletUpdateRequest: WalletUpdateRequest)
+    override fun updateWallet(id: Long, broker: String, walletUpdateRequest: WalletUpdateRequest)
             = this.clientService.updateWallet(
-            cpf = cpf,
+            id = id,
             broker = broker,
             walletUpdateRequest = walletUpdateRequest
     ).getDto()
 
-    override fun deleteWallet(cpf: String, broker: String) {
-        this.clientService.deleteWallet(cpf, broker)
+    override fun deleteWallet(id: Long, broker: String) {
+        this.clientService.deleteWallet(id, broker)
     }
 }
 
@@ -80,7 +81,7 @@ private fun IClient.getEntity() = Client(
 private fun IWallet.getEntity() = Wallet(
         name = (this as WalletRequest).name,
         broker = this.broker,
-        client = Client()
+        client = SecurityContextHolder.getContext().authentication.principal as Client
 )
 
 private fun IWallet.getDto() = WalletDto(

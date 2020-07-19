@@ -19,54 +19,54 @@ internal class ClientServiceFacadeImpl(
         private val walletService: WalletService
 ) : IClientService {
 
-    override fun getClient(cpf: String) = this.clientService.getClient(cpf)
+    override fun getClient(id: Long) = this.clientService.getClient(id)
 
     override fun saveClient(clientToSave: IClient)= this.clientService.saveClient(clientToSave as Client)
 
-    override fun updateClient(cpf: String, clientUpdateRequest: ClientUpdateRequest)
+    override fun updateClient(id: Long, clientUpdateRequest: ClientUpdateRequest)
             = this.clientService.updateClient(
             this.clientService.getClient(
-                    cpf,
+                    id,
                     CustomBadRequestException(ManagerErrorCode.MANAGER_05)
             ),
             clientUpdateRequest
     )
 
-    override fun deleteClient(cpf: String)
+    override fun deleteClient(id: Long)
             = this.clientService.deleteClient(
                     this.clientService.getClient(
-                            cpf,
+                            id,
                             CustomBadRequestException(ManagerErrorCode.MANAGER_06)
                     )
             )
 
-    override fun getWalletCollection(cpf: String) = this.clientService.getClient(cpf).wallet
+    override fun getWalletCollection(id: Long) = this.clientService.getClient(id).wallet
 
-    override fun getWallet(cpf: String, broker: String) = this.walletService.getWallet(cpf, broker)
+    override fun getWallet(id: Long, broker: String) = this.walletService.getWallet(id, broker)
 
-    override fun saveWallet(cpf: String, walletToSave: IWallet)
+    override fun saveWallet(id: Long, walletToSave: IWallet)
             = this.walletService.saveWallet(
             this.clientService.getClient(
-                    cpf,
+                    id,
                     CustomBadRequestException(ManagerErrorCode.MANAGER_08)
             ),
             walletToSave as Wallet
     )
 
-    override fun updateWallet(cpf: String, broker: String, walletUpdateRequest: WalletUpdateRequest)
+    override fun updateWallet(id: Long, broker: String, walletUpdateRequest: WalletUpdateRequest)
             = this.walletService.updateWallet(
             this.walletService.getWallet(
-                    cpf = cpf,
+                    id = id,
                     broker = broker,
                     exception = CustomBadRequestException(ManagerErrorCode.MANAGER_09)
             ),
             walletUpdateRequest
     )
 
-    override fun deleteWallet(cpf: String, broker: String) {
+    override fun deleteWallet(id: Long, broker: String) {
         this.walletService.deleteWallet(
                 this.walletService.getWallet(
-                        cpf = cpf,
+                        id = id,
                         broker = broker,
                         exception = CustomBadRequestException(ManagerErrorCode.MANAGER_10)
                 )

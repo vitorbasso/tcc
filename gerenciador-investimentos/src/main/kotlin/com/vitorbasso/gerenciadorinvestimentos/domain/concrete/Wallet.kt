@@ -24,7 +24,7 @@ data class Wallet(
         val balance: java.math.BigDecimal = java.math.BigDecimal(0),
 
         @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "client_cpf", referencedColumnName = "cpf")
+        @JoinColumn(name = "client_id", referencedColumnName = "id")
         val client: Client,
 
         @OneToMany(mappedBy = "wallet")

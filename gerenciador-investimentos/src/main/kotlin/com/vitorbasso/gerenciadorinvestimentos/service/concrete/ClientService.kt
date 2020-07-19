@@ -7,6 +7,7 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestExcepti
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.repository.ClientRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -17,10 +18,10 @@ internal class ClientService (
 ) {
 
     fun getClient(
-            cpf: String,
+            id: Long,
             exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     )
-            = clientRepository.findByCpf(cpf) ?: throw exception
+            = clientRepository.findByIdOrNull(id) ?: throw exception
 
     fun saveClient(clientToSave: Client)
             = if(!exists(clientToSave.cpf))

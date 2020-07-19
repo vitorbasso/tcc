@@ -1,7 +1,8 @@
 use `gerenciador_investimento`;
 
 create table if not exists `client`(
-	`cpf` varchar(20),
+	`id` bigint auto_increment,
+	`cpf` varchar(20) not null unique,
 	`email` varchar(255) not null unique,
     `password` varchar(255) not null,
 	`first_name` varchar(255) not null,
@@ -9,22 +10,22 @@ create table if not exists `client`(
     `avatar_image` varchar(255),
     `date_created` timestamp not null,
     `date_updated` timestamp,
-    primary key (`cpf`)
+    primary key (`id`)
 )engine=InnoDB;
 
 create table if not exists `wallet`(
 	`id` bigint auto_increment,
-	`name` varchar(255),
-    `broker` varchar(255),
+	`name` varchar(255) not null,
+    `broker` varchar(255) not null,
     `loss_daytrade` decimal(13,2),
     `loss` decimal(13,2),
     `balance_daytrade` decimal(13,2),
     `balance` decimal(13,2),
-    `client_cpf` varchar(255) not null,
+    `client_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
     primary key (`id`),
-    foreign key (`client_cpf`) references `client` (`cpf`)
+    foreign key (`client_id`) references `client` (`id`)
 )engine=InnoDB;
 
 create table if not exists `stock` (

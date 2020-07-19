@@ -16,15 +16,14 @@ internal class WalletService(
 ) {
 
     fun getWallet(
-            cpf: String,
+            id: Long,
             broker: String,
             exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     )
-            = if(exists(cpf, broker)) this.walletRepository.findByBrokerAndClientCpf(broker, cpf)
-            else throw exception
+            = this.walletRepository.findByBrokerAndClientId(broker, id) ?: throw exception
 
     fun saveWallet(client: Client, walletToSave: Wallet): Wallet {
-        if(exists(client.cpf, walletToSave.broker)) throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
+        if(exists(client.id, walletToSave.broker)) throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
         val walletToSaveComplete = Wallet(
                 name = walletToSave.name,
@@ -36,23 +35,16 @@ internal class WalletService(
     }
 
     fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest)
-            = this.walletRepository.save(Wallet(
-            id = walletToUpdate.id,
+            = this.walletRepository.save(walletToUpdate.copy(
             name = walletUpdateRequest.name ?: walletToUpdate.name,
-            broker = walletUpdateRequest.broker ?: walletToUpdate.broker,
-            lossDaytrade = walletToUpdate.lossDaytrade,
-            loss = walletToUpdate.loss,
-            balanceDaytrade = walletToUpdate.balanceDaytrade,
-            balance = walletToUpdate.balance,
-            client = walletToUpdate.client,
-            asset = walletToUpdate.asset
+            broker = walletUpdateRequest.broker ?: walletToUpdate.broker
     ))
 
     fun deleteWallet(wallet: Wallet) {
         this.walletRepository.delete(wallet)
     }
 
-    private fun exists(cpf: String, broker: String)
-            = this.walletRepository.existsByBrokerAndClientCpf(broker, cpf)
+    private fun exists(id: Long, broker: String)
+            = this.walletRepository.existsByBrokerAndClientId(broker, id)
 
 }

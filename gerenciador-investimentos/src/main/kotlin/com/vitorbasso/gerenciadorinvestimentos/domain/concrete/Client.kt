@@ -6,6 +6,8 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.CascadeType
 import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.OneToMany
 
@@ -13,6 +15,9 @@ import javax.persistence.OneToMany
 data class Client (
 
         @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        val id: Long = 0,
+
         val cpf: String = "",
 
         val email: String = "",
