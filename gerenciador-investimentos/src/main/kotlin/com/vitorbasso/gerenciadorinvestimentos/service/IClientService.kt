@@ -7,22 +7,22 @@ import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletUpdateRequest
 
 interface IClientService {
 
-    fun getClient(id: Long): IClient
+    fun getClient(client: IClient): IClient
 
     fun saveClient(clientToSave: IClient) : IClient
 
-    fun updateClient(id: Long, clientUpdateRequest: ClientUpdateRequest) : IClient
+    fun updateClient(client: IClient, clientUpdateRequest: ClientUpdateRequest) : IClient
 
-    fun deleteClient(id: Long)
+    fun deleteClient(client: IClient)
 
-    fun getWalletCollection(id: Long) : List<IWallet>
+    fun getWalletCollection(client: IClient) : List<IWallet>
 
-    fun getWallet(id: Long, broker: String) : IWallet
+    fun getWallet(client: IClient, broker: String) : IWallet
 
-    fun saveWallet(id: Long, walletToSave: IWallet) : IWallet
+    fun saveWallet(client: IClient, walletToSave: IWallet) : IWallet
 
-    fun updateWallet(id: Long, broker: String, walletUpdateRequest: WalletUpdateRequest) : IWallet
+    fun updateWallet(client: IClient, broker: String, walletUpdateRequest: WalletUpdateRequest) : IWallet
 
-    fun deleteWallet(id: Long, broker: String)
+    fun deleteWallet(client: IClient, broker: String)
 
 }

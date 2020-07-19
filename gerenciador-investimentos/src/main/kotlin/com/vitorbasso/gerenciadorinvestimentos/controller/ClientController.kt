@@ -27,7 +27,7 @@ class ClientController(
 
     @GetMapping
     fun getClient(@AuthenticationPrincipal clientDetails: Client)
-            = this.clientService.getClient(clientDetails.id)
+            = this.clientService.getClient(clientDetails)
 
     @PostMapping
     fun saveClient(@RequestBody @Valid clientRequest: ClientRequest)
@@ -38,31 +38,31 @@ class ClientController(
             @AuthenticationPrincipal clientDetails: Client,
             @RequestBody @Valid clientUpdateRequest: ClientUpdateRequest
     )
-            = this.clientService.updateClient(clientDetails.id, clientUpdateRequest)
+            = this.clientService.updateClient(clientDetails, clientUpdateRequest)
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteClient(@AuthenticationPrincipal clientDetails: Client){
-        this.clientService.deleteClient(clientDetails.id)
+        this.clientService.deleteClient(clientDetails)
     }
 
     @GetMapping("/wallets")
     fun getWallets(@AuthenticationPrincipal clientDetails: Client)
-            = this.clientService.getWalletCollection(clientDetails.id)
+            = this.clientService.getWalletCollection(clientDetails)
 
     @GetMapping("/wallets/{broker}")
     fun getWallet(
             @AuthenticationPrincipal clientDetails: Client,
             @PathVariable broker: String
     )
-            = this.clientService.getWallet(clientDetails.id, broker)
+            = this.clientService.getWallet(clientDetails, broker)
 
     @PostMapping("/wallets")
     fun saveWallet(
             @AuthenticationPrincipal clientDetails: Client,
             @RequestBody walletRequest: WalletRequest
     )
-            = this.clientService.saveWallet(clientDetails.id, walletRequest)
+            = this.clientService.saveWallet(clientDetails, walletRequest)
 
     @PutMapping("/wallets/{broker}")
     fun updateWallet(
@@ -70,13 +70,13 @@ class ClientController(
             @PathVariable broker: String,
             @RequestBody walletUpdateRequest: WalletUpdateRequest
     ) = this.clientService.updateWallet(
-            id = clientDetails.id,
+            client = clientDetails,
             broker = broker,
             walletUpdateRequest = walletUpdateRequest
     )
 
     @DeleteMapping("/wallets/{broker}")
     fun deleteWallet(@AuthenticationPrincipal clientDetails: Client, @PathVariable broker: String)
-            = this.clientService.deleteWallet(clientDetails.id, broker)
+            = this.clientService.deleteWallet(clientDetails, broker)
 
 }

@@ -27,37 +27,37 @@ class ClientServiceProxyImpl (
         private val clientService: IClientService
 ) : IClientService {
 
-    override fun getClient(id: Long)
-            = this.clientService.getClient(id).getDto()
+    override fun getClient(client: IClient)
+            = this.clientService.getClient(client).getDto()
 
     override fun saveClient(clientToSave: IClient)
             = this.clientService.saveClient(clientToSave.getEntity()).getDto()
 
-    override fun updateClient(id: Long, clientUpdateRequest: ClientUpdateRequest)
-            = this.clientService.updateClient(id, clientUpdateRequest).getDto()
+    override fun updateClient(client: IClient, clientUpdateRequest: ClientUpdateRequest)
+            = this.clientService.updateClient(client, clientUpdateRequest).getDto()
 
-    override fun deleteClient(id: Long) {
-        this.clientService.deleteClient(id)
+    override fun deleteClient(client: IClient) {
+        this.clientService.deleteClient(client)
     }
 
-    override fun getWalletCollection(id: Long)
-            = this.clientService.getWalletCollection(id).map { it.getSmallDto() }
+    override fun getWalletCollection(client: IClient)
+            = this.clientService.getWalletCollection(client).map { it.getSmallDto() }
 
-    override fun getWallet(id: Long, broker: String)
-            = this.clientService.getWallet(id, broker).getDto()
+    override fun getWallet(client: IClient, broker: String)
+            = this.clientService.getWallet(client, broker).getDto()
 
-    override fun saveWallet(id: Long, walletToSave: IWallet)
-            = this.clientService.saveWallet(id, walletToSave.getEntity()).getDto()
+    override fun saveWallet(client: IClient, walletToSave: IWallet)
+            = this.clientService.saveWallet(client, walletToSave.getEntity()).getDto()
 
-    override fun updateWallet(id: Long, broker: String, walletUpdateRequest: WalletUpdateRequest)
+    override fun updateWallet(client: IClient, broker: String, walletUpdateRequest: WalletUpdateRequest)
             = this.clientService.updateWallet(
-            id = id,
+            client = client,
             broker = broker,
             walletUpdateRequest = walletUpdateRequest
     ).getDto()
 
-    override fun deleteWallet(id: Long, broker: String) {
-        this.clientService.deleteWallet(id, broker)
+    override fun deleteWallet(client: IClient, broker: String) {
+        this.clientService.deleteWallet(client, broker)
     }
 }
 
