@@ -23,7 +23,7 @@ internal class ClientService (
     )= clientRepository.findByIdOrNull(id) ?: throw exception
 
     fun saveClient(clientToSave: Client)
-            = if(!exists(clientToSave.id))
+            = if(!exists(clientToSave.cpf, clientToSave.email))
         this.clientRepository.save(clientToSave.copy(password = this.passwordEncoder.encode(clientToSave.password)))
         else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
@@ -38,6 +38,6 @@ internal class ClientService (
         this.clientRepository.delete(clientToDelete)
     }
 
-    private fun exists(id: Long) = this.clientRepository.existsById(id)
+    private fun exists(cpf: String, email: String) = this.clientRepository.existsByCpfOrEmail(cpf, email)
 
 }
