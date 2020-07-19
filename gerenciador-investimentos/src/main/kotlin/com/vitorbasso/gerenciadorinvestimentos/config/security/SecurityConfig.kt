@@ -1,6 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.config.security
 
 import com.vitorbasso.gerenciadorinvestimentos.filter.security.AuthenticationFilter
+import com.vitorbasso.gerenciadorinvestimentos.filter.security.RestAuthenticationEntryPoint
 import com.vitorbasso.gerenciadorinvestimentos.service.security.ClientDetailsService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -21,11 +22,12 @@ class SecurityConfig(
         @Value("\${api-version}")
         private val apiVersion: String,
         private val clientDetailsService: ClientDetailsService,
-        private val authenticationFilter: AuthenticationFilter
+        private val authenticationFilter: AuthenticationFilter,
+        private val restAuthenticationEntryPoint: RestAuthenticationEntryPoint
 ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.userDetailsService(this.clientDetailsService)
+        auth.userDetailsService(this.clientDetailsService).passwordEncoder(passwordEncoder())
     }
 
     override fun configure(http: HttpSecurity) {
@@ -35,6 +37,7 @@ class SecurityConfig(
                 .antMatchers(HttpMethod.POST, "${apiVersion}/clients").permitAll()
                 .antMatchers("${apiVersion}/authentication").permitAll()
                 .anyRequest().authenticated()
+                .and().exceptionHandling().authenticationEntryPoint(this.restAuthenticationEntryPoint)
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
     }

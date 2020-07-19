@@ -20,8 +20,7 @@ internal class ClientService (
     fun getClient(
             id: Long,
             exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
-    )
-            = clientRepository.findByIdOrNull(id) ?: throw exception
+    )= clientRepository.findByIdOrNull(id) ?: throw exception
 
     fun saveClient(clientToSave: Client)
             = if(!exists(clientToSave.id))
