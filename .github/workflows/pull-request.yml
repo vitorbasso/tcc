@@ -21,4 +21,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: build
+        working-directory: ./gerenciador-investimentos
+        env:
+          GERENCIADOR-INVESTIMENTO_SECURITY_SECRET: ${{secrets.TOKENSIGNINGKEY}}
         run: mvn verify
