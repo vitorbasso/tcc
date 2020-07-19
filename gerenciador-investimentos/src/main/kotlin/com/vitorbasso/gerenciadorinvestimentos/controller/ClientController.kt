@@ -1,13 +1,11 @@
 package com.vitorbasso.gerenciadorinvestimentos.controller
 
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Client
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.ClientRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.ClientUpdateRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletUpdateRequest
 import com.vitorbasso.gerenciadorinvestimentos.service.IClientService
 import org.springframework.http.HttpStatus
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,57 +24,37 @@ class ClientController(
 ) {
 
     @GetMapping
-    fun getClient(@AuthenticationPrincipal clientDetails: Client)
-            = this.clientService.getClient(clientDetails)
+    fun getClient() = this.clientService.getClient()
 
     @PostMapping
     fun saveClient(@RequestBody @Valid clientRequest: ClientRequest)
             = this.clientService.saveClient(clientRequest)
 
     @PutMapping
-    fun updateClient(
-            @AuthenticationPrincipal clientDetails: Client,
-            @RequestBody @Valid clientUpdateRequest: ClientUpdateRequest
-    )
-            = this.clientService.updateClient(clientDetails, clientUpdateRequest)
+    fun updateClient(@RequestBody @Valid clientUpdateRequest: ClientUpdateRequest)
+            = this.clientService.updateClient(clientUpdateRequest)
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteClient(@AuthenticationPrincipal clientDetails: Client){
-        this.clientService.deleteClient(clientDetails)
+    fun deleteClient(){
+        this.clientService.deleteClient()
     }
 
     @GetMapping("/wallets")
-    fun getWallets(@AuthenticationPrincipal clientDetails: Client)
-            = this.clientService.getWalletCollection(clientDetails)
+    fun getWallets()
+            = this.clientService.getWalletCollection()
 
     @GetMapping("/wallets/{broker}")
-    fun getWallet(
-            @AuthenticationPrincipal clientDetails: Client,
-            @PathVariable broker: String
-    )
-            = this.clientService.getWallet(clientDetails, broker)
+    fun getWallet(@PathVariable broker: String) = this.clientService.getWallet(broker)
 
     @PostMapping("/wallets")
-    fun saveWallet(
-            @AuthenticationPrincipal clientDetails: Client,
-            @RequestBody walletRequest: WalletRequest
-    )
-            = this.clientService.saveWallet(clientDetails, walletRequest)
+    fun saveWallet(@RequestBody walletRequest: WalletRequest)= this.clientService.saveWallet(walletRequest)
 
     @PutMapping("/wallets/{broker}")
-    fun updateWallet(
-            @AuthenticationPrincipal clientDetails: Client,
-            @PathVariable broker: String,
-            @RequestBody walletUpdateRequest: WalletUpdateRequest
-    ) = this.clientService.updateWallet(
-            client = clientDetails,
-            broker = broker,
-            walletUpdateRequest = walletUpdateRequest
-    )
+    fun updateWallet(@PathVariable broker: String, @RequestBody walletUpdateRequest: WalletUpdateRequest)
+            = this.clientService.updateWallet(broker = broker, walletUpdateRequest = walletUpdateRequest)
 
     @DeleteMapping("/wallets/{broker}")
-    fun deleteWallet(@AuthenticationPrincipal clientDetails: Client, @PathVariable broker: String)
-            = this.clientService.deleteWallet(clientDetails, broker)
+    fun deleteWallet(@PathVariable broker: String) = this.clientService.deleteWallet(broker)
 
 }
