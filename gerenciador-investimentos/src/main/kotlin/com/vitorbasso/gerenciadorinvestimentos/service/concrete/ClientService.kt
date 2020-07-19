@@ -7,40 +7,37 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestExcepti
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.repository.ClientRepository
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 internal class ClientService (
-        private val clientRepository: ClientRepository
+        private val clientRepository: ClientRepository,
+        private val passwordEncoder: PasswordEncoder
 ) {
 
     fun getClient(
-            cpf: String,
+            id: Long,
             exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
-    )
-            = if(exists(cpf)) clientRepository.findByCpf(cpf) else throw exception
+    )= clientRepository.findByIdOrNull(id) ?: throw exception
 
     fun saveClient(clientToSave: Client)
-            = if(!exists(clientToSave.cpf)) this.clientRepository.save(clientToSave)
-            else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
+            = if(!exists(clientToSave.id))
+        this.clientRepository.save(clientToSave.copy(password = this.passwordEncoder.encode(clientToSave.password)))
+        else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
     fun updateClient(clientToUpdate: Client, updateRequest: ClientUpdateRequest)
-            = this.clientRepository.save(
-            Client(
-                    email = clientToUpdate.email,
-                    cpf = clientToUpdate.cpf,
-                    firstName = updateRequest.firstName ?: clientToUpdate.firstName,
-                    lastName = updateRequest.lastName ?: clientToUpdate.lastName,
-                    avatarImage = updateRequest.avatarImage ?: clientToUpdate.avatarImage,
-                    user = clientToUpdate.user,
-                    wallet = clientToUpdate.wallet
-            )
-    )
+            = this.clientRepository.save(clientToUpdate.copy(
+            firstName = updateRequest.firstName ?: clientToUpdate.firstName,
+            lastName = updateRequest.lastName ?: clientToUpdate.lastName,
+            avatarImage = updateRequest.avatarImage ?: clientToUpdate.avatarImage
+    ))
 
     fun deleteClient(clientToDelete: Client) {
         this.clientRepository.delete(clientToDelete)
     }
 
-    private fun exists(cpf: String) = this.clientRepository.existsByCpf(cpf)
+    private fun exists(id: Long) = this.clientRepository.existsById(id)
 
 }

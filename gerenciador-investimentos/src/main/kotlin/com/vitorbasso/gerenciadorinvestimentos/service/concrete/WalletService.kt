@@ -16,43 +16,27 @@ internal class WalletService(
 ) {
 
     fun getWallet(
-            cpf: String,
+            client: Client,
             broker: String,
             exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     )
-            = if(exists(cpf, broker)) this.walletRepository.findByBrokerAndClientCpf(broker, cpf)
-            else throw exception
+            = this.walletRepository.findByBrokerAndClient(broker, client) ?: throw exception
 
-    fun saveWallet(client: Client, walletToSave: Wallet): Wallet {
-        if(exists(client.cpf, walletToSave.broker)) throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
-
-        val walletToSaveComplete = Wallet(
-                name = walletToSave.name,
-                broker = walletToSave.broker,
-                client = client
-        )
-
-        return this.walletRepository.save(walletToSaveComplete)
-    }
+    fun saveWallet(client: Client, walletToSave: Wallet)
+            = if(!exists(client, walletToSave)) this.walletRepository.save(walletToSave.copy(client = client))
+        else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
     fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest)
-            = this.walletRepository.save(Wallet(
-            id = walletToUpdate.id,
+            = this.walletRepository.save(walletToUpdate.copy(
             name = walletUpdateRequest.name ?: walletToUpdate.name,
-            broker = walletUpdateRequest.broker ?: walletToUpdate.broker,
-            lossDaytrade = walletToUpdate.lossDaytrade,
-            loss = walletToUpdate.loss,
-            balanceDaytrade = walletToUpdate.balanceDaytrade,
-            balance = walletToUpdate.balance,
-            client = walletToUpdate.client,
-            asset = walletToUpdate.asset
+            broker = walletUpdateRequest.broker ?: walletToUpdate.broker
     ))
 
     fun deleteWallet(wallet: Wallet) {
         this.walletRepository.delete(wallet)
     }
 
-    private fun exists(cpf: String, broker: String)
-            = this.walletRepository.existsByBrokerAndClientCpf(broker, cpf)
+    private fun exists(client: Client, wallet: Wallet)
+            = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
 
 }
