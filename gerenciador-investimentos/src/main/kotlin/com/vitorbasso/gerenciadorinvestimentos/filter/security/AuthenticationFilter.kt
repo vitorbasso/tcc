@@ -1,6 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.filter.security
 
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.ClientDetailsService
+import com.vitorbasso.gerenciadorinvestimentos.service.security.ClientDetailsService
 import com.vitorbasso.gerenciadorinvestimentos.util.JwtUtil
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder

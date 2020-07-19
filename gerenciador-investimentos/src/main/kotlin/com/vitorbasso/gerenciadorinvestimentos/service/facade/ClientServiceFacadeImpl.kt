@@ -37,7 +37,7 @@ internal class ClientServiceFacadeImpl(
             = this.clientService.getClient(getClientDetails().id).wallet
 
     override fun getWallet(broker: String)
-            = this.walletService.getWallet(getClientDetails().id, broker)
+            = this.walletService.getWallet(getClientDetails(), broker)
 
     override fun saveWallet(walletToSave: IWallet)
             = this.walletService.saveWallet(
@@ -48,7 +48,7 @@ internal class ClientServiceFacadeImpl(
     override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest)
             = this.walletService.updateWallet(
             this.walletService.getWallet(
-                    id = getClientDetails().id,
+                    client = getClientDetails(),
                     broker = broker,
                     exception = CustomBadRequestException(ManagerErrorCode.MANAGER_09)
             ),
@@ -58,7 +58,7 @@ internal class ClientServiceFacadeImpl(
     override fun deleteWallet(broker: String) {
         this.walletService.deleteWallet(
                 this.walletService.getWallet(
-                        id = getClientDetails().id,
+                        client = getClientDetails(),
                         broker = broker,
                         exception = CustomBadRequestException(ManagerErrorCode.MANAGER_10)
                 )

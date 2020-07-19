@@ -16,23 +16,15 @@ internal class WalletService(
 ) {
 
     fun getWallet(
-            id: Long,
+            client: Client,
             broker: String,
             exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     )
-            = this.walletRepository.findByBrokerAndClientId(broker, id) ?: throw exception
+            = this.walletRepository.findByBrokerAndClient(broker, client) ?: throw exception
 
-    fun saveWallet(client: Client, walletToSave: Wallet): Wallet {
-        if(exists(client.id, walletToSave.broker)) throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
-
-        val walletToSaveComplete = Wallet(
-                name = walletToSave.name,
-                broker = walletToSave.broker,
-                client = client
-        )
-
-        return this.walletRepository.save(walletToSaveComplete)
-    }
+    fun saveWallet(client: Client, walletToSave: Wallet)
+            = if(!exists(client, walletToSave)) this.walletRepository.save(walletToSave.copy(client = client))
+        else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
     fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest)
             = this.walletRepository.save(walletToUpdate.copy(
@@ -44,7 +36,7 @@ internal class WalletService(
         this.walletRepository.delete(wallet)
     }
 
-    private fun exists(id: Long, broker: String)
-            = this.walletRepository.existsByBrokerAndClientId(broker, id)
+    private fun exists(client: Client, wallet: Wallet)
+            = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
 
 }

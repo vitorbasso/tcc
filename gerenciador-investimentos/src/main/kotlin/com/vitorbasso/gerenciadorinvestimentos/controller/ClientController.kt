@@ -41,8 +41,7 @@ class ClientController(
     }
 
     @GetMapping("/wallets")
-    fun getWallets()
-            = this.clientService.getWalletCollection()
+    fun getWallets() = this.clientService.getWalletCollection()
 
     @GetMapping("/wallets/{broker}")
     fun getWallet(@PathVariable broker: String) = this.clientService.getWallet(broker)
@@ -52,7 +51,7 @@ class ClientController(
 
     @PutMapping("/wallets/{broker}")
     fun updateWallet(@PathVariable broker: String, @RequestBody walletUpdateRequest: WalletUpdateRequest)
-            = this.clientService.updateWallet(broker = broker, walletUpdateRequest = walletUpdateRequest)
+            = this.clientService.updateWallet(broker, walletUpdateRequest)
 
     @DeleteMapping("/wallets/{broker}")
     fun deleteWallet(@PathVariable broker: String) = this.clientService.deleteWallet(broker)

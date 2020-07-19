@@ -1,4 +1,4 @@
-package com.vitorbasso.gerenciadorinvestimentos.service.concrete
+package com.vitorbasso.gerenciadorinvestimentos.service.security
 
 import com.vitorbasso.gerenciadorinvestimentos.repository.ClientRepository
 import org.springframework.security.core.userdetails.UserDetailsService

@@ -1,4 +1,4 @@
-package com.vitorbasso.gerenciadorinvestimentos.service.concrete
+package com.vitorbasso.gerenciadorinvestimentos.service.security
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Client
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.AuthenticationRequest

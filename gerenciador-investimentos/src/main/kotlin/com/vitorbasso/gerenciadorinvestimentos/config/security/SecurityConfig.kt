@@ -1,7 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.config.security
 
 import com.vitorbasso.gerenciadorinvestimentos.filter.security.AuthenticationFilter
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.ClientDetailsService
+import com.vitorbasso.gerenciadorinvestimentos.service.security.ClientDetailsService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
