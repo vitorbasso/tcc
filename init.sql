@@ -29,16 +29,16 @@ create table if not exists `wallet`(
 )engine=InnoDB;
 
 create table if not exists `stock` (
-	`ticker` varchar(6),
+	`ticker` varchar(25),
     `current_value` decimal(20, 2) not null,
-    `closing_value` decimal(20, 2),
-    `opening_value` decimal(20, 2),
-    `highest_value` decimal(20, 2),
-    `lowest_value` decimal(20, 2),
-    `variation` decimal(20, 4),
-    `market_value` decimal(20,2),
-    `daily_volume` bigint,
-    `paper_in_circulation` bigint,
+    `closing_value` decimal(20, 2) default null,
+    `opening_value` decimal(20, 2) default null,
+    `highest_value` decimal(20, 2) default null,
+    `lowest_value` decimal(20, 2) default null,
+    `variation` decimal(20, 4) default null,
+    `market_value` decimal(20,2) default null,
+    `daily_volume` bigint default null,
+    `paper_in_circulation` bigint default null,
     primary key (`ticker`)
 )engine=InnoDB;
 
