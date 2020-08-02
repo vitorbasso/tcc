@@ -98,7 +98,7 @@ private fun IWallet.getSmallDto() = WalletSmallDto(
 )
 
 private fun IAsset.getDto() = AssetDto(
-        stockSymbol = (this as Asset).stock.symbol,
+        stockSymbol = (this as Asset).stock.ticker,
         averageCost = this.averageCost,
         amount = this.amount
 )

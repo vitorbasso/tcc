@@ -29,26 +29,30 @@ create table if not exists `wallet`(
 )engine=InnoDB;
 
 create table if not exists `stock` (
-	`symbol` varchar(6),
-    `current_value` decimal(13,2) not null,
-    `type` char,
-    `name` varchar(255),
-    `corporation` varchar(255),
-    `business_area` varchar(255),
-    primary key (`symbol`)
+	`ticker` varchar(6),
+    `current_value` decimal(20, 2) not null,
+    `closing_value` decimal(20, 2),
+    `opening_value` decimal(20, 2),
+    `highest_value` decimal(20, 2),
+    `lowest_value` decimal(20, 2),
+    `variation` decimal(20, 4),
+    `market_value` decimal(20,2),
+    `daily_volume` bigint,
+    `paper_in_circulation` bigint,
+    primary key (`ticker`)
 )engine=InnoDB;
 
 create table if not exists `asset`(
 	`id` bigint auto_increment,
     `wallet_id` bigint not null,
-    `stock_symbol` varchar(6) not null,
+    `stock_ticker` varchar(6) not null,
     `average_cost` decimal(13,2) not null,
     `amount` int not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
     primary key (`id`),
     foreign key (`wallet_id`) references `wallet` (`id`),
-    foreign key (`stock_symbol`) references `stock` (`symbol`)
+    foreign key (`stock_ticker`) references `stock` (`ticker`)
 )engine=InnoDB;
 
 create table if not exists `transaction`(
@@ -56,11 +60,11 @@ create table if not exists `transaction`(
 	`type` varchar(3) not null,
     `quantity` int,
     `value` decimal(13,2),
-    `stock_symbol` varchar(6) not null,
+    `stock_ticker` varchar(6) not null,
     `asset_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
     primary key (`id`),
-    foreign key (`stock_symbol`) references `stock` (`symbol`),
+    foreign key (`stock_ticker`) references `stock` (`ticker`),
     foreign key (`asset_id`) references `asset` (`id`) 
 )engine=InnoDB;
