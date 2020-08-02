@@ -30,7 +30,7 @@ create table if not exists `wallet`(
 
 create table if not exists `stock` (
 	`ticker` varchar(25),
-    `current_value` decimal(20, 2) not null,
+    `current_value` decimal(20, 2) default null,
     `closing_value` decimal(20, 2) default null,
     `opening_value` decimal(20, 2) default null,
     `highest_value` decimal(20, 2) default null,
@@ -39,6 +39,7 @@ create table if not exists `stock` (
     `market_value` decimal(20,2) default null,
     `daily_volume` bigint default null,
     `paper_in_circulation` bigint default null,
+    `date_updated` timestamp default NOW(),
     primary key (`ticker`)
 )engine=InnoDB;
 
