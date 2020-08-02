@@ -13,7 +13,7 @@ import java.util.*
 class JwtUtil(
         @Value("\${gerenciador-investimento.security.secret:secret}")
         private val secret: String,
-        @Value("\${gerenciador-investimento.security.expiration-time}")
+        @Value("\${gerenciador-investimento.security.expiration}")
         private val expirationTime: Long
 ) {
 
