@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface StockRepository : JpaRepository<Stock, String>
+interface StockRepository : JpaRepository<Stock, String>{
+    fun findByTickerStartsWith(ticker: String): List<Stock>
+}
