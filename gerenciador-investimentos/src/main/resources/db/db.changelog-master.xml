@@ -7,4 +7,7 @@
         context="dev">
 
     <includeAll path="changelog/" relativeToChangelogFile="true"/>
+    <changeSet id="LoadStockInfo" author="vitorbasso">
+        <loadData tableName="stock" file="data/stock-info.csv" relativeToChangelogFile="true" separator=";" />
+    </changeSet>
 </databaseChangeLog>

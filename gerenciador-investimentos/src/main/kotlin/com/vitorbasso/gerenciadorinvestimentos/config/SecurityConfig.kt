@@ -1,4 +1,4 @@
-package com.vitorbasso.gerenciadorinvestimentos.config.security
+package com.vitorbasso.gerenciadorinvestimentos.config
 
 import com.vitorbasso.gerenciadorinvestimentos.filter.security.AuthenticationFilter
 import com.vitorbasso.gerenciadorinvestimentos.filter.security.RestAuthenticationEntryPoint

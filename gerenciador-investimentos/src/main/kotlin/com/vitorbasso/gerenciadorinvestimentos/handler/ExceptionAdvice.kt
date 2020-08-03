@@ -33,9 +33,8 @@ class ExceptionAdvice (
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(InternalAuthenticationServiceException::class, BadCredentialsException::class)
-    fun authenticationExceptionHandler(ex: Exception) : ApiErrorDto {
-        return ApiErrorDto(ManagerErrorCode.MANAGER_08, ::getLocalizedMessage)
-    }
+    fun authenticationExceptionHandler(ex: Exception)
+            = ApiErrorDto(ManagerErrorCode.MANAGER_08, ::getLocalizedMessage)
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CustomEntityNotFoundException::class)

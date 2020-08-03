@@ -23,7 +23,7 @@ data class Transaction(
         val value: java.math.BigDecimal,
 
         @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "stock_symbol", referencedColumnName = "symbol")
+        @JoinColumn(name = "stock_ticker", referencedColumnName = "ticker")
         val stock: Stock,
 
         @ManyToOne(fetch = FetchType.LAZY)
