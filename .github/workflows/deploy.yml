@@ -26,7 +26,7 @@ jobs:
           HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
         run: heroku container:login
       - name: download heroku plugin deploy
-        run: heroku plugins:install herku-cli-deploy
+        run: heroku plugins:install heroku-cli-deploy
       - name: build and push
         working-directory: gerenciador-investimentos
         env:
