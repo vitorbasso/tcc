@@ -31,4 +31,4 @@ jobs:
         working-directory: gerenciador-investimentos
         env:
           HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
-        run: heroku deploy:jar target/*.jar --app ${{secrets.HEROKU_APP_NAME}} --jdk 11
+        run: heroku jar:deploy target/*.jar --app ${{secrets.HEROKU_APP_NAME}} --jdk 11
