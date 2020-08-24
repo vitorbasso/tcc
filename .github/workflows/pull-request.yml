@@ -1,8 +1,10 @@
 name: Gerenciador de Investimentos PULL REQUEST
 
 on:
+  push:
+    branches: [master]
   pull_request:
-    branches: [develop, release, master]
+    branches: [develop, master]
 
 jobs:
   pr-verification:
@@ -18,10 +20,7 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - name: build
+          restore-keys: ${{ runner.os }}-maven-
+      - name: verify backend
         working-directory: ./gerenciador-investimentos
-        env:
-          GERENCIADOR-INVESTIMENTO_SECURITY_SECRET: ${{secrets.TOKENSIGNINGKEY}}
         run: mvn verify
