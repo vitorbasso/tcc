@@ -36,7 +36,7 @@ class StockRepository(
 
 private fun QuoteDto.getEntity() = this.quoteResponse.result.firstOrNull()?.let {
     Stock(
-        ticker = it.symbol,
+        ticker = it.symbol.substring(0, it.symbol.length - 3),
         currentValue = BigDecimal.valueOf(it.regularMarketPrice),
         openingValue = BigDecimal.valueOf(it.regularMarketOpen),
         closingValue = BigDecimal.valueOf(it.regularMarketPreviousClose),

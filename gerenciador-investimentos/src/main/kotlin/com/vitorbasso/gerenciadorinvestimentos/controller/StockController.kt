@@ -16,7 +16,7 @@ class StockController(
 ) {
 
     @GetMapping("/{ticker}")
-    fun getStock(@PathVariable ticker: String) = this.yahooApi.getQuote(ticker)
+    fun getStock(@PathVariable ticker: String) = this.stockService.getStock(ticker)
 
     @GetMapping
     fun searchStock(@RequestParam(required = true) query: String) = this.stockService.getStockStartingWith(query)
