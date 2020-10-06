@@ -7,12 +7,12 @@ import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestException
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
-import com.vitorbasso.gerenciadorinvestimentos.repository.WalletRepository
+import com.vitorbasso.gerenciadorinvestimentos.repository.IWalletRepository
 import org.springframework.stereotype.Service
 
 @Service
 internal class WalletService(
-        private val walletRepository: WalletRepository
+        private val walletRepository: IWalletRepository
 ) {
 
     fun getWallet(

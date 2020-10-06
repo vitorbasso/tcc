@@ -1,5 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
+import com.vitorbasso.gerenciadorinvestimentos.domain.IStock
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.math.BigDecimal
@@ -18,10 +19,7 @@ data class Stock (
         val highestValue: BigDecimal,
         val lowestValue: BigDecimal,
         val variation: BigDecimal,
-        val marketValue: BigDecimal,
-        val dailyVolume: Long,
-        val paperInCirculation: Long,
         @field:UpdateTimestamp
         @Column(nullable = false)
         val dateUpdated: LocalDateTime = LocalDateTime.now()
-) : Serializable
+) : Serializable, IStock
