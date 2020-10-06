@@ -23,8 +23,8 @@ class StockRepository(
     }
 
     fun findByTicker(ticker: String) = this.dbStockRepository.findByIdOrNull(ticker).let {
-        if (isStockInvalid(it)) this.dbStockRepository.save(this.yahooApiIntegration.getQuote(ticker).getEntity()).also { println("yahoo") }
-        else it.also { println("local") }
+        if (isStockInvalid(it)) this.dbStockRepository.save(this.yahooApiIntegration.getQuote(ticker).getEntity())
+        else it
     }
 
     private fun isStockInvalid(stock: Stock?)
