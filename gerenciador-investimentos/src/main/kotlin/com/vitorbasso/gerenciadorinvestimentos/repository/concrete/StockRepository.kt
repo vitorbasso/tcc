@@ -20,17 +20,27 @@ class StockRepository(
         const val STOCK_TTL: Long = 5 // in minutes
     }
 
-    override fun findByTickerStartsWith(ticker: String): List<Stock> {
-        TODO()
-    }
+    override fun findByTickerStartsWith(ticker: String)
+        = this.dbStockJpaRepository.findByTickerStartsWith(ticker).takeIf { it.isNotEmpty() }
+        ?: getRemoteStockList(ticker)
 
     override fun findByTicker(ticker: String) = this.dbStockJpaRepository.findByIdOrNull(ticker).let {
-        if (isStockInvalid(it)) this.dbStockJpaRepository.save(this.yahooApiIntegration.getQuote(ticker).getEntity())
+        if (isStockInvalid(it)) saveYahooStock(this.yahooApiIntegration.getQuote(ticker))
         else it
     }
 
     private fun isStockInvalid(stock: Stock?)
         = stock == null || stock.dateUpdated.plusMinutes(STOCK_TTL).isBefore(LocalDateTime.now())
+
+    private fun getRemoteStockList(ticker: String) = this.yahooApiIntegration.autoComplete(ticker).quotes.filter { listItem ->
+        listItem.symbol.endsWith(YahooApiIntegration.SYMBOL_SUFFIX)
+    }.map {filteredListItem ->
+        this.yahooApiIntegration.getQuote(filteredListItem.symbol).getEntity()
+    }.let {remoteList ->
+        this.dbStockJpaRepository.saveAll(remoteList)
+    }
+
+    private fun saveYahooStock(quote: Quote) = this.dbStockJpaRepository.save(quote.getEntity())
 
 }
 

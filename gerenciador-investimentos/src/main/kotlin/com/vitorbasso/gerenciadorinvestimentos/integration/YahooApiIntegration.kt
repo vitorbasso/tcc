@@ -20,7 +20,7 @@ class YahooApiIntegration(
     fun autoComplete(query: String) = this.yahooApi.searchStock(financeKey, query)
 
     fun getQuote(symbols: String)
-        = yahooApi.getQuotes(financeKey, "$symbols$SYMBOL_SUFFIX").quoteResponse.result.firstOrNull()?.let {
+        = yahooApi.getQuotes(financeKey, "${symbols.substringBeforeLast(SYMBOL_SUFFIX)}$SYMBOL_SUFFIX").quoteResponse.result.firstOrNull()?.let {
         it.copy(symbol = it.symbol.substringBeforeLast(SYMBOL_SUFFIX))
     }
         ?: throw CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
