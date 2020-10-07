@@ -32,7 +32,8 @@ class StockRepository(
     private fun isStockInvalid(stock: Stock?)
         = stock == null || stock.dateUpdated.plusMinutes(STOCK_TTL).isBefore(LocalDateTime.now())
 
-    private fun getRemoteStockList(ticker: String) = this.yahooApiIntegration.autoComplete(ticker).quotes.filter { listItem ->
+    private fun getRemoteStockList(ticker: String)
+        = this.yahooApiIntegration.autoComplete(ticker).quotes.filter { listItem ->
         listItem.symbol.endsWith(YahooApiIntegration.SYMBOL_SUFFIX)
     }.map {filteredListItem ->
         this.yahooApiIntegration.getQuote(filteredListItem.symbol).getEntity()
