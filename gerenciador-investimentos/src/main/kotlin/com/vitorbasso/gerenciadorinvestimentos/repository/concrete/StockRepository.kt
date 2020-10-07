@@ -12,8 +12,8 @@ import java.time.LocalDateTime
 
 @Repository
 class StockRepository(
-    private val dbStockJpaRepository: StockJpaRepository,
-    private val yahooApiIntegration: YahooApiIntegration
+    private val stockJpaRepository: StockJpaRepository,
+    private val yahooApi: YahooApiIntegration
 ) : IStockRepository {
 
     companion object {
@@ -21,11 +21,11 @@ class StockRepository(
     }
 
     override fun findByTickerStartsWith(ticker: String)
-        = this.dbStockJpaRepository.findByTickerStartsWith(ticker).takeIf { it.isNotEmpty() }
+        = this.stockJpaRepository.findByTickerStartsWith(ticker).takeIf { it.isNotEmpty() }
         ?: getRemoteStockList(ticker)
 
-    override fun findByTicker(ticker: String) = this.dbStockJpaRepository.findByIdOrNull(ticker).let {
-        if (isStockInvalid(it)) saveYahooStock(this.yahooApiIntegration.getQuote(ticker))
+    override fun findByTicker(ticker: String) = this.stockJpaRepository.findByIdOrNull(ticker).let {
+        if (isStockInvalid(it)) saveYahooStock(this.yahooApi.getQuote(ticker))
         else it
     }
 
@@ -33,15 +33,15 @@ class StockRepository(
         = stock == null || stock.dateUpdated.plusMinutes(STOCK_TTL).isBefore(LocalDateTime.now())
 
     private fun getRemoteStockList(ticker: String)
-        = this.yahooApiIntegration.autoComplete(ticker).quotes.filter { listItem ->
+        = this.yahooApi.autoComplete(ticker).quotes.filter { listItem ->
         listItem.symbol.endsWith(YahooApiIntegration.SYMBOL_SUFFIX)
     }.map {filteredListItem ->
-        this.yahooApiIntegration.getQuote(filteredListItem.symbol).getEntity()
+        this.yahooApi.getQuote(filteredListItem.symbol).getEntity()
     }.let {remoteList ->
-        this.dbStockJpaRepository.saveAll(remoteList)
+        this.stockJpaRepository.saveAll(remoteList)
     }
 
-    private fun saveYahooStock(quote: Quote) = this.dbStockJpaRepository.save(quote.getEntity())
+    private fun saveYahooStock(quote: Quote) = this.stockJpaRepository.save(quote.getEntity())
 
 }
 
