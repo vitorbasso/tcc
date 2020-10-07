@@ -1,6 +1,5 @@
 package com.vitorbasso.gerenciadorinvestimentos.controller
 
-import com.vitorbasso.gerenciadorinvestimentos.integration.YahooApiIntegration
 import com.vitorbasso.gerenciadorinvestimentos.service.IStockService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -11,8 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/\${api-version}/stocks")
 class StockController(
-        private val stockService: IStockService,
-        private val yahooApi: YahooApiIntegration
+        private val stockService: IStockService
 ) {
 
     @GetMapping("/{ticker}")
