@@ -36,9 +36,6 @@ create table if not exists `stock` (
     `highest_value` decimal(20, 2) default null,
     `lowest_value` decimal(20, 2) default null,
     `variation` decimal(20, 4) default null,
-    `market_value` decimal(20,2) default null,
-    `daily_volume` bigint default null,
-    `paper_in_circulation` bigint default null,
     `date_updated` timestamp default NOW(),
     primary key (`ticker`)
 )engine=InnoDB;

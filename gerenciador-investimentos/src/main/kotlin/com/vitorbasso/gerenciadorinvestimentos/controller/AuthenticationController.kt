@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("\${api-version}/authentication")
+@RequestMapping("/\${api-version}/authentication")
 class AuthenticationController(
         private val authenticationService: AuthenticationService
 ) {

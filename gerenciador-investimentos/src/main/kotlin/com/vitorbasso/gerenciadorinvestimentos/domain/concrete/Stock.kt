@@ -18,9 +18,6 @@ data class Stock (
         val highestValue: BigDecimal,
         val lowestValue: BigDecimal,
         val variation: BigDecimal,
-        val marketValue: BigDecimal,
-        val dailyVolume: Long,
-        val paperInCirculation: Long,
         @field:UpdateTimestamp
         @Column(nullable = false)
         val dateUpdated: LocalDateTime = LocalDateTime.now()

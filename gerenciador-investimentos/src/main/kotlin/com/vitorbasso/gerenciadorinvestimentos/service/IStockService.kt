@@ -7,6 +7,8 @@ interface IStockService {
 
     fun getStock(ticker: String): Stock
 
+    fun getStocksBatch(tickers: List<String>) : List<Stock>
+
     fun getStockStartingWith(ticker: String): StockListDto
 
 }

@@ -6,15 +6,15 @@ import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestException
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
-import com.vitorbasso.gerenciadorinvestimentos.repository.ClientRepository
+import com.vitorbasso.gerenciadorinvestimentos.repository.IClientRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 internal class ClientService (
-        private val clientRepository: ClientRepository,
-        private val passwordEncoder: PasswordEncoder
+    private val clientRepository: IClientRepository,
+    private val passwordEncoder: PasswordEncoder
 ) {
 
     fun getClient(
