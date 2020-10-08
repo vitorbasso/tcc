@@ -17,11 +17,25 @@ class YahooApiIntegration(
         const val SYMBOL_SUFFIX = ".SA" //yahoo api necessary for symbols from b3
     }
 
-    fun autoComplete(query: String) = this.yahooApi.searchStock(financeKey, query)
+    fun autoComplete(query: String)
+        = this.yahooApi.searchStock(financeKey, query).quotes.filter { listItem ->
+        listItem.symbol.endsWith(YahooApiIntegration.SYMBOL_SUFFIX)
+    }
 
-    fun getQuote(symbols: String)
-        = yahooApi.getQuotes(financeKey, "${symbols.substringBeforeLast(SYMBOL_SUFFIX)}$SYMBOL_SUFFIX")
+    fun getQuote(symbol: String) = yahooApi.getQuotes(financeKey, getProcessedSymbol(symbol))
         .quoteResponse.result.firstOrNull()?.let {
-            it.copy(symbol = it.symbol.substringBeforeLast(SYMBOL_SUFFIX))
+            it.copy(symbol = cleanSymbol(it.symbol))
         } ?: throw CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
+
+    fun getQuoteBatch(symbols: List<String>) = this.yahooApi.getQuotes(
+        financeKey,
+        symbols.joinToString(separator = ",", transform = ::getProcessedSymbol)
+    ).quoteResponse.result.map {
+        it.copy(symbol = cleanSymbol(it.symbol))
+    }
+
+    private fun getProcessedSymbol(rawSymbol: String) = "${cleanSymbol(rawSymbol)}$SYMBOL_SUFFIX"
+
+    private fun cleanSymbol(processedSymbol: String) = processedSymbol.substringBeforeLast(SYMBOL_SUFFIX)
+
 }

@@ -17,6 +17,10 @@ class StockController(
     fun getStock(@PathVariable ticker: String) = this.stockService.getStock(ticker)
 
     @GetMapping
+    fun getStocksBatch(@RequestParam(required = true) symbols: String)
+        = this.stockService.getStocksBatch(symbols.split(","))
+
+    @GetMapping("/search")
     fun searchStock(@RequestParam(required = true) query: String) = this.stockService.getStockStartingWith(query)
 
 }

@@ -13,6 +13,8 @@ class StockService(
     fun getStock(ticker: String) = this.stockRepository.findByTicker(ticker)
         ?: throw CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
 
+    fun getStocksBatch(tickers: List<String>) = this.stockRepository.findByTickerBatch(tickers)
+
     fun getStockStartingWith(ticker: String) = this.stockRepository.findByTickerStartsWith(ticker)
 
 }

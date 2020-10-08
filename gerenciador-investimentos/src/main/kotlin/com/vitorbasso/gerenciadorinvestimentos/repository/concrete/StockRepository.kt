@@ -29,19 +29,32 @@ class StockRepository(
         else it
     }
 
+    override fun findByTickerBatch(tickers: List<String>) : List<Stock>{
+        val local = this.stockJpaRepository.findAllById(tickers).filter { !isStockInvalid(it) }
+        val tickersRemotely = tickers.filter {
+            !local.map { localTicker -> localTicker.ticker }.contains(it) && !it.isBlank()
+        }
+        return if(tickersRemotely.isEmpty()) local
+        else saveYahooStockBatch(this.yahooApi.getQuoteBatch(tickersRemotely)) + local
+    }
+
     private fun isStockInvalid(stock: Stock?)
         = stock == null || stock.dateUpdated.plusMinutes(STOCK_TTL).isBefore(LocalDateTime.now())
 
     private fun getRemoteStockList(ticker: String)
-        = this.yahooApi.autoComplete(ticker).quotes.filter { listItem ->
-        listItem.symbol.endsWith(YahooApiIntegration.SYMBOL_SUFFIX)
-    }.map {filteredListItem ->
-        this.yahooApi.getQuote(filteredListItem.symbol).getEntity()
-    }.let {remoteList ->
-        this.stockJpaRepository.saveAll(remoteList)
+        = this.yahooApi.autoComplete(ticker).map {
+        this.yahooApi.getQuote(it.symbol)
+    }.let {
+        saveYahooStockBatch(it)
     }
 
     private fun saveYahooStock(quote: Quote) = this.stockJpaRepository.save(quote.getEntity())
+
+    private fun saveYahooStockBatch(quotes: List<Quote>) = quotes.map {
+        it.getEntity()
+    }.let {
+        this.stockJpaRepository.saveAll(it)
+    }
 
 }
 

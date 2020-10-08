@@ -8,4 +8,6 @@ interface IStockRepository {
     fun findByTickerStartsWith(ticker: String): List<Stock>
 
     fun findByTicker(ticker: String): Stock?
+
+    fun findByTickerBatch(tickers: List<String>) : List<Stock>
 }
