@@ -58,11 +58,9 @@ create table if not exists `transaction`(
 	`type` varchar(3) not null,
     `quantity` int,
     `value` decimal(13,2),
-    `stock_ticker` varchar(6) not null,
     `asset_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
     primary key (`id`),
-    foreign key (`stock_ticker`) references `stock` (`ticker`),
     foreign key (`asset_id`) references `asset` (`id`) 
 )engine=InnoDB;
