@@ -14,26 +14,25 @@ import org.springframework.stereotype.Service
 @Service
 internal class WalletServiceFacadeImpl(
         private val walletService: WalletService,
-        private val clientService: ClientService,
-        private val securityContextUtil: SecurityContextUtil
+        private val clientService: ClientService
 ): IWalletService {
 
     override fun getWalletCollection()
-            = this.clientService.getClient(this.securityContextUtil.getClientDetails().id).wallet
+            = this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet
 
     override fun getWallet(broker: String)
-            = this.walletService.getWallet(this.securityContextUtil.getClientDetails(), broker)
+            = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), broker)
 
     override fun saveWallet(walletToSave: IWallet)
             = this.walletService.saveWallet(
-            this.securityContextUtil.getClientDetails(),
+            SecurityContextUtil.getClientDetails(),
             walletToSave as Wallet
     )
 
     override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest)
             = this.walletService.updateWallet(
             this.walletService.getWallet(
-                    client = this.securityContextUtil.getClientDetails(),
+                    client = SecurityContextUtil.getClientDetails(),
                     broker = broker,
                     exception = CustomBadRequestException(ManagerErrorCode.MANAGER_06)
             ),
@@ -43,7 +42,7 @@ internal class WalletServiceFacadeImpl(
     override fun deleteWallet(broker: String) {
         this.walletService.deleteWallet(
                 this.walletService.getWallet(
-                        client = this.securityContextUtil.getClientDetails(),
+                        client = SecurityContextUtil.getClientDetails(),
                         broker = broker,
                         exception = CustomBadRequestException(ManagerErrorCode.MANAGER_07)
                 )

@@ -10,21 +10,20 @@ import org.springframework.stereotype.Service
 
 @Service
 internal class ClientServiceFacadeImpl(
-        private val clientService: ClientService,
-        private val securityContextUtil: SecurityContextUtil
+        private val clientService: ClientService
 ) : IClientService {
 
-    override fun getClient() = this.securityContextUtil.getClientDetails()
+    override fun getClient() = SecurityContextUtil.getClientDetails()
 
     override fun saveClient(clientToSave: IClient)= this.clientService.saveClient(clientToSave as Client)
 
     override fun updateClient(clientUpdateRequest: ClientUpdateRequest)
             = this.clientService.updateClient(
-            this.securityContextUtil.getClientDetails(),
+            getClient(),
             clientUpdateRequest
     )
 
     override fun deleteClient()
-            = this.clientService.deleteClient(this.securityContextUtil.getClientDetails())
+            = this.clientService.deleteClient(getClient())
 
 }
