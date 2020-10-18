@@ -18,6 +18,7 @@ data class Asset (
         val id: Long,
         val averageCost: java.math.BigDecimal = java.math.BigDecimal(0),
         val amount: Int,
+        val numberOfTransactions: Int = 0,
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "wallet_id", referencedColumnName = "id")

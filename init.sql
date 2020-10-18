@@ -46,6 +46,7 @@ create table if not exists `asset`(
     `stock_ticker` varchar(6) not null,
     `average_cost` decimal(13,2) not null,
     `amount` int not null,
+    `number_of_transactions` int not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
     primary key (`id`),
