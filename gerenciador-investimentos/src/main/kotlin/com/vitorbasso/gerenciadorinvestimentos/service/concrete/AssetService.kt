@@ -17,30 +17,31 @@ class AssetService(
         stock: Stock,
         amount: Int,
         cost: BigDecimal
-    ) = this.assetRepository.findByWalletAndStock(wallet, stock)?.let {
+    ) = (this.assetRepository.findByWalletAndStock(wallet, stock)?.let {
         it.copy(
-            averageCost = newAverage(
+            averageCost = getAverageAssetCost(
+                cost = cost,
+                amount = amount,
                 averageCost = it.averageCost,
-                numberOfTransactions = it.numberOfTransactions,
-                cost = cost
+                numberOfTransactions = it.numberOfTransactions
             ),
             amount = it.amount + amount,
             numberOfTransactions = it.numberOfTransactions + 1
         )
     } ?: Asset(
-        averageCost = cost,
+        averageCost = getAverageAssetCost(cost, amount),
         amount = amount,
         numberOfTransactions = 1,
         wallet = wallet,
         stock = stock
-    )
+    )).let { this.assetRepository.save(it) }
 
-    private fun newAverage(
-        averageCost: BigDecimal,
-        numberOfTransactions: Int,
-        cost: BigDecimal
-    ) = (averageCost * BigDecimal(numberOfTransactions) + cost) /
+    private fun getAverageAssetCost(
+        cost: BigDecimal,
+        amount: Int,
+        averageCost: BigDecimal = BigDecimal(0),
+        numberOfTransactions: Int = 0
+    ) = (averageCost * BigDecimal(numberOfTransactions) + (cost / BigDecimal(amount))) /
         (BigDecimal(numberOfTransactions) + BigDecimal(1))
-
 
 }
