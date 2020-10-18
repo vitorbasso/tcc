@@ -15,7 +15,7 @@ import javax.persistence.OneToMany
 data class Asset (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long,
+        val id: Long = -1,
         val averageCost: java.math.BigDecimal = java.math.BigDecimal(0),
         val amount: Int,
         val numberOfTransactions: Int = 0,
