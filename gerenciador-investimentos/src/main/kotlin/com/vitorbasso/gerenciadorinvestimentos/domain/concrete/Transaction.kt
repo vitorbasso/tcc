@@ -1,6 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
+import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -16,7 +17,7 @@ data class Transaction(
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long,
 
-        val type: String,
+        val type: TransactionType,
 
         val quantity: Int,
 

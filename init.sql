@@ -57,7 +57,7 @@ create table if not exists `asset`(
 
 create table if not exists `transaction`(
 	`id` bigint auto_increment,
-	`type` varchar(3) not null,
+	`type` int not null,
     `quantity` int,
     `value` decimal(13,2),
     `asset_id` bigint not null,
