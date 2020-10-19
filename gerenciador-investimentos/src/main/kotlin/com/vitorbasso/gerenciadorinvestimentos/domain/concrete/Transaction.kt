@@ -4,6 +4,7 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
 import com.vitorbasso.gerenciadorinvestimentos.domain.ITransaction
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import java.math.BigDecimal
+import java.time.LocalDate
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -24,6 +25,8 @@ data class Transaction(
     val quantity: Int,
 
     val value: BigDecimal,
+
+    val transactionDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", referencedColumnName = "id")

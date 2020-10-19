@@ -49,7 +49,8 @@ internal class TransactionServiceFacadeImpl(
             type = transactionRequest.type,
             quantity = transactionRequest.quantity,
             value = transactionRequest.value,
-            asset = it
+            asset = it,
+            transactionDate = transactionRequest.date
         )
     }.let {
         this.transactionService.save(it)
