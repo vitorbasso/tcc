@@ -68,5 +68,5 @@ private fun IAsset.getDto() = AssetDto(
     stockSymbol = (this as Asset).stock.ticker,
     averageCost = this.averageCost,
     amount = this.amount,
-    lifetimeBalance = this.assetBalance
+    lifetimeBalance = this.lifetimeBalance
 )

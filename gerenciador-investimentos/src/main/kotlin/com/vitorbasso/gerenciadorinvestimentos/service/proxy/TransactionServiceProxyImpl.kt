@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Primary
-class TransactionServiceProxy (
+class TransactionServiceProxyImpl (
     @Qualifier("transactionServiceFacadeImpl")
     private val transactionService: ITransactionService
 ) : ITransactionService {

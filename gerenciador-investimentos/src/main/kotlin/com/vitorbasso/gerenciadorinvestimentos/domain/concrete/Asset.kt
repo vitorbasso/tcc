@@ -19,8 +19,8 @@ data class Asset(
     val id: Long = -1,
     val averageCost: BigDecimal = BigDecimal(0),
     val amount: Int = 0,
-    val assetBalance: BigDecimal = BigDecimal(0),
-    val numberOfTransactions: Int = 0,
+    val lifetimeBalance: BigDecimal = BigDecimal(0),
+    val averageCount: Int = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")
