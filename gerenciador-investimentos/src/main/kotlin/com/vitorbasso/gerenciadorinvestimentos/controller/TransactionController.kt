@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RestController
 class TransactionController {
 
     @GetMapping
-    fun getTransactionsByWallet() {
-        TODO()
-    }
+    fun getTransactionsByWallet() = "Hello Transactions"
 
 }
