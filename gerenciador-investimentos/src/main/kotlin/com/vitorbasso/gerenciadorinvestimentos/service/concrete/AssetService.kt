@@ -28,11 +28,13 @@ class AssetService(
                 numberOfTransactions = it.numberOfTransactions
             ),
             amount = it.amount + amount,
+            assetBalance = it.assetBalance - cost,
             numberOfTransactions = it.numberOfTransactions + 1
         )
     } ?: Asset(
         averageCost = getAverageAssetCost(cost, amount),
         amount = amount,
+        assetBalance = -cost,
         numberOfTransactions = 1,
         wallet = wallet,
         stock = stock
@@ -41,15 +43,17 @@ class AssetService(
     fun subtractFromAsset(
         wallet: Wallet,
         stock: Stock,
-        amount: Int
+        amount: Int,
+        cost: BigDecimal
     ) = (this.assetRepository.findByWalletAndStock(wallet, stock)?.takeUnless {
         it.amount - amount < 0
     } ?: throw CustomBadRequestException(ManagerErrorCode.MANAGER_10)).let {
-        it.copy(amount = it.amount - amount).takeUnless {
-            updatedAsset ->  updatedAsset.amount == 0
-        }?.let {updatedAsset ->
-            this.assetRepository.save(updatedAsset)
-        } ?: this.assetRepository.delete(it).let { null }
+        it.copy(amount = it.amount - amount, assetBalance = it.assetBalance + cost).let { updatedAsset ->
+            if(updatedAsset.amount != 0)
+                this.assetRepository.save(updatedAsset)
+            else
+                this.assetRepository.save(updatedAsset.copy(averageCost = BigDecimal(0), numberOfTransactions = 0))
+        }
     }
 
     private fun getAverageAssetCost(
