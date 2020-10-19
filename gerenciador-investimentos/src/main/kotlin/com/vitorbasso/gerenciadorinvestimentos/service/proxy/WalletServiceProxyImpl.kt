@@ -19,23 +19,22 @@ import org.springframework.stereotype.Service
 @Service
 @Primary
 class WalletServiceProxyImpl(
-        @Qualifier("walletServiceFacadeImpl")
-        private val walletService: IWalletService
-): IWalletService {
+    @Qualifier("walletServiceFacadeImpl")
+    private val walletService: IWalletService
+) : IWalletService {
 
     override fun getWalletCollection()
-            = this.walletService.getWalletCollection().map { it.getSmallDto() }
+        = this.walletService.getWalletCollection().map { it.getSmallDto() }
 
-    override fun getWallet(broker: String)
-            = this.walletService.getWallet(broker).getDto()
+    override fun getWallet(broker: String) = this.walletService.getWallet(broker).getDto()
 
     override fun saveWallet(walletToSave: IWallet)
-            = this.walletService.saveWallet(walletToSave.getEntity()).getDto()
+        = this.walletService.saveWallet(walletToSave.getEntity()).getDto()
 
     override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest)
-            = this.walletService.updateWallet(
-            broker = broker,
-            walletUpdateRequest = walletUpdateRequest
+        = this.walletService.updateWallet(
+        broker = broker,
+        walletUpdateRequest = walletUpdateRequest
     ).getDto()
 
     override fun deleteWallet(broker: String) {
@@ -45,28 +44,29 @@ class WalletServiceProxyImpl(
 }
 
 private fun IWallet.getEntity() = Wallet(
-        name = (this as WalletRequest).name,
-        broker = this.broker,
-        client = SecurityContextHolder.getContext().authentication.principal as Client
+    name = (this as WalletRequest).name,
+    broker = this.broker,
+    client = SecurityContextHolder.getContext().authentication.principal as Client
 )
 
 private fun IWallet.getDto() = WalletDto(
-        name = (this as Wallet).name,
-        broker = this.broker,
-        lossDaytrade = this.lossDaytrade,
-        loss = this.loss,
-        balanceDaytrade = this.balanceDaytrade,
-        balance = this.balance,
-        stockAsset = this.asset.map { it.getDto() }
+    name = (this as Wallet).name,
+    broker = this.broker,
+    lossDaytrade = this.lossDaytrade,
+    loss = this.loss,
+    balanceDaytrade = this.balanceDaytrade,
+    balance = this.balance,
+    stockAsset = this.asset.map { it.getDto() }
 )
 
 private fun IWallet.getSmallDto() = WalletSmallDto(
-        name = (this as Wallet).name,
-        broker = this.broker
+    name = (this as Wallet).name,
+    broker = this.broker
 )
 
 private fun IAsset.getDto() = AssetDto(
-        stockSymbol = (this as Asset).stock.ticker,
-        averageCost = this.averageCost,
-        amount = this.amount
+    stockSymbol = (this as Asset).stock.ticker,
+    averageCost = this.averageCost,
+    amount = this.amount,
+    lifetimeBalance = this.assetBalance
 )
