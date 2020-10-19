@@ -20,16 +20,10 @@ class AssetService(
         amount: Int,
         cost: BigDecimal
     ) = (this.assetRepository.findByWalletAndStock(wallet, stock)?.let {
-        it.copy(
-            averageCost = getAverageAssetCost(
-                cost = cost,
-                amount = amount,
-                averageCost = it.averageCost,
-                numberOfTransactions = it.numberOfTransactions
-            ),
-            amount = it.amount + amount,
-            assetBalance = it.assetBalance - cost,
-            numberOfTransactions = it.numberOfTransactions + 1
+        performAddition(
+            asset = it,
+            amount = amount,
+            cost = cost
         )
     } ?: Asset(
         averageCost = getAverageAssetCost(cost, amount),
@@ -48,12 +42,29 @@ class AssetService(
     ) = (this.assetRepository.findByWalletAndStock(wallet, stock)?.takeUnless {
         it.amount - amount < 0
     } ?: throw CustomBadRequestException(ManagerErrorCode.MANAGER_10)).let {
-        it.copy(amount = it.amount - amount, assetBalance = it.assetBalance + cost).let { updatedAsset ->
-            if(updatedAsset.amount != 0)
-                this.assetRepository.save(updatedAsset)
-            else
-                this.assetRepository.save(updatedAsset.copy(averageCost = BigDecimal(0), numberOfTransactions = 0))
-        }
+        this.assetRepository.save(performSubtraction(
+            asset = it,
+            amount = amount,
+            cost = cost
+        ))
+    }
+
+    private fun performAddition(asset: Asset, amount: Int, cost: BigDecimal) = asset.copy(
+        averageCost = getAverageAssetCost(
+            cost = cost,
+            amount = amount,
+            averageCost = asset.averageCost,
+            numberOfTransactions = asset.numberOfTransactions
+        ),
+        amount = asset.amount + amount,
+        assetBalance = asset.assetBalance - cost,
+        numberOfTransactions = asset.numberOfTransactions + 1
+    )
+
+    private fun performSubtraction(asset: Asset, amount: Int, cost: BigDecimal)
+        = asset.copy(amount = asset.amount - amount, assetBalance = asset.assetBalance + cost).let {
+        if (it.amount == 0) it.copy(averageCost = BigDecimal(0), numberOfTransactions = 0)
+        else it
     }
 
     private fun getAverageAssetCost(
