@@ -28,8 +28,8 @@ class AssetService(
     } ?: Asset(
         averageCost = getAverageAssetCost(cost, amount),
         amount = amount,
-        assetBalance = -cost,
-        numberOfTransactions = 1,
+        lifetimeBalance = -cost,
+        averageCount = 1,
         wallet = wallet,
         stock = stock
     )).let { this.assetRepository.save(it) }
@@ -54,16 +54,16 @@ class AssetService(
             cost = cost,
             amount = amount,
             averageCost = asset.averageCost,
-            numberOfTransactions = asset.numberOfTransactions
+            numberOfTransactions = asset.averageCount
         ),
         amount = asset.amount + amount,
-        assetBalance = asset.assetBalance - cost,
-        numberOfTransactions = asset.numberOfTransactions + 1
+        lifetimeBalance = asset.lifetimeBalance - cost,
+        averageCount = asset.averageCount + 1
     )
 
     private fun performSubtraction(asset: Asset, amount: Int, cost: BigDecimal)
-        = asset.copy(amount = asset.amount - amount, assetBalance = asset.assetBalance + cost).let {
-        if (it.amount == 0) it.copy(averageCost = BigDecimal(0), numberOfTransactions = 0)
+        = asset.copy(amount = asset.amount - amount, lifetimeBalance = asset.lifetimeBalance + cost).let {
+        if (it.amount == 0) it.copy(averageCost = BigDecimal(0), averageCount = 0)
         else it
     }
 

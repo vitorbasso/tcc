@@ -1,6 +1,10 @@
 package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
+import com.vitorbasso.gerenciadorinvestimentos.domain.ITransaction
+import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
+import java.math.BigDecimal
+import java.time.LocalDate
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -12,18 +16,20 @@ import javax.persistence.ManyToOne
 @Entity
 data class Transaction(
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = -1,
 
-        val type: String,
+    val type: TransactionType,
 
-        val quantity: Int,
+    val quantity: Int,
 
-        val value: java.math.BigDecimal,
+    val value: BigDecimal,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "asset_id", referencedColumnName = "id")
-        val asset: Asset
+    val transactionDate: LocalDate,
 
-) : BaseEntity()
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asset_id", referencedColumnName = "id")
+    val asset: Asset
+
+) : BaseEntity(), ITransaction

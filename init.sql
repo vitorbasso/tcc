@@ -46,8 +46,8 @@ create table if not exists `asset`(
     `stock_ticker` varchar(6) not null,
     `average_cost` decimal(13,2) not null,
     `amount` int not null,
-    `asset_balance` decimal(20, 2) not null,
-    `number_of_transactions` int not null,
+    `lifetime_balance` decimal(20, 2) not null,
+    `average_count` int not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
     primary key (`id`),
@@ -57,9 +57,10 @@ create table if not exists `asset`(
 
 create table if not exists `transaction`(
 	`id` bigint auto_increment,
-	`type` varchar(3) not null,
+	`type` int not null,
     `quantity` int,
     `value` decimal(13,2),
+    `transaction_date` date not null,
     `asset_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,
