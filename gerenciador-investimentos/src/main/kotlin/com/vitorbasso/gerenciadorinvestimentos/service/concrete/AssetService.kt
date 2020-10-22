@@ -30,7 +30,7 @@ class AssetService(
         averageCount = 1,
         wallet = wallet,
         stock = stock
-    )).let { this.assetRepository.save(it) }
+    )).let { saveAsset(it) }
 
     fun subtractFromAsset(
         wallet: Wallet,
@@ -50,7 +50,11 @@ class AssetService(
         averageCount = 0,
         wallet = wallet,
         stock = stock
-    )).let { this.assetRepository.save(it) }
+    )).let { saveAsset(it) }
+
+    private fun saveAsset(asset: Asset)
+        = if(asset.amount == 0) this.assetRepository.save(asset.copy(averageCost = BigDecimal(0), averageCount = 0))
+    else this.assetRepository.save(asset)
 
     private fun performAddition(asset: Asset, amount: Int, cost: BigDecimal) = asset.copy(
         averageCost = getAverageAssetCost(
