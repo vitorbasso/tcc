@@ -54,7 +54,7 @@ internal class TransactionServiceFacadeImpl(
         this.stockService.getStock(transactionRequest.ticker),
         transactionRequest.quantity,
         transactionRequest.value
-    ).let { it ->
+    ).let {
         Transaction(
             type = transactionRequest.type,
             quantity = transactionRequest.quantity,
