@@ -39,9 +39,8 @@ class AssetService(
         stock: Stock,
         amount: Int,
         cost: BigDecimal
-    ) = (this.assetRepository.findByWalletAndStock(wallet, stock)?.takeUnless {
-        it.amount - amount < 0
-    } ?: throw CustomBadRequestException(ManagerErrorCode.MANAGER_10)).let {
+    ) = (this.assetRepository.findByWalletAndStock(wallet, stock)
+        ?: throw CustomBadRequestException(ManagerErrorCode.MANAGER_10)).let {
         this.assetRepository.save(performSubtraction(
             asset = it,
             amount = amount,
