@@ -9,6 +9,6 @@ import java.time.LocalDate
 @Repository
 interface ITransactionRepository : JpaRepository<Transaction, Long> {
 
-    fun findByAssetAndTransactionDate(asset: Asset, transactionDate: LocalDate): List<Transaction>
+    fun findByAssetAndTransactionDateOrderByTransactionDate(asset: Asset, transactionDate: LocalDate): List<Transaction>
 
 }

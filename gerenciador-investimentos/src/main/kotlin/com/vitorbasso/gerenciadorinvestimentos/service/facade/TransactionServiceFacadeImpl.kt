@@ -6,6 +6,7 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
+import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
@@ -15,6 +16,7 @@ import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Service
 internal class TransactionServiceFacadeImpl(
@@ -52,17 +54,20 @@ internal class TransactionServiceFacadeImpl(
         this.stockService.getStock(transactionRequest.ticker),
         transactionRequest.quantity,
         transactionRequest.value
-    ).let {
+    ).let { it ->
         Transaction(
             type = transactionRequest.type,
             quantity = transactionRequest.quantity,
             value = transactionRequest.value,
             asset = it,
-            transactionDate = transactionRequest.date
+            transactionDate = checkDate(transactionRequest.date)
         )
     }.let {
         this.transactionService.save(processDaytrade(it))
     }
+
+    private fun checkDate(dateToCheck: LocalDate)
+        = dateToCheck.takeIf { date -> !date.isAfter(LocalDate.now()) } ?: throw CustomWrongDateException()
 
     private fun processDaytrade(transaction: Transaction): Transaction {
         val sameDayTransactions = this.transactionService.findTransactionsOnDate(

@@ -14,6 +14,6 @@ class TransactionService(
     fun save(transaction: Transaction) = this.transactionRepository.save(transaction)
 
     fun findTransactionsOnDate(asset: Asset, date: LocalDate = LocalDate.now())
-        = this.transactionRepository.findByAssetAndTransactionDate(asset, date)
+        = this.transactionRepository.findByAssetAndTransactionDateOrderByTransactionDate(asset, date)
 
 }
