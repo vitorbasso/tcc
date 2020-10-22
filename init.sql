@@ -61,6 +61,8 @@ create table if not exists `transaction`(
     `quantity` int,
     `value` decimal(13,2),
     `transaction_date` date not null,
+    `daytrade` tinyint not null,
+    `daytrade_quantity` int not null,
     `asset_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp,

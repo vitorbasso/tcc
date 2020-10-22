@@ -26,5 +26,7 @@ private fun ITransaction.getDto() = TransactionDto(
     quantity = this.quantity,
     value = this.value,
     ticker = this.asset.stock.ticker,
-    transactionDate = this.transactionDate
+    transactionDate = this.transactionDate,
+    daytrade = this.daytrade,
+    daytradeQuantity = this.daytradeQuantity
 )

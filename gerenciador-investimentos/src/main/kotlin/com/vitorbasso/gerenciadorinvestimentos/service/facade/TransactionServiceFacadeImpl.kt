@@ -61,25 +61,25 @@ internal class TransactionServiceFacadeImpl(
             transactionDate = transactionRequest.date
         )
     }.let {
-        this.transactionService.save(it)
+        this.transactionService.save(it.copy(daytrade = isDaytrade(it.asset, it)))
     }
 
     private fun isDaytrade(asset: Asset, transaction: Transaction)
         = this.transactionService.findTransactionsOnDate(asset, transaction.transactionDate).let {transactionsOnDate ->
         transactionsOnDate.any { it.type != transaction.type }
-            && quantityChecksOut(transactionsOnDate, transaction)
+            && quantityChecksOut(transactionsOnDate, transaction.type)
     }
 
-    private fun quantityChecksOut(transactionsOnDate: List<Transaction>, transactionToCheck: Transaction)
-        = transactionsOnDate.fold(0) { total, transactionOnDate ->
-        when (transactionOnDate.type) {
-            TransactionType.BUY -> total + transactionOnDate.quantity
-            TransactionType.SELL -> total - transactionOnDate.quantity
+    private fun quantityChecksOut(transactionsOnDate: List<Transaction>, transactionType: TransactionType)
+        = transactionsOnDate.fold(0) { total, transaction ->
+        when (transaction.type) {
+            TransactionType.BUY -> total + transaction.quantity
+            TransactionType.SELL -> total - transaction.quantity
         }
     }.let {
-        when (transactionToCheck.type) {
-            TransactionType.SELL -> it + transactionToCheck.quantity > 0
-            TransactionType.BUY -> it - transactionToCheck.quantity < 0
+        when (transactionType) {
+            TransactionType.SELL -> it > 0
+            TransactionType.BUY -> it < 0
         }
     }
 
