@@ -61,10 +61,10 @@ internal class TransactionServiceFacadeImpl(
             transactionDate = transactionRequest.date
         )
     }.let {
-        this.transactionService.save(addDaytrade(it))
+        this.transactionService.save(processDaytrade(it))
     }
 
-    private fun addDaytrade(transaction: Transaction): Transaction {
+    private fun processDaytrade(transaction: Transaction): Transaction {
         val sameDayTransactions = this.transactionService.findTransactionsOnDate(
             transaction.asset,
             transaction.transactionDate
@@ -115,20 +115,20 @@ internal class TransactionServiceFacadeImpl(
         otherTypeTransactions.forEachIndexed { index, transaction ->
             if (quantityLeftAvailableForDaytrading > 0) {
                 quantityLeftAvailableForDaytrading = if (index > 0) {
-                    updateTransaction(
+                    updatePastTransaction(
                         transaction = transaction,
                         quantityLeft = quantityLeftAvailableForDaytrading,
                         quantityAvailableToUse = transaction.quantity
                     )
                 } else {
                     if (lastQuantityStillAvailableForDaytrade > 0) {
-                        updateTransaction(
+                        updatePastTransaction(
                             transaction = transaction,
                             quantityLeft = quantityLeftAvailableForDaytrading,
                             quantityAvailableToUse = lastQuantityStillAvailableForDaytrade
                         )
                     } else {
-                        updateTransaction(
+                        updatePastTransaction(
                             transaction = transaction,
                             quantityLeft = quantityLeftAvailableForDaytrading,
                             quantityAvailableToUse = transaction.quantity
@@ -141,7 +141,7 @@ internal class TransactionServiceFacadeImpl(
         return quantityLeftAvailableForDaytrading
     }
 
-    private fun updateTransaction(
+    private fun updatePastTransaction(
         transaction: Transaction,
         quantityLeft: Int,
         quantityAvailableToUse: Int
