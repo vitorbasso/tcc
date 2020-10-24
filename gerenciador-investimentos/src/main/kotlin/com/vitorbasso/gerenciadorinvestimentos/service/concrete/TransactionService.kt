@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class TransactionService(
+internal class TransactionService(
         val transactionRepository: ITransactionRepository
 ) {
 

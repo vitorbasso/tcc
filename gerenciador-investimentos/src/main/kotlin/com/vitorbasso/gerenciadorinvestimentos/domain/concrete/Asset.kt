@@ -3,6 +3,7 @@ package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
 import com.vitorbasso.gerenciadorinvestimentos.domain.IAsset
 import java.math.BigDecimal
+import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -30,7 +31,7 @@ data class Asset(
     @JoinColumn(name = "stock_ticker", referencedColumnName = "ticker")
     val stock: Stock,
 
-    @OneToMany(mappedBy = "asset")
+    @OneToMany(mappedBy = "asset", cascade = [CascadeType.ALL])
     val transactions: List<Transaction> = listOf()
 
 ) : BaseEntity(), IAsset
