@@ -28,6 +28,10 @@ data class Transaction(
 
     val transactionDate: LocalDate,
 
+    val daytrade: Boolean = false,
+
+    val daytradeQuantity: Int = 0,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", referencedColumnName = "id")
     val asset: Asset

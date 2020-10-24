@@ -3,8 +3,6 @@ package com.vitorbasso.gerenciadorinvestimentos.service.concrete
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Stock
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
-import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
-import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestException
 import com.vitorbasso.gerenciadorinvestimentos.repository.IAssetRepository
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -32,22 +30,31 @@ class AssetService(
         averageCount = 1,
         wallet = wallet,
         stock = stock
-    )).let { this.assetRepository.save(it) }
+    )).let { saveAsset(it) }
 
     fun subtractFromAsset(
         wallet: Wallet,
         stock: Stock,
         amount: Int,
         cost: BigDecimal
-    ) = (this.assetRepository.findByWalletAndStock(wallet, stock)?.takeUnless {
-        it.amount - amount < 0
-    } ?: throw CustomBadRequestException(ManagerErrorCode.MANAGER_10)).let {
-        this.assetRepository.save(performSubtraction(
+    ) = (this.assetRepository.findByWalletAndStock(wallet, stock)?.let {
+        performSubtraction(
             asset = it,
             amount = amount,
             cost = cost
-        ))
-    }
+        )
+    } ?: Asset(
+        averageCost = getAverageAssetCost(BigDecimal(0), amount),
+        amount = -amount,
+        lifetimeBalance = cost,
+        averageCount = 0,
+        wallet = wallet,
+        stock = stock
+    )).let { saveAsset(it) }
+
+    private fun saveAsset(asset: Asset)
+        = if(asset.amount == 0) this.assetRepository.save(asset.copy(averageCost = BigDecimal(0), averageCount = 0))
+    else this.assetRepository.save(asset)
 
     private fun performAddition(asset: Asset, amount: Int, cost: BigDecimal) = asset.copy(
         averageCost = getAverageAssetCost(

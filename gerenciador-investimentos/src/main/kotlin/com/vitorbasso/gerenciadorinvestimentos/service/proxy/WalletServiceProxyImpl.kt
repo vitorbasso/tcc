@@ -52,10 +52,10 @@ private fun IWallet.getEntity() = Wallet(
 private fun IWallet.getDto() = WalletDto(
     name = (this as Wallet).name,
     broker = this.broker,
-    lossDaytrade = this.lossDaytrade,
-    loss = this.loss,
-    balanceDaytrade = this.balanceDaytrade,
-    balance = this.balance,
+    monthlyBalanceDaytrade = this.monthlyBalanceDaytrade,
+    monthlyBalance = this.monthlyBalance,
+    lifetimeBalanceDaytrade = this.lifetimeBalanceDaytrade,
+    lifetimeBalance = this.lifetimeBalance,
     stockAsset = this.asset.map { it.getDto() }
 )
 
