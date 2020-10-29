@@ -1,11 +1,8 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Stock
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
-import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AssetService
@@ -15,7 +12,6 @@ import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.math.BigDecimal
 import java.time.LocalDate
 
 @Service
@@ -27,47 +23,29 @@ internal class TransactionServiceFacadeImpl(
 ) : ITransactionService {
 
     @Transactional
-    override fun performTransaction(transactionRequest: TransactionRequest) = when (transactionRequest.type) {
-        TransactionType.BUY -> processTransaction(
-            transactionRequest = transactionRequest,
-            wallet = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), transactionRequest.broker),
-            updateAsset = this.assetService::addToAsset
-        )
-        TransactionType.SELL -> processTransaction(
-            transactionRequest = transactionRequest,
-            wallet = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), transactionRequest.broker),
-            updateAsset = this.assetService::subtractFromAsset
-        )
-    }
-
-    private fun processTransaction(
-        transactionRequest: TransactionRequest,
-        wallet: Wallet,
-        updateAsset: (
-            wallet: Wallet,
-            stock: Stock,
-            quantity: Int,
-            value: BigDecimal
-        ) -> Asset
-    ) = updateAsset(
-        wallet,
-        this.stockService.getStock(transactionRequest.ticker),
-        transactionRequest.quantity,
-        transactionRequest.value
+    override fun performTransaction(transactionRequest: TransactionRequest)
+        = this.assetService.addTransactionToAsset(
+        wallet = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), transactionRequest.broker),
+        stock = this.stockService.getStock(transactionRequest.ticker),
+        amount = transactionRequest.quantity,
+        cost = transactionRequest.value,
+        type = transactionRequest.type
     ).let {
-        Transaction(
-            type = transactionRequest.type,
-            quantity = transactionRequest.quantity,
-            value = transactionRequest.value,
-            asset = it,
-            transactionDate = checkDate(transactionRequest.date)
-        )
+        transactionRequest.getTransaction(it)
     }.let {
         this.transactionService.save(processDaytrade(it))
     }
 
-    private fun checkDate(dateToCheck: LocalDate)
-        = dateToCheck.takeIf { date -> !date.isAfter(LocalDate.now()) } ?: throw CustomWrongDateException()
+    private fun TransactionRequest.getTransaction(asset: Asset) = Transaction(
+        type = this.type,
+        quantity = this.quantity,
+        value = this.value,
+        asset = asset,
+        transactionDate = checkDate(this.date)
+    )
+
+    private fun checkDate(dateToCheck: LocalDate) = dateToCheck.takeIf { !it.isAfter(LocalDate.now()) }
+        ?: throw CustomWrongDateException()
 
     private fun processDaytrade(transaction: Transaction): Transaction {
         val sameDayTransactions = this.transactionService.findTransactionsOnDate(
