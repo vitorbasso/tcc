@@ -23,7 +23,11 @@ internal class AssetService(
     fun deleteAsset(asset: Asset) = this.assetRepository.delete(asset)
 
     fun saveAsset(asset: Asset) = if (asset.amount == 0)
-        this.assetRepository.save(asset.copy(averageCost = BigDecimal(0), averageCount = 0))
+        this.assetRepository.save(asset.copy(
+            averageCost = BigDecimal(0),
+            averageQuantityCount = 0,
+            averageValueCount = BigDecimal.ZERO
+        ))
     else this.assetRepository.save(asset)
 
     fun processBuyTransaction(
@@ -36,21 +40,23 @@ internal class AssetService(
         averageCost = updateAverageAssetCost(
             cost = cost,
             amount = amount,
-            averageCost = asset.averageCost,
-            numberOfPapersOldAverage = asset.averageCount
+            averageValueCount = asset.averageValueCount,
+            averageQuantityCount = asset.averageQuantityCount
         ),
         amount = asset.amount + amount,
         lifetimeBalance = asset.lifetimeBalance - cost,
-        averageCount = asset.averageCount + 1
+        averageQuantityCount = asset.averageQuantityCount + amount,
+        averageValueCount = asset.averageValueCount.add(cost)
     ) ?: Asset(
         averageCost = updateAverageAssetCost(cost, amount),
         amount = amount,
         lifetimeBalance = -cost,
-        averageCount = 1,
+        averageQuantityCount = amount,
+        averageValueCount = cost,
         wallet = wallet,
         stock = stock
     )
-    
+
     fun processSellTransaction(
         asset: Asset?,
         amount: Int,
@@ -61,10 +67,9 @@ internal class AssetService(
         amount = asset.amount - amount,
         lifetimeBalance = asset.lifetimeBalance + cost
     ) ?: Asset(
-        averageCost = updateAverageAssetCost(BigDecimal(0), amount),
+        averageCost = updateAverageAssetCost(BigDecimal.ZERO, amount),
         amount = -amount,
         lifetimeBalance = cost,
-        averageCount = 0,
         wallet = wallet,
         stock = stock
     )
@@ -72,10 +77,9 @@ internal class AssetService(
     private fun updateAverageAssetCost(
         cost: BigDecimal,
         amount: Int,
-        averageCost: BigDecimal = BigDecimal(0),
-        numberOfPapersOldAverage: Int = 0
-    ) = averageCost.multiply(BigDecimal(numberOfPapersOldAverage))
-        .add(cost.divide(BigDecimal(amount), 20,  RoundingMode.HALF_DOWN))
-        .divide(BigDecimal(numberOfPapersOldAverage + 1), 20, RoundingMode.HALF_DOWN)
+        averageValueCount: BigDecimal = BigDecimal(0),
+        averageQuantityCount: Int = 0
+    ) = averageValueCount.add(cost)
+        .divide(BigDecimal(averageQuantityCount + amount), 20, RoundingMode.HALF_EVEN)
 
 }
