@@ -2,14 +2,15 @@ package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
 import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
+import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
-import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -19,13 +20,14 @@ internal class TransactionServiceFacadeImpl(
     private val transactionService: TransactionService,
     private val stockService: StockService,
     private val assetService: IAssetService,
-    private val walletService: WalletService
+    @Qualifier("walletServiceFacadeImpl")
+    private val walletService: IWalletService
 ) : ITransactionService {
 
     @Transactional
     override fun performTransaction(transactionRequest: TransactionRequest)
         = this.assetService.addTransactionToAsset(
-        wallet = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), transactionRequest.broker),
+        wallet = this.walletService.getWallet(transactionRequest.broker) as Wallet,
         stock = this.stockService.getStock(transactionRequest.ticker),
         amount = transactionRequest.quantity,
         cost = transactionRequest.value,
