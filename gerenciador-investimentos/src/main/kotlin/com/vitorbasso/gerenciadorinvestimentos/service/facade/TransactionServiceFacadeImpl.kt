@@ -4,8 +4,8 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
+import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
@@ -18,7 +18,7 @@ import java.time.LocalDate
 internal class TransactionServiceFacadeImpl(
     private val transactionService: TransactionService,
     private val stockService: StockService,
-    private val assetService: AssetService,
+    private val assetService: IAssetService,
     private val walletService: WalletService
 ) : ITransactionService {
 
