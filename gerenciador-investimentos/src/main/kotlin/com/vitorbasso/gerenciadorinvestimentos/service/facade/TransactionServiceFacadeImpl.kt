@@ -99,27 +99,13 @@ internal class TransactionServiceFacadeImpl(
 
         otherTypeTransactions.forEachIndexed { index, transaction ->
             if (quantityLeftAvailableForDaytrading > 0) {
-                quantityLeftAvailableForDaytrading = if (index > 0) {
-                    updatePastTransaction(
-                        transaction = transaction,
-                        quantityLeft = quantityLeftAvailableForDaytrading,
-                        quantityAvailableToUse = transaction.quantity
-                    )
-                } else {
-                    if (lastQuantityStillAvailableForDaytrade > 0) {
-                        updatePastTransaction(
-                            transaction = transaction,
-                            quantityLeft = quantityLeftAvailableForDaytrading,
-                            quantityAvailableToUse = lastQuantityStillAvailableForDaytrade
-                        )
-                    } else {
-                        updatePastTransaction(
-                            transaction = transaction,
-                            quantityLeft = quantityLeftAvailableForDaytrading,
-                            quantityAvailableToUse = transaction.quantity
-                        )
-                    }
-                }
+                quantityLeftAvailableForDaytrading = updatePastTransaction(
+                    transaction = transaction,
+                    quantityLeft = quantityLeftAvailableForDaytrading,
+                    quantityAvailableToUse =
+                    if(index > 0 || lastQuantityStillAvailableForDaytrade <= 0) transaction.quantity
+                    else lastQuantityStillAvailableForDaytrade
+                )
             }
         }
 
