@@ -7,10 +7,8 @@ import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
 import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
-import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -20,8 +18,7 @@ internal class TransactionServiceFacadeImpl(
     private val transactionService: TransactionService,
     private val stockService: StockService,
     private val assetService: IAssetService,
-    @Qualifier("walletServiceFacadeImpl")
-    private val walletService: IWalletService
+    private val walletService: WalletServiceFacadeImpl
 ) : ITransactionService {
 
     @Transactional
@@ -36,7 +33,7 @@ internal class TransactionServiceFacadeImpl(
         transactionRequest.getTransaction(it)
     }.let {
         this.transactionService.save(processDaytrade(it))
-    }
+    }.also { this.walletService.processTransaction(it) }
 
     private fun TransactionRequest.getTransaction(asset: Asset) = Transaction(
         type = this.type,

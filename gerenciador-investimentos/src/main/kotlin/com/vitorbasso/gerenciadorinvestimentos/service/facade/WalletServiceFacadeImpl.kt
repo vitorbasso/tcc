@@ -1,6 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.IWallet
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletUpdateRequest
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
@@ -48,5 +49,8 @@ internal class WalletServiceFacadeImpl(
                 )
         )
     }
+
+    fun processTransaction(transaction: Transaction)
+        = this.walletService.processTransaction(transaction.asset.wallet, transaction)
 
 }
