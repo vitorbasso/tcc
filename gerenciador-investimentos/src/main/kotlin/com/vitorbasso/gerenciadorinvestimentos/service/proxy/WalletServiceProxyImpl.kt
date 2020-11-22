@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 @Primary
@@ -46,7 +47,8 @@ class WalletServiceProxyImpl(
 private fun IWallet.getEntity() = Wallet(
     name = (this as WalletRequest).name,
     broker = this.broker,
-    client = SecurityContextHolder.getContext().authentication.principal as Client
+    client = SecurityContextHolder.getContext().authentication.principal as Client,
+    walletMonth = LocalDate.now()
 )
 
 private fun IWallet.getDto() = WalletDto(

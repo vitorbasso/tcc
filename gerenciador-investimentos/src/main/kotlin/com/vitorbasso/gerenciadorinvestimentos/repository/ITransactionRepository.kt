@@ -14,7 +14,7 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
 
     @Query("select t " +
         "from Transaction t " +
-        "where month(t.transactionDate)=:transactionMonth" +
+        "where month(t.transactionDate)=:transactionMonth " +
         "and t.asset=:asset")
     fun findByMonth(asset: Asset, transactionMonth: Int): List<Transaction>
 
