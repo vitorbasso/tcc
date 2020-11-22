@@ -50,7 +50,8 @@ internal class WalletServiceFacadeImpl(
         )
     }
 
-    fun processTransaction(transaction: Transaction)
-        = this.walletService.processTransaction(transaction.asset.wallet, transaction)
+    fun updateBalance(newTransaction: Transaction, sameMonthTransactions: List<Transaction>) {
+        this.walletService.processTransaction(newTransaction.asset.wallet, newTransaction)
+    }
 
 }

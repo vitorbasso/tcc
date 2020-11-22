@@ -11,6 +11,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Service
@@ -32,8 +33,8 @@ internal class TransactionServiceFacadeImpl(
     ).let {
         transactionRequest.getTransaction(it)
     }.let {
-        this.transactionService.save(processDaytrade(it))
-    }.also { this.walletService.processTransaction(it) }
+        this.transactionService.save(processTransaction(it))
+    }
 
     private fun TransactionRequest.getTransaction(asset: Asset) = Transaction(
         type = this.type,
@@ -43,14 +44,22 @@ internal class TransactionServiceFacadeImpl(
         transactionDate = checkDate(this.date)
     )
 
-    private fun checkDate(dateToCheck: LocalDate) = dateToCheck.takeIf { !it.isAfter(LocalDate.now()) }
-        ?: throw CustomWrongDateException()
+    private fun checkDate(dateToCheck: LocalDate) = dateToCheck.takeIf {
+        !it.isAfter(LocalDate.now()) && (it.dayOfWeek != DayOfWeek.SATURDAY || it.dayOfWeek != DayOfWeek.SUNDAY)
+    } ?: throw CustomWrongDateException()
+
+    private fun processTransaction(transaction: Transaction) : Transaction {
+        val processedTransactionForDaytrade = processDaytrade(transaction)
+        this.walletService.updateBalance(
+            processedTransactionForDaytrade,
+            this.transactionService.findTransactionsOnSameMonth(processedTransactionForDaytrade)
+        )
+        return processedTransactionForDaytrade
+    }
 
     private fun processDaytrade(transaction: Transaction): Transaction {
-        val sameDayTransactions = this.transactionService.findTransactionsOnDate(
-            transaction.asset,
-            transaction.transactionDate
-        )
+
+        val sameDayTransactions = this.transactionService.findTransactionsOnSameDate(transaction)
 
         var sameTypeTransactionAssetQuantity = -1 * sameDayTransactions.filter {
             it.type == transaction.type && it.daytradeQuantity != it.quantity
