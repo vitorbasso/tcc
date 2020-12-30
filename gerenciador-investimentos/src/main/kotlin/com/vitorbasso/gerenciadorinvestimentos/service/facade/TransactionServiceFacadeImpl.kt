@@ -2,7 +2,6 @@ package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
 import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
@@ -25,7 +24,7 @@ internal class TransactionServiceFacadeImpl(
     @Transactional
     override fun performTransaction(transactionRequest: TransactionRequest)
         = this.assetService.addTransactionToAsset(
-        wallet = this.walletService.getWallet(transactionRequest.broker) as Wallet,
+        wallet = this.walletService.getWallet(transactionRequest.broker),
         stock = this.stockService.getStock(transactionRequest.ticker),
         amount = transactionRequest.quantity,
         cost = transactionRequest.value,
