@@ -11,47 +11,48 @@ import com.vitorbasso.gerenciadorinvestimentos.service.concrete.ClientService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 internal class WalletServiceFacadeImpl(
-        private val walletService: WalletService,
-        private val clientService: ClientService
-): IWalletService {
+    private val walletService: WalletService,
+    private val clientService: ClientService
+) : IWalletService {
 
-    override fun getWalletCollection()
-            = this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet
+    override fun getWalletCollection() = this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet
 
-    override fun getWallet(broker: String)
-            = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), broker)
+    override fun getWallet(broker: String) = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), broker).validate()
 
-    override fun saveWallet(walletToSave: IWallet)
-            = this.walletService.saveWallet(
-            SecurityContextUtil.getClientDetails(),
-            walletToSave as Wallet
+    override fun saveWallet(walletToSave: IWallet) = this.walletService.saveWallet(
+        SecurityContextUtil.getClientDetails(),
+        walletToSave as Wallet
     )
 
-    override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest)
-            = this.walletService.updateWallet(
-            this.walletService.getWallet(
-                    client = SecurityContextUtil.getClientDetails(),
-                    broker = broker,
-                    exception = CustomBadRequestException(ManagerErrorCode.MANAGER_06)
-            ),
-            walletUpdateRequest
+    override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest) = this.walletService.updateWallet(
+        this.walletService.getWallet(
+            client = SecurityContextUtil.getClientDetails(),
+            broker = broker,
+            exception = CustomBadRequestException(ManagerErrorCode.MANAGER_06)
+        ).validate(),
+        walletUpdateRequest
     )
 
     override fun deleteWallet(broker: String) {
         this.walletService.deleteWallet(
-                this.walletService.getWallet(
-                        client = SecurityContextUtil.getClientDetails(),
-                        broker = broker,
-                        exception = CustomBadRequestException(ManagerErrorCode.MANAGER_07)
-                )
+            this.walletService.getWallet(
+                client = SecurityContextUtil.getClientDetails(),
+                broker = broker,
+                exception = CustomBadRequestException(ManagerErrorCode.MANAGER_07)
+            ).validate()
         )
     }
 
     fun updateBalance(newTransaction: Transaction, sameMonthTransactions: List<Transaction>) {
-        this.walletService.processTransaction(newTransaction.asset.wallet, newTransaction)
+        this.walletService.processTransaction(newTransaction.asset.wallet.validate(), newTransaction)
     }
+
+    private fun isValid(wallet: Wallet) = wallet.walletMonth.monthValue == LocalDate.now().monthValue
+
+    private fun Wallet.validate() = this.takeIf { isValid(it) } ?: walletService.enforceWalletMonth(this)
 
 }
