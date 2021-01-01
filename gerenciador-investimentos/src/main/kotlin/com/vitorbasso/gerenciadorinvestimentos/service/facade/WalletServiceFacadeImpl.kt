@@ -21,14 +21,16 @@ internal class WalletServiceFacadeImpl(
 
     override fun getWalletCollection() = this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet
 
-    override fun getWallet(broker: String) = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), broker).validate()
+    override fun getWallet(broker: String)
+    = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), broker).validate()
 
     override fun saveWallet(walletToSave: IWallet) = this.walletService.saveWallet(
         SecurityContextUtil.getClientDetails(),
         walletToSave as Wallet
     )
 
-    override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest) = this.walletService.updateWallet(
+    override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest)
+    = this.walletService.updateWallet(
         this.walletService.getWallet(
             client = SecurityContextUtil.getClientDetails(),
             broker = broker,
