@@ -21,29 +21,29 @@ internal class WalletServiceFacadeImpl(
 
     override fun getWalletCollection() = this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet
 
-    override fun getWallet(broker: String)
-    = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), broker).validate()
+    override fun getWallet(walletId: Long)
+    = this.walletService.getWallet(walletId, SecurityContextUtil.getClientDetails().id).validate()
 
     override fun saveWallet(walletToSave: IWallet) = this.walletService.saveWallet(
         SecurityContextUtil.getClientDetails(),
         walletToSave as Wallet
     )
 
-    override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest)
+    override fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest)
     = this.walletService.updateWallet(
         this.walletService.getWallet(
-            client = SecurityContextUtil.getClientDetails(),
-            broker = broker,
+            walletId = walletId,
+            clientId = SecurityContextUtil.getClientDetails().id,
             exception = CustomBadRequestException(ManagerErrorCode.MANAGER_06)
         ).validate(),
         walletUpdateRequest
     )
 
-    override fun deleteWallet(broker: String) {
+    override fun deleteWallet(walletId: Long) {
         this.walletService.deleteWallet(
             this.walletService.getWallet(
-                client = SecurityContextUtil.getClientDetails(),
-                broker = broker,
+                walletId = walletId,
+                clientId = SecurityContextUtil.getClientDetails().id,
                 exception = CustomBadRequestException(ManagerErrorCode.MANAGER_07)
             ).validate()
         )

@@ -14,11 +14,11 @@ class AssetController (
     private val assetService: IAssetService
 ){
 
-    @DeleteMapping("/{broker}/{ticker}")
+    @DeleteMapping("/{walletId}/{ticker}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteAsset(
-        @PathVariable broker: String,
+        @PathVariable walletId: Long,
         @PathVariable ticker: String
-    )= this.assetService.deleteAsset(broker, ticker)
+    )= this.assetService.deleteAsset(walletId, ticker)
 
 }

@@ -27,19 +27,19 @@ class WalletServiceProxyImpl(
     override fun getWalletCollection()
         = this.walletService.getWalletCollection().map { it.getSmallDto() }
 
-    override fun getWallet(broker: String) = this.walletService.getWallet(broker).getDto()
+    override fun getWallet(walletId: Long) = this.walletService.getWallet(walletId).getDto()
 
     override fun saveWallet(walletToSave: IWallet)
         = this.walletService.saveWallet(walletToSave.getEntity()).getDto()
 
-    override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest)
+    override fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest)
         = this.walletService.updateWallet(
-        broker = broker,
+        walletId = walletId,
         walletUpdateRequest = walletUpdateRequest
     ).getDto()
 
-    override fun deleteWallet(broker: String) {
-        this.walletService.deleteWallet(broker)
+    override fun deleteWallet(walletId: Long) {
+        this.walletService.deleteWallet(walletId)
     }
 
 }

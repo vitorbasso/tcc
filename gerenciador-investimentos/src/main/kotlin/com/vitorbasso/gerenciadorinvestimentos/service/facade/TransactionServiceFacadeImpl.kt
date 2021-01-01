@@ -24,7 +24,7 @@ internal class TransactionServiceFacadeImpl(
     @Transactional
     override fun performTransaction(transactionRequest: TransactionRequest)
         = this.assetService.addTransactionToAsset(
-        wallet = this.walletService.getWallet(transactionRequest.broker),
+        wallet = this.walletService.getWallet(transactionRequest.walletId),
         stock = this.stockService.getStock(transactionRequest.ticker),
         amount = transactionRequest.quantity,
         cost = transactionRequest.value,

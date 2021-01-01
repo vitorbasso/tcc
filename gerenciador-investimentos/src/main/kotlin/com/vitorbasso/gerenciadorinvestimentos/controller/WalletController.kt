@@ -21,17 +21,17 @@ class WalletController(
     @GetMapping
     fun getWallets() = this.walletService.getWalletCollection()
 
-    @GetMapping("/{broker}")
-    fun getWallet(@PathVariable broker: String) = this.walletService.getWallet(broker)
+    @GetMapping("/{id}")
+    fun getWallet(@PathVariable id: Long) = this.walletService.getWallet(id)
 
     @PostMapping
     fun saveWallet(@RequestBody walletRequest: WalletRequest)= this.walletService.saveWallet(walletRequest)
 
-    @PutMapping("/{broker}")
-    fun updateWallet(@PathVariable broker: String, @RequestBody walletUpdateRequest: WalletUpdateRequest)
-            = this.walletService.updateWallet(broker, walletUpdateRequest)
+    @PutMapping("/{id}")
+    fun updateWallet(@PathVariable id: Long, @RequestBody walletUpdateRequest: WalletUpdateRequest)
+            = this.walletService.updateWallet(id, walletUpdateRequest)
 
-    @DeleteMapping("/{broker}")
-    fun deleteWallet(@PathVariable broker: String) = this.walletService.deleteWallet(broker)
+    @DeleteMapping("/{id}")
+    fun deleteWallet(@PathVariable id: Long) = this.walletService.deleteWallet(id)
 
 }

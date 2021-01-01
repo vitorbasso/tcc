@@ -7,7 +7,7 @@ import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import java.math.BigDecimal
 
 interface IAssetService {
-    fun deleteAsset(broker: String, ticker: String)
+    fun deleteAsset(walletId: Long, ticker: String)
 
     fun addTransactionToAsset(
         wallet: Wallet,

@@ -12,6 +12,7 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundExc
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.repository.IMonthlyWalletRepository
 import com.vitorbasso.gerenciadorinvestimentos.repository.IWalletRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -24,10 +25,10 @@ internal class WalletService(
 ) {
 
     fun getWallet(
-        client: Client,
-        broker: String,
+        walletId: Long,
+        clientId: Long,
         exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
-    ) = this.walletRepository.findByBrokerAndClient(broker, client) ?: throw exception
+    ) = this.walletRepository.findByIdOrNull(walletId)?.takeIf { it.client.id == clientId } ?: throw exception
 
     fun saveWallet(client: Client, walletToSave: Wallet)
     = if (!exists(client, walletToSave)) this.walletRepository.save(walletToSave.copy(client = client))
