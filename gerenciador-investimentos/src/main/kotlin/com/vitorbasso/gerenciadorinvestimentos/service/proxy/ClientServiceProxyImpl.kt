@@ -12,18 +12,17 @@ import org.springframework.stereotype.Service
 
 @Service
 @Primary
-class ClientServiceProxyImpl (
-        @Qualifier("clientServiceFacadeImpl")
-        private val clientService: IClientService
+class ClientServiceProxyImpl(
+    @Qualifier("clientServiceFacadeImpl")
+    private val clientService: IClientService
 ) : IClientService {
 
     override fun getClient() = this.clientService.getClient().getDto()
 
-    override fun saveClient(clientToSave: IClient)
-            = this.clientService.saveClient(clientToSave.getEntity()).getDto()
+    override fun saveClient(clientToSave: IClient) = this.clientService.saveClient(clientToSave.getEntity()).getDto()
 
     override fun updateClient(clientUpdateRequest: ClientUpdateRequest)
-            = this.clientService.updateClient(clientUpdateRequest).getDto()
+    = this.clientService.updateClient(clientUpdateRequest).getDto()
 
     override fun deleteClient() {
         this.clientService.deleteClient()
@@ -32,18 +31,19 @@ class ClientServiceProxyImpl (
 }
 
 private fun IClient.getDto() = ClientDto(
-        firstName = (this as Client).firstName,
-        lastName = this.lastName,
-        email = this.email,
-        cpf = this.cpf,
-        avatarImage = this.avatarImage
+    id = (this as Client).id,
+    firstName = this.firstName,
+    lastName = this.lastName,
+    email = this.email,
+    cpf = this.cpf,
+    avatarImage = this.avatarImage
 )
 
 private fun IClient.getEntity() = Client(
-        cpf = (this as ClientRequest).cpf,
-        email = this.email,
-        password = this.password,
-        firstName = this.firstName,
-        lastName = this.lastName,
-        avatarImage = this.avatarImage
+    cpf = (this as ClientRequest).cpf,
+    email = this.email,
+    password = this.password,
+    firstName = this.firstName,
+    lastName = this.lastName,
+    avatarImage = this.avatarImage
 )

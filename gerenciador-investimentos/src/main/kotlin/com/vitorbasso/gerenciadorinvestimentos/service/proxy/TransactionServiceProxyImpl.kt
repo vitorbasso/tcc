@@ -11,18 +11,19 @@ import org.springframework.stereotype.Service
 
 @Service
 @Primary
-class TransactionServiceProxyImpl (
+class TransactionServiceProxyImpl(
     @Qualifier("transactionServiceFacadeImpl")
     private val transactionService: ITransactionService
 ) : ITransactionService {
 
     override fun performTransaction(transactionRequest: TransactionRequest)
-        = this.transactionService.performTransaction(transactionRequest).getDto()
+    = this.transactionService.performTransaction(transactionRequest).getDto()
 
 }
 
 private fun ITransaction.getDto() = TransactionDto(
-    type = (this as Transaction).type.name,
+    id = (this as Transaction).id,
+    type = this.type.name,
     quantity = this.quantity,
     value = this.value,
     ticker = this.asset.stock.ticker,

@@ -16,10 +16,6 @@ class StockRepository(
     private val yahooApi: YahooApiIntegration
 ) : IStockRepository {
 
-    companion object {
-        const val STOCK_TTL: Long = 5 // in minutes
-    }
-
     override fun findByTickerStartsWith(ticker: String)
         = this.stockJpaRepository.findByTickerStartsWith(ticker).takeIf { it.isNotEmpty() }
         ?: getRemoteStockList(ticker)
@@ -54,6 +50,10 @@ class StockRepository(
         it.getEntity()
     }.let {
         this.stockJpaRepository.saveAll(it)
+    }
+
+    companion object {
+        const val STOCK_TTL: Long = 5 // in minutes
     }
 
 }

@@ -1,13 +1,11 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.concrete
 
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
 import com.vitorbasso.gerenciadorinvestimentos.repository.ITransactionRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 internal class TransactionService(
@@ -19,8 +17,17 @@ internal class TransactionService(
 
     fun save(transaction: Transaction) = this.transactionRepository.save(transaction)
 
-    fun findTransactionsOnDate(asset: Asset, date: LocalDate = LocalDate.now())
-        = this.transactionRepository.findByAssetAndTransactionDateOrderByTransactionDate(asset, date)
+    fun findTransactionsOnSameDate(transaction: Transaction)
+        = this.transactionRepository.findByAssetAndTransactionDateOrderByTransactionDate(
+        transaction.asset,
+        transaction.transactionDate
+    )
+
+    fun findTransactionsOnSameMonth(transaction: Transaction)
+        = this.transactionRepository.findByMonth(
+        transaction.asset,
+        transaction.transactionDate.month.ordinal + 1
+    )
 
     fun deleteTransaction(transaction: Transaction) = this.transactionRepository.delete(transaction)
 

@@ -8,10 +8,9 @@ import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
-import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Service
@@ -19,13 +18,13 @@ internal class TransactionServiceFacadeImpl(
     private val transactionService: TransactionService,
     private val stockService: StockService,
     private val assetService: IAssetService,
-    private val walletService: WalletService
+    private val walletService: WalletServiceFacadeImpl,
+    private val monthlyWalletService: MonthlyWalletServiceFacadeImpl
 ) : ITransactionService {
 
     @Transactional
-    override fun performTransaction(transactionRequest: TransactionRequest)
-        = this.assetService.addTransactionToAsset(
-        wallet = this.walletService.getWallet(SecurityContextUtil.getClientDetails(), transactionRequest.broker),
+    override fun performTransaction(transactionRequest: TransactionRequest) = this.assetService.addTransactionToAsset(
+        wallet = this.walletService.getWallet(transactionRequest.walletId),
         stock = this.stockService.getStock(transactionRequest.ticker),
         amount = transactionRequest.quantity,
         cost = transactionRequest.value,
@@ -33,7 +32,7 @@ internal class TransactionServiceFacadeImpl(
     ).let {
         transactionRequest.getTransaction(it)
     }.let {
-        this.transactionService.save(processDaytrade(it))
+        this.transactionService.save(processTransaction(it))
     }
 
     private fun TransactionRequest.getTransaction(asset: Asset) = Transaction(
@@ -44,14 +43,22 @@ internal class TransactionServiceFacadeImpl(
         transactionDate = checkDate(this.date)
     )
 
-    private fun checkDate(dateToCheck: LocalDate) = dateToCheck.takeIf { !it.isAfter(LocalDate.now()) }
-        ?: throw CustomWrongDateException()
+    private fun checkDate(dateToCheck: LocalDate) = dateToCheck.takeIf {
+        !it.isAfter(LocalDate.now()) && (it.dayOfWeek != DayOfWeek.SATURDAY || it.dayOfWeek != DayOfWeek.SUNDAY)
+    } ?: throw CustomWrongDateException()
+
+    private fun processTransaction(transaction: Transaction): Transaction {
+        val processedTransactionForDaytrade = processDaytrade(transaction)
+        this.walletService.updateBalance(
+            processedTransactionForDaytrade,
+            this.monthlyWalletService
+        )
+        return processedTransactionForDaytrade
+    }
 
     private fun processDaytrade(transaction: Transaction): Transaction {
-        val sameDayTransactions = this.transactionService.findTransactionsOnDate(
-            transaction.asset,
-            transaction.transactionDate
-        )
+
+        val sameDayTransactions = this.transactionService.findTransactionsOnSameDate(transaction)
 
         var sameTypeTransactionAssetQuantity = -1 * sameDayTransactions.filter {
             it.type == transaction.type && it.daytradeQuantity != it.quantity
@@ -97,27 +104,13 @@ internal class TransactionServiceFacadeImpl(
 
         otherTypeTransactions.forEachIndexed { index, transaction ->
             if (quantityLeftAvailableForDaytrading > 0) {
-                quantityLeftAvailableForDaytrading = if (index > 0) {
-                    updatePastTransaction(
-                        transaction = transaction,
-                        quantityLeft = quantityLeftAvailableForDaytrading,
-                        quantityAvailableToUse = transaction.quantity
-                    )
-                } else {
-                    if (lastQuantityStillAvailableForDaytrade > 0) {
-                        updatePastTransaction(
-                            transaction = transaction,
-                            quantityLeft = quantityLeftAvailableForDaytrading,
-                            quantityAvailableToUse = lastQuantityStillAvailableForDaytrade
-                        )
-                    } else {
-                        updatePastTransaction(
-                            transaction = transaction,
-                            quantityLeft = quantityLeftAvailableForDaytrading,
-                            quantityAvailableToUse = transaction.quantity
-                        )
-                    }
-                }
+                quantityLeftAvailableForDaytrading = updatePastTransaction(
+                    transaction = transaction,
+                    quantityLeft = quantityLeftAvailableForDaytrading,
+                    quantityAvailableToUse =
+                    if (index > 0 || lastQuantityStillAvailableForDaytrade <= 0) transaction.quantity
+                    else lastQuantityStillAvailableForDaytrade
+                )
             }
         }
 

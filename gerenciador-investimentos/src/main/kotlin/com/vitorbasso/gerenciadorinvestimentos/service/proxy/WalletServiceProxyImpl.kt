@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 @Primary
@@ -26,19 +27,19 @@ class WalletServiceProxyImpl(
     override fun getWalletCollection()
         = this.walletService.getWalletCollection().map { it.getSmallDto() }
 
-    override fun getWallet(broker: String) = this.walletService.getWallet(broker).getDto()
+    override fun getWallet(walletId: Long) = this.walletService.getWallet(walletId).getDto()
 
     override fun saveWallet(walletToSave: IWallet)
         = this.walletService.saveWallet(walletToSave.getEntity()).getDto()
 
-    override fun updateWallet(broker: String, walletUpdateRequest: WalletUpdateRequest)
+    override fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest)
         = this.walletService.updateWallet(
-        broker = broker,
+        walletId = walletId,
         walletUpdateRequest = walletUpdateRequest
     ).getDto()
 
-    override fun deleteWallet(broker: String) {
-        this.walletService.deleteWallet(broker)
+    override fun deleteWallet(walletId: Long) {
+        this.walletService.deleteWallet(walletId)
     }
 
 }
@@ -46,11 +47,13 @@ class WalletServiceProxyImpl(
 private fun IWallet.getEntity() = Wallet(
     name = (this as WalletRequest).name,
     broker = this.broker,
-    client = SecurityContextHolder.getContext().authentication.principal as Client
+    client = SecurityContextHolder.getContext().authentication.principal as Client,
+    walletMonth = LocalDate.now()
 )
 
 private fun IWallet.getDto() = WalletDto(
-    name = (this as Wallet).name,
+    id = (this as Wallet).id,
+    name = this.name,
     broker = this.broker,
     monthlyBalanceDaytrade = this.monthlyBalanceDaytrade,
     monthlyBalance = this.monthlyBalance,
@@ -60,12 +63,14 @@ private fun IWallet.getDto() = WalletDto(
 )
 
 private fun IWallet.getSmallDto() = WalletSmallDto(
-    name = (this as Wallet).name,
+    id = (this as Wallet).id,
+    name = this.name,
     broker = this.broker
 )
 
 private fun IAsset.getDto() = AssetDto(
-    stockSymbol = (this as Asset).stock.ticker,
+    id = (this as Asset).id,
+    stockSymbol = this.stock.ticker,
     averageCost = this.averageCost,
     amount = this.amount,
     lifetimeBalance = this.lifetimeBalance

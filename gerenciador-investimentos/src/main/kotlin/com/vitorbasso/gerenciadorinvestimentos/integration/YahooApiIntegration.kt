@@ -13,10 +13,6 @@ class YahooApiIntegration(
     private val financeKey: String
 ) {
 
-    companion object {
-        const val SYMBOL_SUFFIX = ".SA" //yahoo api necessary for symbols from b3
-    }
-
     fun autoComplete(query: String)
         = this.yahooApi.searchStock(financeKey, query).quotes.filter { listItem ->
         listItem.symbol.endsWith(YahooApiIntegration.SYMBOL_SUFFIX)
@@ -37,5 +33,9 @@ class YahooApiIntegration(
     private fun getProcessedSymbol(rawSymbol: String) = "${cleanSymbol(rawSymbol)}$SYMBOL_SUFFIX"
 
     private fun cleanSymbol(processedSymbol: String) = processedSymbol.substringBeforeLast(SYMBOL_SUFFIX)
+
+    companion object {
+        const val SYMBOL_SUFFIX = ".SA" //yahoo api necessary for symbols from b3
+    }
 
 }

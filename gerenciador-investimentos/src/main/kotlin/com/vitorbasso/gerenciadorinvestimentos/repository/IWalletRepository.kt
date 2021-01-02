@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface IWalletRepository : JpaRepository<Wallet, Int> {
+interface IWalletRepository : JpaRepository<Wallet, Long> {
     fun findByBrokerAndClient(broker: String, client: Client): Wallet?
 
     fun existsByBrokerAndClient(broker: String, client: Client): Boolean
