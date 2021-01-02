@@ -29,7 +29,10 @@ internal class MonthlyWalletServiceFacadeImpl(
     )
 
     fun saveMonthlyWallet(monthlyWallet: MonthlyWallet)
-    = this.monthlyWalletService.save(monthlyWallet, SecurityContextUtil.getClientDetails().id)
+    = this.monthlyWalletService.save(
+        monthlyWallet.copy(walletMonth = monthlyWallet.walletMonth.withDayOfMonth(1)),
+        SecurityContextUtil.getClientDetails().id
+    )
 
     override fun deleteMonthlyWallet(monthlyWalletId: Long) = this.monthlyWalletService.deleteMonthlyWallet(
         this.monthlyWalletService.getMonthlyWallet(
