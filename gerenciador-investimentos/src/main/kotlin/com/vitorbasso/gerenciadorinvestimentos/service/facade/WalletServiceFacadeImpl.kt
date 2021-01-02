@@ -19,7 +19,8 @@ internal class WalletServiceFacadeImpl(
     private val clientService: ClientService
 ) : IWalletService {
 
-    override fun getWalletCollection() = this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet
+    override fun getWalletCollection()
+    = this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet
 
     override fun getWallet(walletId: Long)
     = this.walletService.getWallet(walletId, SecurityContextUtil.getClientDetails().id).validate()
@@ -49,9 +50,14 @@ internal class WalletServiceFacadeImpl(
         )
     }
 
-    fun updateBalance(newTransaction: Transaction, sameMonthTransactions: List<Transaction>) {
-        this.walletService.processTransaction(newTransaction.asset.wallet.validate(), newTransaction)
-    }
+    fun updateBalance(
+        newTransaction: Transaction,
+        monthlyWalletService: MonthlyWalletServiceFacadeImpl
+    ) = this.walletService.processTransaction(
+        wallet = newTransaction.asset.wallet.validate(),
+        transaction = newTransaction,
+        monthlyWalletService = monthlyWalletService
+    )
 
     private fun isValid(wallet: Wallet)
     = wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)

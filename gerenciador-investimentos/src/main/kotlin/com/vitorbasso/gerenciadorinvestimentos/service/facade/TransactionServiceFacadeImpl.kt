@@ -18,12 +18,12 @@ internal class TransactionServiceFacadeImpl(
     private val transactionService: TransactionService,
     private val stockService: StockService,
     private val assetService: IAssetService,
-    private val walletService: WalletServiceFacadeImpl
+    private val walletService: WalletServiceFacadeImpl,
+    private val monthlyWalletService: MonthlyWalletServiceFacadeImpl
 ) : ITransactionService {
 
     @Transactional
-    override fun performTransaction(transactionRequest: TransactionRequest)
-        = this.assetService.addTransactionToAsset(
+    override fun performTransaction(transactionRequest: TransactionRequest) = this.assetService.addTransactionToAsset(
         wallet = this.walletService.getWallet(transactionRequest.walletId),
         stock = this.stockService.getStock(transactionRequest.ticker),
         amount = transactionRequest.quantity,
@@ -47,11 +47,11 @@ internal class TransactionServiceFacadeImpl(
         !it.isAfter(LocalDate.now()) && (it.dayOfWeek != DayOfWeek.SATURDAY || it.dayOfWeek != DayOfWeek.SUNDAY)
     } ?: throw CustomWrongDateException()
 
-    private fun processTransaction(transaction: Transaction) : Transaction {
+    private fun processTransaction(transaction: Transaction): Transaction {
         val processedTransactionForDaytrade = processDaytrade(transaction)
         this.walletService.updateBalance(
             processedTransactionForDaytrade,
-            this.transactionService.findTransactionsOnSameMonth(processedTransactionForDaytrade)
+            this.monthlyWalletService
         )
         return processedTransactionForDaytrade
     }
@@ -108,7 +108,7 @@ internal class TransactionServiceFacadeImpl(
                     transaction = transaction,
                     quantityLeft = quantityLeftAvailableForDaytrading,
                     quantityAvailableToUse =
-                    if(index > 0 || lastQuantityStillAvailableForDaytrade <= 0) transaction.quantity
+                    if (index > 0 || lastQuantityStillAvailableForDaytrade <= 0) transaction.quantity
                     else lastQuantityStillAvailableForDaytrade
                 )
             }
