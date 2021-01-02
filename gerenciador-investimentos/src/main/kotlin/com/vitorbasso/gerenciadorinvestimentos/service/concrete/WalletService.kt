@@ -67,12 +67,12 @@ internal class WalletService(
             BigDecimal(transaction.quantity).subtract(BigDecimal(transaction.daytradeQuantity)).abs()
         )
         val monthlyWallet
-        = monthlyWalletService.getMonthlyWalletByMonth(transaction.transactionDate) ?: MonthlyWallet(
+        = monthlyWalletService.getMonthlyWalletByMonth(transaction.transactionDate.withDayOfMonth(1)) ?: MonthlyWallet(
             name = wallet.name,
             broker = wallet.broker,
             monthlyBalanceDaytrade = BigDecimal.ZERO,
             monthlyBalance = BigDecimal.ZERO,
-            walletMonth = transaction.transactionDate,
+            walletMonth = transaction.transactionDate.withDayOfMonth(1),
             walletId = wallet.id,
             client = wallet.client
         )
