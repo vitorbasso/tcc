@@ -32,10 +32,12 @@ internal class WalletService(
         exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     ) = this.walletRepository.findByIdOrNull(walletId)?.takeIf { it.client.id == clientId } ?: throw exception
 
-    fun saveWallet(client: Client, walletToSave: Wallet) = if (!exists(client, walletToSave)) this.walletRepository.save(walletToSave.copy(client = client))
+    fun saveWallet(client: Client, walletToSave: Wallet)
+    = if (!exists(client, walletToSave)) this.walletRepository.save(walletToSave.copy(client = client))
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
-    fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest) = this.walletRepository.save(walletToUpdate.copy(
+    fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest)
+    = this.walletRepository.save(walletToUpdate.copy(
         name = walletUpdateRequest.name ?: walletToUpdate.name,
         broker = walletUpdateRequest.broker ?: walletToUpdate.broker
     ))
@@ -43,7 +45,8 @@ internal class WalletService(
     fun deleteWallet(wallet: Wallet) = this.walletRepository.delete(wallet)
 
     @Transactional
-    fun enforceWalletMonth(wallet: Wallet) = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
+    fun enforceWalletMonth(wallet: Wallet)
+    = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
         this.monthlyWalletRepository.save(wallet.toMonthlyWallet())
         wallet.copy(
             monthlyBalanceDaytrade = BigDecimal.ZERO,
@@ -63,7 +66,8 @@ internal class WalletService(
         val normalValue = it.multiply(
             BigDecimal(transaction.quantity).subtract(BigDecimal(transaction.daytradeQuantity)).abs()
         )
-        val monthlyWallet = monthlyWalletService.getMonthlyWalletByMonth(transaction.transactionDate) ?: MonthlyWallet(
+        val monthlyWallet
+        = monthlyWalletService.getMonthlyWalletByMonth(transaction.transactionDate) ?: MonthlyWallet(
             name = wallet.name,
             broker = wallet.broker,
             monthlyBalanceDaytrade = BigDecimal.ZERO,
@@ -199,7 +203,8 @@ internal class WalletService(
         lifetimeBalance = wallet.lifetimeBalance.add(normalValue)
     )
 
-    private fun exists(client: Client, wallet: Wallet) = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
+    private fun exists(client: Client, wallet: Wallet)
+    = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
 
 }
 

@@ -14,16 +14,22 @@ internal class MonthlyWalletServiceFacadeImpl(
     private val monthlyWalletService: MonthlyWalletService
 ) : IMonthlyWalletService {
 
-    override fun getMonthlyWallets() = this.monthlyWalletService.getMonthlyWallets(SecurityContextUtil.getClientDetails().id)
+    override fun getMonthlyWallets()
+    = this.monthlyWalletService.getMonthlyWallets(SecurityContextUtil.getClientDetails().id)
 
     override fun getMonthlyWallet(monthlyWalletId: Long) = this.monthlyWalletService.getMonthlyWallet(
         monthlyWalletId,
         SecurityContextUtil.getClientDetails().id
     )
 
-    fun getMonthlyWalletByMonth(month: LocalDate) = this.monthlyWalletService.getMonthlyWalletByMonth(month.withDayOfMonth(1), SecurityContextUtil.getClientDetails().id)
+    fun getMonthlyWalletByMonth(month: LocalDate)
+    = this.monthlyWalletService.getMonthlyWalletByMonth(
+        month.withDayOfMonth(1),
+        SecurityContextUtil.getClientDetails().id
+    )
 
-    fun saveMonthlyWallet(monthlyWallet: MonthlyWallet) = this.monthlyWalletService.save(monthlyWallet, SecurityContextUtil.getClientDetails().id)
+    fun saveMonthlyWallet(monthlyWallet: MonthlyWallet)
+    = this.monthlyWalletService.save(monthlyWallet, SecurityContextUtil.getClientDetails().id)
 
     override fun deleteMonthlyWallet(monthlyWalletId: Long) = this.monthlyWalletService.deleteMonthlyWallet(
         this.monthlyWalletService.getMonthlyWallet(
