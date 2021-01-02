@@ -14,6 +14,7 @@ import com.vitorbasso.gerenciadorinvestimentos.repository.IMonthlyWalletReposito
 import com.vitorbasso.gerenciadorinvestimentos.repository.IWalletRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -42,16 +43,18 @@ internal class WalletService(
 
     fun deleteWallet(wallet: Wallet) = this.walletRepository.delete(wallet)
 
+    @Transactional
     fun enforceWalletMonth(wallet: Wallet)
-    = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth))
+    = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
+        this.monthlyWalletRepository.save(wallet.toMonthlyWallet())
         wallet.copy(
             monthlyBalanceDaytrade = BigDecimal.ZERO,
             monthlyBalance = BigDecimal.ZERO,
             walletMonth = LocalDate.now().withDayOfMonth(1)
         ).let {
-            this.monthlyWalletRepository.save(wallet.toMonthlyWallet())
             this.walletRepository.save(it)
         }
+    }
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
     fun processTransaction(wallet: Wallet, transaction: Transaction)

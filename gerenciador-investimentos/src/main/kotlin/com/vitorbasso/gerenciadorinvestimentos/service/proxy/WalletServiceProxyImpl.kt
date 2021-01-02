@@ -52,7 +52,8 @@ private fun IWallet.getEntity() = Wallet(
 )
 
 private fun IWallet.getDto() = WalletDto(
-    name = (this as Wallet).name,
+    id = (this as Wallet).id,
+    name = this.name,
     broker = this.broker,
     monthlyBalanceDaytrade = this.monthlyBalanceDaytrade,
     monthlyBalance = this.monthlyBalance,
@@ -62,12 +63,14 @@ private fun IWallet.getDto() = WalletDto(
 )
 
 private fun IWallet.getSmallDto() = WalletSmallDto(
-    name = (this as Wallet).name,
+    id = (this as Wallet).id,
+    name = this.name,
     broker = this.broker
 )
 
 private fun IAsset.getDto() = AssetDto(
-    stockSymbol = (this as Asset).stock.ticker,
+    id = (this as Asset).id,
+    stockSymbol = this.stock.ticker,
     averageCost = this.averageCost,
     amount = this.amount,
     lifetimeBalance = this.lifetimeBalance

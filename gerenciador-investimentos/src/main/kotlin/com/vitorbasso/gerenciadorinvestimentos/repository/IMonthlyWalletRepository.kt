@@ -7,5 +7,8 @@ import java.time.LocalDate
 
 @Repository
 interface IMonthlyWalletRepository : JpaRepository<MonthlyWallet, Long> {
+
+    fun findAllByClientId(clientId: Long) : List<MonthlyWallet>
+
     fun existsByWalletIdAndWalletMonth(walletId: Long, walletMonth: LocalDate): Boolean
 }

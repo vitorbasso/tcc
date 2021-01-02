@@ -5,6 +5,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class TransactionDto(
+    val id: Long,
     val type: String,
     val quantity: Int,
     val value: BigDecimal,
