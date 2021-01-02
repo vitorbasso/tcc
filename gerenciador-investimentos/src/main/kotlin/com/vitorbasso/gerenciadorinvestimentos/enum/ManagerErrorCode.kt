@@ -12,4 +12,5 @@ enum class ManagerErrorCode (val cause: String) {
     MANAGER_08("error.authentication.bad-credentials"),
     MANAGER_09("error.forbidden"),
     MANAGER_10("error.transaction.bad.date"),
+    MANAGER_11("error.client.monthly-wallet.delete")
 }

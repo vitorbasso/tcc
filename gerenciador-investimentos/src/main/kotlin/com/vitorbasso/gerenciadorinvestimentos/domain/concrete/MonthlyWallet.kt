@@ -1,6 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
+import com.vitorbasso.gerenciadorinvestimentos.domain.IMonthlyWallet
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.Entity
@@ -27,4 +28,4 @@ data class MonthlyWallet(
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     val client: Client
 
-) : BaseEntity()
+) : BaseEntity(), IMonthlyWallet
