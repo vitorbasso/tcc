@@ -17,6 +17,10 @@ internal class TransactionService(
 
     fun save(transaction: Transaction) = this.transactionRepository.save(transaction)
 
+    fun saveAndFlush(transaction: Transaction) = this.transactionRepository.saveAndFlush(transaction)
+
+    fun saveAll(transactions: List<Transaction>) = this.transactionRepository.saveAll(transactions)
+
     fun findTransactionsOnSameDate(transaction: Transaction)
         = this.transactionRepository.findByAssetAndTransactionDateOrderByTransactionDate(
         transaction.asset,
