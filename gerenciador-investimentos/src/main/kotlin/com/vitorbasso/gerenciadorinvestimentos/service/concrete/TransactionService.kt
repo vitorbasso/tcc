@@ -12,7 +12,8 @@ internal class TransactionService(
         val transactionRepository: ITransactionRepository
 ) {
 
-    fun getTransaction(transactionId: Long) = this.transactionRepository.findByIdOrNull(transactionId)
+    fun getTransaction(transactionId: Long, clientId: Long)
+    = this.transactionRepository.findByIdOrNull(transactionId)?.takeIf { it.asset.wallet.client.id == clientId }
         ?: throw CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
 
     fun save(transaction: Transaction) = this.transactionRepository.save(transaction)
