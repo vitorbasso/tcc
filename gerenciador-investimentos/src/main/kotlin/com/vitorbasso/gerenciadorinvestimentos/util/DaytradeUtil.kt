@@ -13,17 +13,16 @@ object DaytradeUtil {
 
         val (buyTransactions, sellTransactions) = getBuyAndSellLists(sameDayTransactions)
 
-        if(buyTransactions.isEmpty() || sellTransactions.isEmpty()) return sameDayTransactions
+        if(buyTransactions.isEmpty() || sellTransactions.isEmpty()) return buyTransactions+sellTransactions
 
         for(buyTransaction in buyTransactions) {
             if(!attemptToFillAvailableDaytradeQuantity(buyTransaction, sellTransactions, changedTransactions))
                 break
         }
 
-        if(sellTransactions.isNotEmpty() && sellTransactions.first().daytrade)
-            changedTransactions.add(sellTransactions.first())
-
-        return changedTransactions
+        return changedTransactions + sellTransactions + buyTransactions.filterNot {
+            changedTransactions.map { changed-> changed.id }.contains(it.id)
+        }
     }
 
     private fun attemptToFillAvailableDaytradeQuantity(

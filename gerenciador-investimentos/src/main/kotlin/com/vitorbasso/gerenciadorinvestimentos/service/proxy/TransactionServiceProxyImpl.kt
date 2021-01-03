@@ -19,6 +19,8 @@ class TransactionServiceProxyImpl(
     override fun performTransaction(transactionRequest: TransactionRequest)
     = this.transactionService.performTransaction(transactionRequest).getDto()
 
+    override fun deleteTransaction(transactionId: Long) = this.transactionService.deleteTransaction(transactionId)
+
 }
 
 private fun ITransaction.getDto() = TransactionDto(

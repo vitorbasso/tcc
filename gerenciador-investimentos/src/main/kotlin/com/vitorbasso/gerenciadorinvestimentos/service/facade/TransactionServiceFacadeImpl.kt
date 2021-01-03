@@ -36,6 +36,15 @@ internal class TransactionServiceFacadeImpl(
         processTransaction(it)
     }
 
+    @Transactional
+    override fun deleteTransaction(transactionId: Long) {
+        val transactionToDelete = this.transactionService.getTransaction(transactionId)
+        val transactions = this.transactionService.findTransactionsOnSameDate(transactionToDelete).toMutableList()
+        transactions.remove(transactionToDelete)
+        this.transactionService.saveAll(DaytradeUtil.reprocessTransactionsForDaytrade(transactions))
+        this.transactionService.deleteTransaction(transactionToDelete)
+    }
+
     private fun processTransaction(transaction: Transaction): Transaction {
         val transactionProcessed = processDaytrade(this.transactionService.saveAndFlush(transaction))
         this.walletService.updateBalance(

@@ -5,4 +5,6 @@ import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
 
 interface ITransactionService {
     fun performTransaction(transactionRequest: TransactionRequest) : ITransaction
+
+    fun deleteTransaction(transactionId: Long)
 }
