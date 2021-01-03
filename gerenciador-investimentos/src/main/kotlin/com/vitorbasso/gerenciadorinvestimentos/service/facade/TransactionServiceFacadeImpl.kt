@@ -9,6 +9,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
 import com.vitorbasso.gerenciadorinvestimentos.util.DaytradeUtil
+import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
@@ -34,6 +35,18 @@ internal class TransactionServiceFacadeImpl(
         transactionRequest.getTransaction(it)
     }.let {
         processTransaction(it)
+    }
+
+    @Transactional
+    override fun deleteTransaction(transactionId: Long) {
+        val transactionToDelete = this.transactionService.getTransaction(
+            transactionId,
+            SecurityContextUtil.getClientDetails().id
+        )
+        val transactions = this.transactionService.findTransactionsOnSameDate(transactionToDelete).toMutableList()
+        transactions.remove(transactionToDelete)
+        this.transactionService.saveAll(DaytradeUtil.reprocessTransactionsForDaytrade(transactions))
+        this.transactionService.deleteTransaction(transactionToDelete)
     }
 
     private fun processTransaction(transaction: Transaction): Transaction {
