@@ -9,16 +9,16 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-data class Stock (
-        @Id
-        val ticker: String,
-        val currentValue: BigDecimal,
-        val openingValue: BigDecimal,
-        val closingValue: BigDecimal,
-        val highestValue: BigDecimal,
-        val lowestValue: BigDecimal,
-        val variation: BigDecimal,
-        @field:UpdateTimestamp
-        @Column(nullable = false)
-        val dateUpdated: LocalDateTime = LocalDateTime.now()
+data class Stock(
+    @Id
+    val ticker: String = "",
+    val currentValue: BigDecimal = BigDecimal.ZERO,
+    val openingValue: BigDecimal = BigDecimal.ZERO,
+    val closingValue: BigDecimal = BigDecimal.ZERO,
+    val highestValue: BigDecimal = BigDecimal.ZERO,
+    val lowestValue: BigDecimal = BigDecimal.ZERO,
+    val variation: BigDecimal = BigDecimal.ZERO,
+    @field:UpdateTimestamp
+    @Column(nullable = false)
+    val dateUpdated: LocalDateTime = LocalDateTime.now()
 ) : Serializable
