@@ -50,7 +50,9 @@ internal class TransactionServiceFacadeImpl(
     }
 
     private fun processTransaction(transaction: Transaction): Transaction {
-        val transactionProcessed = processDaytrade(this.transactionService.saveAndFlush(transaction))
+        val transactionProcessed = processDaytrade(this.transactionService.saveAndFlush(transaction.copy(
+            isSellout = transaction.asset.amount == 0
+        )))
         this.walletService.updateBalance(
             transactionProcessed,
             this.monthlyWalletService

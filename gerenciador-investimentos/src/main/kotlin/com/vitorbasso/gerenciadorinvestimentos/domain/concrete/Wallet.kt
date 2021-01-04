@@ -25,6 +25,7 @@ data class Wallet(
     val lifetimeBalanceDaytrade: BigDecimal = BigDecimal.ZERO,
     val lifetimeBalance: BigDecimal = BigDecimal.ZERO,
     val withdrawn: BigDecimal = BigDecimal.ZERO,
+    val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
     val walletMonth: LocalDate = LocalDate.now(),
 
     @ManyToOne(fetch = FetchType.LAZY)

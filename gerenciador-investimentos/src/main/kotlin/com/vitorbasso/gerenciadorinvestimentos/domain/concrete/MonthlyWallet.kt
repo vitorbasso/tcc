@@ -22,6 +22,7 @@ data class MonthlyWallet(
     val monthlyBalanceDaytrade: BigDecimal = BigDecimal.ZERO,
     val monthlyBalance: BigDecimal = BigDecimal.ZERO,
     val withdrawn: BigDecimal = BigDecimal.ZERO,
+    val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
     val walletId: Long = 0,
     val walletMonth: LocalDate = LocalDate.now(),
 

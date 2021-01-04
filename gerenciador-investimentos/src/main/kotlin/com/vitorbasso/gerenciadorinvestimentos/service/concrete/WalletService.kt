@@ -122,6 +122,24 @@ internal class WalletService(
         }
     }
 
+    private fun processLifetimeBuyTransaction(
+        wallet: Wallet,
+        daytradeValue: BigDecimal,
+        normalValue: BigDecimal
+    ) = wallet.copy(
+        lifetimeBalanceDaytrade = wallet.lifetimeBalanceDaytrade.subtract(daytradeValue),
+        lifetimeBalance = wallet.lifetimeBalance.subtract(normalValue)
+    )
+
+    private fun processMonthlyBuyTransaction(
+        wallet: Wallet,
+        daytradeValue: BigDecimal,
+        normalValue: BigDecimal
+    ) = wallet.copy(
+        monthlyBalanceDaytrade = wallet.monthlyBalanceDaytrade.subtract(daytradeValue),
+        monthlyBalance = wallet.monthlyBalance.subtract(normalValue)
+    )
+
     private fun proccessMonthlyWalletBuyTransaction(
         monthlyWallet: MonthlyWallet,
         daytradeValue: BigDecimal,
@@ -157,23 +175,13 @@ internal class WalletService(
         }
     }
 
-    private fun proccessMonthlyWalletSellTransaction(
-        monthlyWallet: MonthlyWallet,
-        daytradeValue: BigDecimal,
-        normalValue: BigDecimal,
-        monthlyWalletService: MonthlyWalletServiceFacadeImpl
-    ) = monthlyWalletService.saveMonthlyWallet(monthlyWallet.copy(
-        monthlyBalanceDaytrade = monthlyWallet.monthlyBalanceDaytrade.add(daytradeValue),
-        monthlyBalance = monthlyWallet.monthlyBalance.add(normalValue)
-    ))
-
-    private fun processMonthlyBuyTransaction(
+    private fun processLifetimeSellTransaction(
         wallet: Wallet,
         daytradeValue: BigDecimal,
         normalValue: BigDecimal
     ) = wallet.copy(
-        monthlyBalanceDaytrade = wallet.monthlyBalanceDaytrade.subtract(daytradeValue),
-        monthlyBalance = wallet.monthlyBalance.subtract(normalValue)
+        lifetimeBalanceDaytrade = wallet.lifetimeBalanceDaytrade.add(daytradeValue),
+        lifetimeBalance = wallet.lifetimeBalance.add(normalValue)
     )
 
     private fun processMonthlySellTransaction(
@@ -185,23 +193,15 @@ internal class WalletService(
         monthlyBalance = wallet.monthlyBalance.add(normalValue)
     )
 
-    private fun processLifetimeBuyTransaction(
-        wallet: Wallet,
+    private fun proccessMonthlyWalletSellTransaction(
+        monthlyWallet: MonthlyWallet,
         daytradeValue: BigDecimal,
-        normalValue: BigDecimal
-    ) = wallet.copy(
-        lifetimeBalanceDaytrade = wallet.lifetimeBalanceDaytrade.subtract(daytradeValue),
-        lifetimeBalance = wallet.lifetimeBalance.subtract(normalValue)
-    )
-
-    private fun processLifetimeSellTransaction(
-        wallet: Wallet,
-        daytradeValue: BigDecimal,
-        normalValue: BigDecimal
-    ) = wallet.copy(
-        lifetimeBalanceDaytrade = wallet.lifetimeBalanceDaytrade.add(daytradeValue),
-        lifetimeBalance = wallet.lifetimeBalance.add(normalValue)
-    )
+        normalValue: BigDecimal,
+        monthlyWalletService: MonthlyWalletServiceFacadeImpl
+    ) = monthlyWalletService.saveMonthlyWallet(monthlyWallet.copy(
+        monthlyBalanceDaytrade = monthlyWallet.monthlyBalanceDaytrade.add(daytradeValue),
+        monthlyBalance = monthlyWallet.monthlyBalance.add(normalValue)
+    ))
 
     private fun exists(client: Client, wallet: Wallet)
     = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
