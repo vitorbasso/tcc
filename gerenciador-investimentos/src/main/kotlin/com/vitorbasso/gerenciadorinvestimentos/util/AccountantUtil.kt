@@ -5,7 +5,7 @@ import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import org.springframework.stereotype.Component
 
 @Component
-object DaytradeUtil {
+object AccountantUtil {
 
     fun reprocessTransactionsForDaytrade(sameDayTransactions: List<Transaction>): List<Transaction>{
 

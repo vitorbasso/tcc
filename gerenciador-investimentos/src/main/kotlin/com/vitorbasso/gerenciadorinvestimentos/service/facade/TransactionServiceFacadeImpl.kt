@@ -8,7 +8,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
-import com.vitorbasso.gerenciadorinvestimentos.util.DaytradeUtil
+import com.vitorbasso.gerenciadorinvestimentos.util.AccountantUtil
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -45,28 +45,28 @@ internal class TransactionServiceFacadeImpl(
         )
         val transactions = this.transactionService.findTransactionsOnSameDate(transactionToDelete).toMutableList()
         transactions.remove(transactionToDelete)
-        this.transactionService.saveAll(DaytradeUtil.reprocessTransactionsForDaytrade(transactions))
+        this.transactionService.saveAll(AccountantUtil.reprocessTransactionsForDaytrade(transactions))
         this.transactionService.deleteTransaction(transactionToDelete)
     }
 
     private fun processTransaction(transaction: Transaction): Transaction {
-        val transactionProcessed = processDaytrade(this.transactionService.saveAndFlush(transaction.copy(
+        val transactionDaytradeProcessed = processDaytrade(this.transactionService.saveAndFlush(transaction.copy(
             isSellout = transaction.asset.amount == 0
         )))
         this.walletService.updateBalance(
-            transactionProcessed,
+            transactionDaytradeProcessed,
             this.monthlyWalletService
         )
-        return transactionProcessed
+        return transactionDaytradeProcessed
     }
 
     private fun processDaytrade(transaction: Transaction)
     = this.transactionService.findTransactionsOnSameDate(transaction).let {
-        this.transactionService.saveAll(DaytradeUtil.reprocessTransactionsForDaytrade(it)).find {
-            processedTransaction ->
-            processedTransaction.id == transaction.id
-        } ?: transaction
-    }
+        this.transactionService.saveAll(AccountantUtil.reprocessTransactionsForDaytrade(it))
+    }.find {
+        processedTransaction ->
+        processedTransaction.id == transaction.id
+    } ?: transaction
 
     private fun checkDate(dateToCheck: LocalDate) = dateToCheck.takeIf {
         !it.isAfter(LocalDate.now()) && (it.dayOfWeek != DayOfWeek.SATURDAY || it.dayOfWeek != DayOfWeek.SUNDAY)
