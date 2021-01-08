@@ -20,13 +20,15 @@ data class Transaction(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
-    val type: TransactionType,
+    val type: TransactionType = TransactionType.BUY,
 
-    val quantity: Int,
+    val quantity: Int = 0,
 
-    val value: BigDecimal,
+    val value: BigDecimal = BigDecimal.ZERO,
 
-    val transactionDate: LocalDate,
+    val transactionDate: LocalDate = LocalDate.now(),
+
+    val isSellout: Boolean = false,
 
     val daytrade: Boolean = false,
 
@@ -34,6 +36,6 @@ data class Transaction(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", referencedColumnName = "id")
-    val asset: Asset
+    val asset: Asset = Asset()
 
 ) : BaseEntity(), ITransaction

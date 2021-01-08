@@ -18,19 +18,19 @@ data class Asset(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
-    val averageCost: BigDecimal = BigDecimal(0),
+    val averageCost: BigDecimal = BigDecimal.ZERO,
     val amount: Int = 0,
-    val lifetimeBalance: BigDecimal = BigDecimal(0),
+    val lifetimeBalance: BigDecimal = BigDecimal.ZERO,
     val averageQuantityCount: Int = 0,
-    val averageValueCount: BigDecimal = BigDecimal(0),
+    val averageValueCount: BigDecimal = BigDecimal.ZERO,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")
-    val wallet: Wallet,
+    val wallet: Wallet = Wallet(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_ticker", referencedColumnName = "ticker")
-    val stock: Stock,
+    val stock: Stock = Stock(),
 
     @OneToMany(mappedBy = "asset", cascade = [CascadeType.ALL])
     val transactions: List<Transaction> = listOf()

@@ -18,17 +18,19 @@ data class Wallet(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-    val name: String,
-    val broker: String,
-    val monthlyBalanceDaytrade: BigDecimal = BigDecimal(0),
-    val monthlyBalance: BigDecimal = BigDecimal(0),
-    val lifetimeBalanceDaytrade: BigDecimal = BigDecimal(0),
-    val lifetimeBalance: BigDecimal = BigDecimal(0),
-    val walletMonth: LocalDate,
+    val name: String = "",
+    val broker: String = "",
+    val monthlyBalanceDaytrade: BigDecimal = BigDecimal.ZERO,
+    val monthlyBalance: BigDecimal = BigDecimal.ZERO,
+    val lifetimeBalanceDaytrade: BigDecimal = BigDecimal.ZERO,
+    val lifetimeBalance: BigDecimal = BigDecimal.ZERO,
+    val withdrawn: BigDecimal = BigDecimal.ZERO,
+    val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
+    val walletMonth: LocalDate = LocalDate.now(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", referencedColumnName = "id")
-    val client: Client,
+    val client: Client = Client(),
 
     @OneToMany(mappedBy = "wallet")
     val asset: List<Asset> = listOf()
