@@ -93,7 +93,12 @@ internal class WalletService(
                 daytradeValue = daytradeValue,
                 normalValue = normalValue,
                 monthlyWalletService
-            )
+            ).let { wallet ->
+                wallet.copy(
+                    withdrawn = wallet.withdrawn + normalValue,
+                    withdrawnDaytrade = wallet.withdrawnDaytrade + daytradeValue
+                )
+            }
         }
     }.let { this.walletRepository.save(it) }
 
