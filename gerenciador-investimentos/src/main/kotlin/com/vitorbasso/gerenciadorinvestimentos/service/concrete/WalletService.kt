@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 internal class WalletService(
@@ -72,7 +73,7 @@ internal class WalletService(
             broker = wallet.broker,
             monthlyBalanceDaytrade = BigDecimal.ZERO,
             monthlyBalance = BigDecimal.ZERO,
-            walletMonth = transaction.transactionDate.withDayOfMonth(1),
+            walletMonth = transaction.transactionDate.toLocalDate().withDayOfMonth(1),
             walletId = wallet.id,
             client = wallet.client
         )
@@ -105,7 +106,7 @@ internal class WalletService(
     private fun processBuyTransaction(
         wallet: Wallet,
         monthlyWallet: MonthlyWallet,
-        transactionDate: LocalDate,
+        transactionDate: LocalDateTime,
         daytradeValue: BigDecimal,
         normalValue: BigDecimal,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
@@ -114,7 +115,7 @@ internal class WalletService(
         daytradeValue = daytradeValue,
         normalValue = normalValue
     ).let {
-        if (transactionDate.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1))
+        if (transactionDate.toLocalDate().withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1))
             processMonthlyBuyTransaction(it, daytradeValue, normalValue)
         else {
             proccessMonthlyWalletBuyTransaction(
@@ -158,7 +159,7 @@ internal class WalletService(
     private fun processSellTransaction(
         wallet: Wallet,
         monthlyWallet: MonthlyWallet,
-        transactionDate: LocalDate,
+        transactionDate: LocalDateTime,
         daytradeValue: BigDecimal,
         normalValue: BigDecimal,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
@@ -167,7 +168,7 @@ internal class WalletService(
         daytradeValue = daytradeValue,
         normalValue = normalValue
     ).let {
-        if (transactionDate.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1))
+        if (transactionDate.toLocalDate().withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1))
             processMonthlySellTransaction(it, daytradeValue, normalValue)
         else {
             proccessMonthlyWalletSellTransaction(

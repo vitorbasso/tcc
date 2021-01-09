@@ -2,7 +2,7 @@ package com.vitorbasso.gerenciadorinvestimentos.dto.response
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.ITransaction
 import java.math.BigDecimal
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class TransactionDto(
     val id: Long,
@@ -10,7 +10,7 @@ data class TransactionDto(
     val quantity: Int,
     val value: BigDecimal,
     val ticker: String,
-    val transactionDate: LocalDate,
+    val transactionDate: LocalDateTime,
     val daytrade: Boolean,
     val daytradeQuantity: Int
 ) : ITransaction

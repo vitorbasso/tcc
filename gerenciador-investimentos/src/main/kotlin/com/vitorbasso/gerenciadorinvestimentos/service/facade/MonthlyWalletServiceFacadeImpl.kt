@@ -7,7 +7,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.IMonthlyWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.MonthlyWalletService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.stereotype.Service
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 internal class MonthlyWalletServiceFacadeImpl(
@@ -22,9 +22,9 @@ internal class MonthlyWalletServiceFacadeImpl(
         SecurityContextUtil.getClientDetails().id
     )
 
-    fun getMonthlyWalletByMonth(month: LocalDate)
+    fun getMonthlyWalletByMonth(month: LocalDateTime)
     = this.monthlyWalletService.getMonthlyWalletByMonth(
-        month.withDayOfMonth(1),
+        month.toLocalDate().withDayOfMonth(1),
         SecurityContextUtil.getClientDetails().id
     )
 

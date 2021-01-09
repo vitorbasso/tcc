@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 internal class TransactionServiceFacadeImpl(
@@ -68,8 +69,8 @@ internal class TransactionServiceFacadeImpl(
         processedTransaction.id == transaction.id
     } ?: transaction
 
-    private fun checkDate(dateToCheck: LocalDate) = dateToCheck.takeIf {
-        !it.isAfter(LocalDate.now()) && (it.dayOfWeek != DayOfWeek.SATURDAY || it.dayOfWeek != DayOfWeek.SUNDAY)
+    private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
+        !it.toLocalDate().isAfter(LocalDate.now()) && (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY)
     } ?: throw CustomWrongDateException()
 
     private fun TransactionRequest.getTransaction(asset: Asset) = Transaction(

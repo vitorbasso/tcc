@@ -81,7 +81,7 @@ create table if not exists `transaction`(
 	`type` int not null,
     `quantity` int default 0,
     `value` decimal(13,2) default 0,
-    `transaction_date` date not null,
+    `transaction_date` timestamp not null default NOW(),
     `is_sellout` boolean not null default false,
     `daytrade` boolean not null default false,
     `daytrade_quantity` int not null default 0,

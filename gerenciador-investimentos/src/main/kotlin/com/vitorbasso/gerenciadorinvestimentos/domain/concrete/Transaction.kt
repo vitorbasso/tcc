@@ -4,7 +4,7 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
 import com.vitorbasso.gerenciadorinvestimentos.domain.ITransaction
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import java.math.BigDecimal
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -26,7 +26,7 @@ data class Transaction(
 
     val value: BigDecimal = BigDecimal.ZERO,
 
-    val transactionDate: LocalDate = LocalDate.now(),
+    val transactionDate: LocalDateTime = LocalDateTime.now(),
 
     val isSellout: Boolean = false,
 
