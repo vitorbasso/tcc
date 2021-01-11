@@ -28,10 +28,10 @@ internal class TransactionService(
         transaction.transactionDate
     )
 
-    fun findTransactionsOnSameMonth(transaction: Transaction)
-        = this.transactionRepository.findByMonth(
-        transaction.asset,
-        transaction.transactionDate.month.ordinal + 1
+    fun findFromLastIsSellout(transaction: Transaction)
+    = this.transactionRepository.findFromLastIsSellout(
+        transaction.asset.id,
+        transaction.transactionDate
     )
 
     fun deleteTransaction(transaction: Transaction) = this.transactionRepository.delete(transaction)

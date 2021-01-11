@@ -35,6 +35,9 @@ internal class TransactionServiceFacadeImpl(
     ).let {
         transactionRequest.getTransaction(it)
     }.let {
+        println(
+            this.transactionService.findFromLastIsSellout(it).map { trans -> trans.id }
+        )
         processTransaction(it)
     }
 
@@ -70,7 +73,8 @@ internal class TransactionServiceFacadeImpl(
     } ?: transaction
 
     private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
-        !it.toLocalDate().isAfter(LocalDate.now()) && (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY)
+        !it.toLocalDate().isAfter(LocalDate.now()) &&
+            (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY)
     } ?: throw CustomWrongDateException()
 
     private fun TransactionRequest.getTransaction(asset: Asset) = Transaction(
