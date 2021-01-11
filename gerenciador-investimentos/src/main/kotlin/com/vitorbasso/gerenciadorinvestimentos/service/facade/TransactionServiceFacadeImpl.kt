@@ -35,9 +35,6 @@ internal class TransactionServiceFacadeImpl(
     ).let {
         transactionRequest.getTransaction(it)
     }.let {
-        println(
-            this.transactionService.findFromLastIsSellout(it).map { trans -> trans.id }
-        )
         processTransaction(it)
     }
 
