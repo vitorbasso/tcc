@@ -29,7 +29,10 @@ internal class TransactionService(
     )
 
     fun findFromLastIsSellout(transaction: Transaction)
-    = if(this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(transaction.asset, transaction.transactionDate))
+    = if(this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(
+            transaction.asset,
+            transaction.transactionDate
+        ))
         this.transactionRepository.findFromLastIsSellout(
         transaction.asset.id,
         transaction.transactionDate
