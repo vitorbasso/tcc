@@ -32,4 +32,8 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
     )
     fun findFromLastIsSellout(assetId: Long, transactionDate: LocalDateTime): List<Transaction>
 
+    fun existsByAssetAndTransactionDateGreaterThanEqual(asset: Asset, transactionDate: LocalDateTime) : Boolean
+
+    fun findAllByAsset(asset: Asset) : List<Transaction>
+
 }

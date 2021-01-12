@@ -29,10 +29,13 @@ internal class TransactionService(
     )
 
     fun findFromLastIsSellout(transaction: Transaction)
-    = this.transactionRepository.findFromLastIsSellout(
+    = if(this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(transaction.asset, transaction.transactionDate))
+        this.transactionRepository.findFromLastIsSellout(
         transaction.asset.id,
         transaction.transactionDate
-    )
+    ).takeIf { it.isNotEmpty() } ?: this.transactionRepository.findAllByAsset(transaction.asset)
+    else
+        listOf()
 
     fun deleteTransaction(transaction: Transaction) = this.transactionRepository.delete(transaction)
 
