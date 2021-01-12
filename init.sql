@@ -91,3 +91,5 @@ create table if not exists `transaction`(
     primary key (`id`),
     foreign key (`asset_id`) references `asset` (`id`) 
 )engine=InnoDB;
+
+CREATE INDEX `transaction_date` ON `transaction` (`transaction_date`);

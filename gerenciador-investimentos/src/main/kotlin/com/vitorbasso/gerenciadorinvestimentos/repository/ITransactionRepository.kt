@@ -10,9 +10,10 @@ import java.time.LocalDateTime
 @Repository
 interface ITransactionRepository : JpaRepository<Transaction, Long> {
 
-    fun findByAssetAndTransactionDateOrderByTransactionDate(
+    fun findByAssetAndTransactionDateBetweenOrderByTransactionDate(
         asset: Asset,
-        transactionDate: LocalDateTime
+        transactionDateStart: LocalDateTime,
+        transactionDateEnd: LocalDateTime
     ): List<Transaction>
 
     @Query(
@@ -21,7 +22,7 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
             "select t.* " +
             "from transaction t " +
             "where t.asset_id = :assetId " +
-            "and t.transaction_date >= (" +
+            "and t.transaction_date > (" +
             "select t1.transaction_date " +
             "from transaction t1 " +
             "where t1.asset_id = :assetId " +
@@ -32,8 +33,8 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
     )
     fun findFromLastIsSellout(assetId: Long, transactionDate: LocalDateTime): List<Transaction>
 
-    fun existsByAssetAndTransactionDateGreaterThanEqual(asset: Asset, transactionDate: LocalDateTime) : Boolean
+    fun existsByAssetAndTransactionDateGreaterThanEqual(asset: Asset, transactionDate: LocalDateTime): Boolean
 
-    fun findAllByAsset(asset: Asset) : List<Transaction>
+    fun findAllByAsset(asset: Asset): List<Transaction>
 
 }

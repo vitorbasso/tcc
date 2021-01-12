@@ -63,7 +63,11 @@ internal class TransactionServiceFacadeImpl(
 
     private fun processDaytrade(transaction: Transaction)
     = this.transactionService.findTransactionsOnSameDate(transaction).let {
-        this.transactionService.saveAll(AccountantUtil.reprocessTransactionsForDaytrade(it))
+        this.transactionService.saveAll(AccountantUtil.accountForNewTransaction(
+            transaction,
+            this.transactionService.findFromLastIsSellout(transaction),
+            it
+        ))
     }.find {
         processedTransaction ->
         processedTransaction.id == transaction.id

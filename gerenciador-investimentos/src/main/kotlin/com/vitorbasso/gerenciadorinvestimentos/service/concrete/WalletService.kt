@@ -13,6 +13,7 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.repository.IMonthlyWalletRepository
 import com.vitorbasso.gerenciadorinvestimentos.repository.IWalletRepository
 import com.vitorbasso.gerenciadorinvestimentos.service.facade.MonthlyWalletServiceFacadeImpl
+import com.vitorbasso.gerenciadorinvestimentos.util.AccountantUtil
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -63,9 +64,9 @@ internal class WalletService(
         transaction: Transaction,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
     ) = transaction.value.divide(BigDecimal(transaction.quantity), 20, RoundingMode.HALF_EVEN).let {
-        val daytradeValue = it.multiply(BigDecimal(transaction.daytradeQuantity))
-        val normalValue = it.multiply(
-            BigDecimal(transaction.quantity).subtract(BigDecimal(transaction.daytradeQuantity)).abs()
+        val (normalValue, daytradeValue) = AccountantUtil.getTransactionNormalAndDaytradeValue(
+            it,
+            transaction
         )
         val monthlyWallet
         = monthlyWalletService.getMonthlyWalletByMonth(transaction.transactionDate.withDayOfMonth(1)) ?: MonthlyWallet(

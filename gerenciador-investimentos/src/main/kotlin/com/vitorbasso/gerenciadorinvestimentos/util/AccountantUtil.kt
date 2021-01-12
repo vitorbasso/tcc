@@ -3,9 +3,35 @@ package com.vitorbasso.gerenciadorinvestimentos.util
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import org.springframework.stereotype.Component
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Component
 object AccountantUtil {
+
+    fun accountForNewTransaction(newTransaction: Transaction, staleTransactions: List<Transaction>, sameDayTransactions: List<Transaction>) : List<Transaction> {
+        staleTransactions.fold(mapOf("normal" to BigDecimal.ZERO, "daytrade" to BigDecimal.ZERO)){ total, transaction ->
+            val (normalValue, daytradeValue) = getTransactionNormalAndDaytradeValue(
+                getAverageTickerValue(transaction),
+                transaction
+            )
+            mapOf(
+                "normal" to total["normal"]?.add(normalValue),
+                "dayytrade" to total["daytrade"]?.add(daytradeValue)
+            )
+        }
+        return reprocessTransactionsForDaytrade(sameDayTransactions)
+    }
+
+    private fun getAverageTickerValue(transaction: Transaction)
+    = transaction.value.divide(BigDecimal(transaction.quantity), 20, RoundingMode.HALF_EVEN)
+
+    fun getTransactionNormalAndDaytradeValue(averageTickerValue: BigDecimal, transaction: Transaction) = Pair(
+        averageTickerValue.multiply(
+            BigDecimal(transaction.quantity).subtract(BigDecimal(transaction.daytradeQuantity)).abs()
+        ),
+        averageTickerValue.multiply(BigDecimal(transaction.daytradeQuantity))
+    )
 
     fun reprocessTransactionsForDaytrade(sameDayTransactions: List<Transaction>): List<Transaction>{
 
