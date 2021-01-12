@@ -9,7 +9,11 @@ import java.math.RoundingMode
 @Component
 object AccountantUtil {
 
-    fun accountForNewTransaction(newTransaction: Transaction, staleTransactions: List<Transaction>, sameDayTransactions: List<Transaction>) : List<Transaction> {
+    fun accountForNewTransaction(
+        newTransaction: Transaction,
+        staleTransactions: List<Transaction>,
+        sameDayTransactions: List<Transaction>
+    ) : List<Transaction> {
         staleTransactions.fold(mapOf("normal" to BigDecimal.ZERO, "daytrade" to BigDecimal.ZERO)){ total, transaction ->
             val (normalValue, daytradeValue) = getTransactionNormalAndDaytradeValue(
                 getAverageTickerValue(transaction),
