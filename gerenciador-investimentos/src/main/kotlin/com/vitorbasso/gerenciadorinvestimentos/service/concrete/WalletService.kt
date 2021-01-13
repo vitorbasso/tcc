@@ -163,7 +163,8 @@ internal class WalletService(
         }
     }
 
-    private fun exists(client: Client, wallet: Wallet) = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
+    private fun exists(client: Client, wallet: Wallet)
+    = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
 
 }
 

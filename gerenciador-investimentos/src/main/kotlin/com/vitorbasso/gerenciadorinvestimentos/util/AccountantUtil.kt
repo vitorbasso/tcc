@@ -17,7 +17,8 @@ object AccountantUtil {
         staleTransactions: List<Transaction>,
         sameDayTransactions: List<Transaction>
     ) : List<Transaction> {
-        staleTransactions.fold(mapOf(NORMAL_VALUE to BigDecimal.ZERO, DAYTRADE_VALUE to BigDecimal.ZERO)){ total, transaction ->
+        staleTransactions.fold(mapOf(NORMAL_VALUE to BigDecimal.ZERO, DAYTRADE_VALUE to BigDecimal.ZERO)){
+            total, transaction ->
             val (normalValue, daytradeValue) = getTransactionNormalAndDaytradeValue(
                 getAverageTickerValue(transaction),
                 transaction
