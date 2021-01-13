@@ -9,22 +9,28 @@ import java.math.RoundingMode
 @Component
 object AccountantUtil {
 
+    private const val NORMAL_VALUE = "normal"
+    private const val DAYTRADE_VALUE = "daytrade"
+
     fun accountForNewTransaction(
         newTransaction: Transaction,
         staleTransactions: List<Transaction>,
         sameDayTransactions: List<Transaction>
     ) : List<Transaction> {
-        staleTransactions.fold(mapOf("normal" to BigDecimal.ZERO, "daytrade" to BigDecimal.ZERO)){ total, transaction ->
+        staleTransactions.fold(mapOf(NORMAL_VALUE to BigDecimal.ZERO, DAYTRADE_VALUE to BigDecimal.ZERO)){ total, transaction ->
             val (normalValue, daytradeValue) = getTransactionNormalAndDaytradeValue(
                 getAverageTickerValue(transaction),
                 transaction
             )
             mapOf(
-                "normal" to total["normal"]?.add(normalValue),
-                "dayytrade" to total["daytrade"]?.add(daytradeValue)
+                NORMAL_VALUE to total[NORMAL_VALUE]?.add(normalValue),
+                DAYTRADE_VALUE to total[DAYTRADE_VALUE]?.add(daytradeValue)
             )
         }
-        return reprocessTransactionsForDaytrade(sameDayTransactions)
+        val samedayTransactions = staleTransactions.filter {
+            it.transactionDate.toLocalDate() == newTransaction.transactionDate.toLocalDate()
+        }
+        return reprocessTransactionsForDaytrade(samedayTransactions)
     }
 
     private fun getAverageTickerValue(transaction: Transaction)

@@ -34,12 +34,10 @@ internal class WalletService(
         exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     ) = this.walletRepository.findByIdOrNull(walletId)?.takeIf { it.client.id == clientId } ?: throw exception
 
-    fun saveWallet(client: Client, walletToSave: Wallet)
-    = if (!exists(client, walletToSave)) this.walletRepository.save(walletToSave.copy(client = client))
+    fun saveWallet(client: Client, walletToSave: Wallet) = if (!exists(client, walletToSave)) this.walletRepository.save(walletToSave.copy(client = client))
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
-    fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest)
-    = this.walletRepository.save(walletToUpdate.copy(
+    fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest) = this.walletRepository.save(walletToUpdate.copy(
         name = walletUpdateRequest.name ?: walletToUpdate.name,
         broker = walletUpdateRequest.broker ?: walletToUpdate.broker
     ))
@@ -47,8 +45,7 @@ internal class WalletService(
     fun deleteWallet(wallet: Wallet) = this.walletRepository.delete(wallet)
 
     @Transactional
-    fun enforceWalletMonth(wallet: Wallet)
-    = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
+    fun enforceWalletMonth(wallet: Wallet) = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
         this.monthlyWalletRepository.save(wallet.toMonthlyWallet())
         wallet.copy(
             monthlyBalanceDaytrade = BigDecimal.ZERO,
@@ -68,15 +65,10 @@ internal class WalletService(
             it,
             transaction
         )
-        val monthlyWallet
-        = monthlyWalletService.getMonthlyWalletByMonth(transaction.transactionDate.withDayOfMonth(1)) ?: MonthlyWallet(
-            name = wallet.name,
-            broker = wallet.broker,
-            monthlyBalanceDaytrade = BigDecimal.ZERO,
-            monthlyBalance = BigDecimal.ZERO,
-            walletMonth = transaction.transactionDate.toLocalDate().withDayOfMonth(1),
-            walletId = wallet.id,
-            client = wallet.client
+        val monthlyWallet = getTheMonthlyWallet(
+            wallet = wallet,
+            monthlyWalletService = monthlyWalletService,
+            transaction = transaction
         )
 
         when (transaction.type) {
@@ -95,14 +87,24 @@ internal class WalletService(
                 daytradeValue = daytradeValue,
                 normalValue = normalValue,
                 monthlyWalletService
-            ).let { wallet ->
-                wallet.copy(
-                    withdrawn = wallet.withdrawn + normalValue,
-                    withdrawnDaytrade = wallet.withdrawnDaytrade + daytradeValue
-                )
-            }
+            )
         }
     }.let { this.walletRepository.save(it) }
+
+    private fun getTheMonthlyWallet(
+        wallet: Wallet,
+        monthlyWalletService: MonthlyWalletServiceFacadeImpl,
+        transaction: Transaction
+    ) = monthlyWalletService.getMonthlyWalletByMonth(transaction.transactionDate.withDayOfMonth(1))
+        ?: MonthlyWallet(
+            name = wallet.name,
+            broker = wallet.broker,
+            monthlyBalanceDaytrade = BigDecimal.ZERO,
+            monthlyBalance = BigDecimal.ZERO,
+            walletMonth = transaction.transactionDate.toLocalDate().withDayOfMonth(1),
+            walletId = wallet.id,
+            client = wallet.client
+        )
 
     private fun processBuyTransaction(
         wallet: Wallet,
@@ -111,51 +113,23 @@ internal class WalletService(
         daytradeValue: BigDecimal,
         normalValue: BigDecimal,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
-    ) = processLifetimeBuyTransaction(
-        wallet = wallet,
-        daytradeValue = daytradeValue,
-        normalValue = normalValue
-    ).let {
-        if (transactionDate.toLocalDate().withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1))
-            processMonthlyBuyTransaction(it, daytradeValue, normalValue)
-        else {
-            proccessMonthlyWalletBuyTransaction(
-                monthlyWallet = monthlyWallet,
-                daytradeValue = daytradeValue,
-                normalValue = normalValue,
-                monthlyWalletService = monthlyWalletService
-            )
-            it
-        }
-    }
-
-    private fun processLifetimeBuyTransaction(
-        wallet: Wallet,
-        daytradeValue: BigDecimal,
-        normalValue: BigDecimal
     ) = wallet.copy(
         lifetimeBalanceDaytrade = wallet.lifetimeBalanceDaytrade.subtract(daytradeValue),
         lifetimeBalance = wallet.lifetimeBalance.subtract(normalValue)
-    )
-
-    private fun processMonthlyBuyTransaction(
-        wallet: Wallet,
-        daytradeValue: BigDecimal,
-        normalValue: BigDecimal
-    ) = wallet.copy(
-        monthlyBalanceDaytrade = wallet.monthlyBalanceDaytrade.subtract(daytradeValue),
-        monthlyBalance = wallet.monthlyBalance.subtract(normalValue)
-    )
-
-    private fun proccessMonthlyWalletBuyTransaction(
-        monthlyWallet: MonthlyWallet,
-        daytradeValue: BigDecimal,
-        normalValue: BigDecimal,
-        monthlyWalletService: MonthlyWalletServiceFacadeImpl
-    ) = monthlyWalletService.saveMonthlyWallet(monthlyWallet.copy(
-        monthlyBalanceDaytrade = monthlyWallet.monthlyBalanceDaytrade.subtract(daytradeValue),
-        monthlyBalance = monthlyWallet.monthlyBalance.subtract(normalValue)
-    ))
+    ).let {
+        if (transactionDate.toLocalDate().withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1))
+            wallet.copy(
+                monthlyBalanceDaytrade = wallet.monthlyBalanceDaytrade.subtract(daytradeValue),
+                monthlyBalance = wallet.monthlyBalance.subtract(normalValue)
+            )
+        else {
+            monthlyWalletService.saveMonthlyWallet(monthlyWallet.copy(
+                monthlyBalanceDaytrade = monthlyWallet.monthlyBalanceDaytrade.subtract(daytradeValue),
+                monthlyBalance = monthlyWallet.monthlyBalance.subtract(normalValue)
+            ))
+            it
+        }
+    }
 
     private fun processSellTransaction(
         wallet: Wallet,
@@ -164,54 +138,29 @@ internal class WalletService(
         daytradeValue: BigDecimal,
         normalValue: BigDecimal,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
-    ) = processLifetimeSellTransaction(
-        wallet = wallet,
-        daytradeValue = daytradeValue,
-        normalValue = normalValue
+    ) = wallet.copy(
+        lifetimeBalanceDaytrade = wallet.lifetimeBalanceDaytrade.add(daytradeValue),
+        lifetimeBalance = wallet.lifetimeBalance.add(normalValue)
     ).let {
         if (transactionDate.toLocalDate().withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1))
-            processMonthlySellTransaction(it, daytradeValue, normalValue)
-        else {
-            proccessMonthlyWalletSellTransaction(
-                monthlyWallet = monthlyWallet,
-                daytradeValue = daytradeValue,
-                normalValue = normalValue,
-                monthlyWalletService = monthlyWalletService
+            wallet.copy(
+                monthlyBalanceDaytrade = wallet.monthlyBalanceDaytrade.add(daytradeValue),
+                monthlyBalance = wallet.monthlyBalance.add(normalValue),
+                withdrawn = wallet.withdrawn + normalValue,
+                withdrawnDaytrade = wallet.withdrawnDaytrade + daytradeValue
             )
+        else {
+            monthlyWalletService.saveMonthlyWallet(monthlyWallet.copy(
+                monthlyBalanceDaytrade = monthlyWallet.monthlyBalanceDaytrade.add(daytradeValue),
+                monthlyBalance = monthlyWallet.monthlyBalance.add(normalValue),
+                withdrawn = wallet.withdrawn + normalValue,
+                withdrawnDaytrade = wallet.withdrawnDaytrade + daytradeValue
+            ))
             it
         }
     }
 
-    private fun processLifetimeSellTransaction(
-        wallet: Wallet,
-        daytradeValue: BigDecimal,
-        normalValue: BigDecimal
-    ) = wallet.copy(
-        lifetimeBalanceDaytrade = wallet.lifetimeBalanceDaytrade.add(daytradeValue),
-        lifetimeBalance = wallet.lifetimeBalance.add(normalValue)
-    )
-
-    private fun processMonthlySellTransaction(
-        wallet: Wallet,
-        daytradeValue: BigDecimal,
-        normalValue: BigDecimal
-    ) = wallet.copy(
-        monthlyBalanceDaytrade = wallet.monthlyBalanceDaytrade.add(daytradeValue),
-        monthlyBalance = wallet.monthlyBalance.add(normalValue)
-    )
-
-    private fun proccessMonthlyWalletSellTransaction(
-        monthlyWallet: MonthlyWallet,
-        daytradeValue: BigDecimal,
-        normalValue: BigDecimal,
-        monthlyWalletService: MonthlyWalletServiceFacadeImpl
-    ) = monthlyWalletService.saveMonthlyWallet(monthlyWallet.copy(
-        monthlyBalanceDaytrade = monthlyWallet.monthlyBalanceDaytrade.add(daytradeValue),
-        monthlyBalance = monthlyWallet.monthlyBalance.add(normalValue)
-    ))
-
-    private fun exists(client: Client, wallet: Wallet)
-    = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
+    private fun exists(client: Client, wallet: Wallet) = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
 
 }
 

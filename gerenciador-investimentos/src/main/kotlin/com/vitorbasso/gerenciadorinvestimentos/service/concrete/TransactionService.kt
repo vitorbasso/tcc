@@ -30,8 +30,6 @@ internal class TransactionService(
         transaction.transactionDate.plusDays(1).atStartOfDay()
     )
 
-    private fun LocalDateTime.atStartOfDay() = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
-
     fun findFromLastIsSellout(transaction: Transaction)
     = if(this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(
             transaction.asset,
@@ -42,8 +40,10 @@ internal class TransactionService(
         transaction.transactionDate
     ).takeIf { it.isNotEmpty() } ?: this.transactionRepository.findAllByAsset(transaction.asset)
     else
-        listOf()
+        findTransactionsOnSameDate(transaction)
 
     fun deleteTransaction(transaction: Transaction) = this.transactionRepository.delete(transaction)
 
 }
+
+private fun LocalDateTime.atStartOfDay() = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
