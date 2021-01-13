@@ -46,4 +46,5 @@ internal class TransactionService(
 
 }
 
-private fun LocalDateTime.atStartOfDay() = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
+private fun LocalDateTime.atStartOfDay()
+= this.withHour(0).withMinute(0).withSecond(0).withNano(0)
