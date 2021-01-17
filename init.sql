@@ -39,7 +39,7 @@ create table if not exists `monthly_wallet`(
     `monthly_balance` decimal(20,2) default 0,
     `withdrawn` decimal(20,2) default 0,
     `withdrawn_daytrade` decimal(20,2) default 0,
-    `wallet_id` bigint not null unique,
+    `wallet_id` bigint not null,
     `wallet_month` date not null,
     `client_id` bigint not null,
     `date_created` timestamp not null default NOW(),

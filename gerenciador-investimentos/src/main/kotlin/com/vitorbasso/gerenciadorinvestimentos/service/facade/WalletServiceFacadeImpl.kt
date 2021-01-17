@@ -1,7 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.IWallet
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletUpdateRequest
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
@@ -9,6 +8,7 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestExcepti
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.ClientService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
+import com.vitorbasso.gerenciadorinvestimentos.util.AccountantUtil
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -50,17 +50,33 @@ internal class WalletServiceFacadeImpl(
         )
     }
 
-    fun updateBalance(
-        newTransaction: Transaction,
+    fun processWalletReport(
+        wallet: Wallet,
+        walletReport: Map<LocalDate, AccountantUtil.WalletReport>,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
-    ) = this.walletService.processTransaction(
-        wallet = newTransaction.asset.wallet.validate(),
-        transaction = newTransaction,
-        monthlyWalletService = monthlyWalletService
-    )
+    ) = wallet.validate().let { walletValidated ->
+        walletReport.forEach {
+            println("maybe here?")
+            this.walletService.processWalletReport(
+                walletValidated,
+                it.value,
+                it.key,
+                monthlyWalletService
+            )
+        }
+    }
+
+//    fun updateBalance(
+//        newTransaction: Transaction,
+//        monthlyWalletService: MonthlyWalletServiceFacadeImpl
+//    ) = this.walletService.processTransaction(
+//        wallet = newTransaction.asset.wallet.validate(),
+//        transaction = newTransaction,
+//        monthlyWalletService = monthlyWalletService
+//    )
 
     private fun isValid(wallet: Wallet)
-    = wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)
+    = println("is it me?").let {  wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)}
 
     private fun Wallet.validate() = this.takeIf { isValid(it) } ?: walletService.enforceWalletMonth(this)
 

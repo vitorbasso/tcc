@@ -53,7 +53,13 @@ object AccountantUtil {
         val accountForId = accountedFor.map { it.id }
 
         return AccountantReport(
-            transactionReport = temp.filter { !accountForId.contains(it.id) } + accountedFor
+            transactionReport = temp.filter { !accountForId.contains(it.id) } + accountedFor,
+            walletsReport = mapOf(newTransaction.transactionDate.atStartOfMonth() to WalletReport(
+                newNormalValue = temp2.newNormalValue.subtract(temp1.newNormalValue),
+                newDaytradeValue = temp2.newDaytradeValue.subtract(temp1.newDaytradeValue),
+                newWithdrawn = temp2.newWithdrawn.subtract(temp1.newWithdrawn),
+                newDaytradeWithdrawn = temp2.newDaytradeWithdrawn.subtract(temp1.newDaytradeWithdrawn)
+            ))
         )
     }
 
@@ -63,6 +69,12 @@ object AccountantUtil {
         transactions: List<Transaction>,
         changedTransactions: MutableList<Transaction>
     ): WalletReport {
+        val mapOfTransactions = mutableMapOf<LocalDate, List<Transaction>>()
+        transactions.map { it.transactionDate.atStartOfMonth() to it }.forEach {
+            mapOfTransactions[it.first] = mapOfTransactions[it.first]?.plus(listOf(it.second))?: listOf(it.second)
+        }
+        println("mapOfTransactions = ${mapOfTransactions.map { it.key to it.value.map { trans -> trans.id } }}")
+
         var totalValue = initialValue
         var totalQuantity = initialQuantity
         var withdrawn = BigDecimal.ZERO

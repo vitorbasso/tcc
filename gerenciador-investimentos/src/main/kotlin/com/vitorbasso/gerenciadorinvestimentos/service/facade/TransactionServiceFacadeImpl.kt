@@ -51,21 +51,31 @@ internal class TransactionServiceFacadeImpl(
     }
 
     private fun processTransaction(transaction: Transaction): Transaction {
-        val transactionDaytradeProcessed = processDaytrade(transaction)
-        this.walletService.updateBalance(
-            transactionDaytradeProcessed,
+        val accountantReport = AccountantUtil.accountForNewTransaction(
+            transaction,
+            this.transactionService.findFromLastIsSellout(transaction)
+        )
+        this.transactionService.saveAll(accountantReport.transactionReport)
+
+        this.walletService.processWalletReport(
+            transaction.asset.wallet,
+            accountantReport.walletsReport,
             this.monthlyWalletService
         )
-        return transactionDaytradeProcessed
+
+        return accountantReport.transactionReport.findLast { it.transactionDate.isEqual(transaction.transactionDate) }
+            ?: transaction
     }
 
-    private fun processDaytrade(transaction: Transaction)
-    = AccountantUtil.accountForNewTransaction(
-        transaction,
-        this.transactionService.findFromLastIsSellout(transaction)
-    ).let { this.transactionService.saveAll(it.transactionReport).find { processedTransaction ->
-        processedTransaction.id == transaction.id
-    } ?: transaction }
+
+//
+//    private fun processDaytrade(transaction: Transaction)
+//    = AccountantUtil.accountForNewTransaction(
+//        transaction,
+//        this.transactionService.findFromLastIsSellout(transaction)
+//    ).let { this.transactionService.saveAll(it.transactionReport).find { processedTransaction ->
+//        processedTransaction.id == transaction.id
+//    } ?: transaction }
 
     private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
         !it.toLocalDate().isAfter(LocalDate.now()) &&
