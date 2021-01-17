@@ -13,8 +13,7 @@ internal class TransactionService(
     val transactionRepository: ITransactionRepository
 ) {
 
-    fun getTransaction(transactionId: Long, clientId: Long)
-    = this.transactionRepository.findByIdOrNull(transactionId)?.takeIf { it.asset.wallet.client.id == clientId }
+    fun getTransaction(transactionId: Long, clientId: Long) = this.transactionRepository.findByIdOrNull(transactionId)?.takeIf { it.asset.wallet.client.id == clientId }
         ?: throw CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
 
     fun save(transaction: Transaction) = this.transactionRepository.save(transaction)
@@ -24,24 +23,17 @@ internal class TransactionService(
     fun saveAll(transactions: List<Transaction>) = this.transactionRepository.saveAll(transactions)
 
     fun findFromLastIsSellout(transaction: Transaction) = findTransactionsOnSameDate(transaction).let {
-        if (this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(
-                transaction.asset,
+        (
+            this.transactionRepository.findFromLastIsSellout(
+                transaction.asset.id,
                 transaction.transactionDate
-            ))
-            (
-                this.transactionRepository.findFromLastIsSellout(
-                    transaction.asset.id,
-                    transaction.transactionDate
-                ).takeIf { last -> last.isNotEmpty() }
-                    ?: this.transactionRepository.findAllByAssetOrderByTransactionDate(transaction.asset)
-            ).takeIf { last -> last.size > it.size }
-            ?: it
-        else
-            it
+            ).takeIf { last -> last.isNotEmpty() }
+                ?: this.transactionRepository.findAllByAssetOrderByTransactionDate(transaction.asset)
+        ).takeIf { last -> last.size > it.size }
+        ?: it
     }
 
-    fun findTransactionsOnSameDate(transaction: Transaction)
-    = this.transactionRepository.findByAssetAndTransactionDateBetweenOrderByTransactionDate(
+    fun findTransactionsOnSameDate(transaction: Transaction) = this.transactionRepository.findByAssetAndTransactionDateBetweenOrderByTransactionDate(
         transaction.asset,
         transaction.transactionDate.atStartOfDay(),
         transaction.transactionDate.plusDays(1).atStartOfDay()

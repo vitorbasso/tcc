@@ -28,9 +28,8 @@ object AccountantUtil {
     fun accountForNewTransaction(
         newTransaction: Transaction,
         staleTransactions: List<Transaction>
-    ): List<Transaction> {
+    ): AccountantReport {
         val accountedFor = mutableListOf<Transaction>()
-        println("staleTransactions = ${staleTransactions.map { it.id }}")
 
         val (before, after) = staleTransactions.partition {
             it.transactionDate.isBefore(newTransaction.transactionDate)
@@ -43,28 +42,27 @@ object AccountantUtil {
             !it.transactionDate.toLocalDate().isEqual(newTransaction.transactionDate.toLocalDate())
         }
 
-        val temp = reprocessTransactionsForDaytrade(beforeSameDay+newTransaction+afterSameDay)
+        val temp = reprocessTransactionsForDaytrade(beforeSameDay + newTransaction + afterSameDay).toMutableList()
 
         val teste = (beforeNotSameDay + temp + afterNotSameDay).sortedBy { it.transactionDate }
 
-        val temp1 = calculateStuff(transactions = staleTransactions)
-        println("before = $temp1")
-        val temp2 = calculateStuff( transactions = teste)
-        println("after = $temp2")
+        val temp1 = calculateStuff(transactions = staleTransactions, changedTransactions = accountedFor)
 
-        println("changes = ${
-            WalletReport(
-                newNormalValue = temp2.newNormalValue.subtract(temp1.newNormalValue),
-                newDaytradeValue = temp2.newDaytradeValue.subtract(temp1.newDaytradeValue),
-                newWithdrawn = temp2.newWithdrawn.subtract(temp1.newWithdrawn),
-                newDaytradeWithdrawn = temp2.newDaytradeWithdrawn.subtract(temp1.newDaytradeWithdrawn)
-            )
-        }}")
+        val temp2 = calculateStuff(transactions = teste, changedTransactions = accountedFor)
 
-        return temp
+        val accountForId = accountedFor.map { it.id }
+
+        return AccountantReport(
+            transactionReport = temp.filter { !accountForId.contains(it.id) } + accountedFor
+        )
     }
 
-    private fun calculateStuff(initialValue: BigDecimal = BigDecimal.ZERO, initialQuantity: Int = 0, transactions: List<Transaction>) : WalletReport{
+    private fun calculateStuff(
+        initialValue: BigDecimal = BigDecimal.ZERO,
+        initialQuantity: Int = 0,
+        transactions: List<Transaction>,
+        changedTransactions: MutableList<Transaction>
+    ): WalletReport {
         var totalValue = initialValue
         var totalQuantity = initialQuantity
         var withdrawn = BigDecimal.ZERO
@@ -139,6 +137,8 @@ object AccountantUtil {
                 state = false
                 totalQuantity = checkingQuantity
                 totalValue = getAverageCost(it.value, it.quantity).multiply(BigDecimal(checkingQuantity))
+                changedTransactions.removeIf { ctrans -> ctrans.id == it.id }
+                changedTransactions.add(it.copy(isSellout = true))
             }
         }
         return WalletReport(
@@ -156,8 +156,7 @@ object AccountantUtil {
         averageTickerValue.multiply(BigDecimal(transaction.daytradeQuantity))
     )
 
-    private fun getAverageCost(value: BigDecimal = BigDecimal.ZERO, quantity: Int = 1)
-    = value.divide(BigDecimal(quantity).takeIf { it.compareTo(BigDecimal.ZERO) > 0 }
+    private fun getAverageCost(value: BigDecimal = BigDecimal.ZERO, quantity: Int = 1) = value.divide(BigDecimal(quantity).takeIf { it.compareTo(BigDecimal.ZERO) > 0 }
         ?: BigDecimal.ONE, 20, RoundingMode.HALF_EVEN)
 
     fun reprocessTransactionsForDaytrade(sameDayTransactions: List<Transaction>): List<Transaction> {
@@ -219,7 +218,6 @@ object AccountantUtil {
 
 }
 
-private fun LocalDateTime.atStartOfDay()
-    = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
+private fun LocalDateTime.atStartOfDay() = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
 
 private fun LocalDateTime.atStartOfMonth() = this.toLocalDate().withDayOfMonth(1)

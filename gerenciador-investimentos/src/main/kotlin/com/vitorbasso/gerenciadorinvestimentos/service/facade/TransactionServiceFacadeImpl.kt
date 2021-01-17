@@ -60,12 +60,12 @@ internal class TransactionServiceFacadeImpl(
     }
 
     private fun processDaytrade(transaction: Transaction)
-    = this.transactionService.saveAll(AccountantUtil.accountForNewTransaction(
+    = AccountantUtil.accountForNewTransaction(
         transaction,
         this.transactionService.findFromLastIsSellout(transaction)
-    )).find { processedTransaction ->
+    ).let { this.transactionService.saveAll(it.transactionReport).find { processedTransaction ->
         processedTransaction.id == transaction.id
-    } ?: transaction
+    } ?: transaction }
 
     private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
         !it.toLocalDate().isAfter(LocalDate.now()) &&
