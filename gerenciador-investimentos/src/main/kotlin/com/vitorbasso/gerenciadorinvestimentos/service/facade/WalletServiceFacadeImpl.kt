@@ -56,7 +56,6 @@ internal class WalletServiceFacadeImpl(
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
     ) = wallet.validate().let { walletValidated ->
         walletReport.forEach {
-            println("maybe here?")
             this.walletService.processWalletReport(
                 walletValidated,
                 it.value,
@@ -76,7 +75,7 @@ internal class WalletServiceFacadeImpl(
 //    )
 
     private fun isValid(wallet: Wallet)
-    = println("is it me?").let {  wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)}
+    = wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)
 
     private fun Wallet.validate() = this.takeIf { isValid(it) } ?: walletService.enforceWalletMonth(this)
 

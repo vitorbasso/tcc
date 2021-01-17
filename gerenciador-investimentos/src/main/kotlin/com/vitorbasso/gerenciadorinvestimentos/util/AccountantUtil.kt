@@ -46,14 +46,12 @@ object AccountantUtil {
 
         val teste = (beforeNotSameDay + temp + afterNotSameDay).sortedBy { it.transactionDate }
 
-        val temp1 = calculateStuff(transactions = staleTransactions, changedTransactions = accountedFor)
+        val temp1 = calculateStuff(transactions = staleTransactions)
 
         val temp2 = calculateStuff(transactions = teste, changedTransactions = accountedFor)
 
-        val accountForId = accountedFor.map { it.id }
-
         return AccountantReport(
-            transactionReport = temp.filter { !accountForId.contains(it.id) } + accountedFor,
+            transactionReport = accountedFor,
             walletsReport = mapOf(newTransaction.transactionDate.atStartOfMonth() to WalletReport(
                 newNormalValue = temp2.newNormalValue.subtract(temp1.newNormalValue),
                 newDaytradeValue = temp2.newDaytradeValue.subtract(temp1.newDaytradeValue),
@@ -67,13 +65,12 @@ object AccountantUtil {
         initialValue: BigDecimal = BigDecimal.ZERO,
         initialQuantity: Int = 0,
         transactions: List<Transaction>,
-        changedTransactions: MutableList<Transaction>
+        changedTransactions: MutableList<Transaction> = mutableListOf()
     ): WalletReport {
         val mapOfTransactions = mutableMapOf<LocalDate, List<Transaction>>()
         transactions.map { it.transactionDate.atStartOfMonth() to it }.forEach {
             mapOfTransactions[it.first] = mapOfTransactions[it.first]?.plus(listOf(it.second))?: listOf(it.second)
         }
-        println("mapOfTransactions = ${mapOfTransactions.map { it.key to it.value.map { trans -> trans.id } }}")
 
         var totalValue = initialValue
         var totalQuantity = initialQuantity
@@ -149,8 +146,9 @@ object AccountantUtil {
                 state = false
                 totalQuantity = checkingQuantity
                 totalValue = getAverageCost(it.value, it.quantity).multiply(BigDecimal(checkingQuantity))
-                changedTransactions.removeIf { ctrans -> ctrans.id == it.id }
                 changedTransactions.add(it.copy(isSellout = true))
+            } else {
+                changedTransactions.add(it.copy(isSellout = false))
             }
         }
         return WalletReport(

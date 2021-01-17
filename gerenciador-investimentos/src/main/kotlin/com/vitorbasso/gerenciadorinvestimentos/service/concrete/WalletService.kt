@@ -31,7 +31,7 @@ internal class WalletService(
     ) = this.walletRepository.findByIdOrNull(walletId)?.takeIf { it.client.id == clientId } ?: throw exception
 
     fun saveWallet(client: Client, walletToSave: Wallet) = if (!exists(client, walletToSave))
-        this.walletRepository.save(walletToSave.copy(client = client))
+        this.walletRepository.save(walletToSave.copy(walletMonth = walletToSave.walletMonth.withDayOfMonth(1), client = client))
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
     fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest) = this.walletRepository.save(walletToUpdate.copy(
@@ -59,7 +59,7 @@ internal class WalletService(
         walletMonth: LocalDate,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
     ) {
-        println("hello there")
+        println("walletMonth = $walletMonth = wallet.walletMonth = ${wallet.walletMonth} == ${walletMonth.isEqual(wallet.walletMonth)}")
         if (walletMonth.isEqual(wallet.walletMonth)) {
             this.walletRepository.save(
                 wallet.copy(
@@ -84,7 +84,6 @@ internal class WalletService(
             }
             )
         }
-        println("general kenobi")
     }
 
 //    fun processTransaction(
