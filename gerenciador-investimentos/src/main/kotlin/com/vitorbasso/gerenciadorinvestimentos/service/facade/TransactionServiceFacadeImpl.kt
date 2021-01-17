@@ -51,9 +51,7 @@ internal class TransactionServiceFacadeImpl(
     }
 
     private fun processTransaction(transaction: Transaction): Transaction {
-        val transactionDaytradeProcessed = processDaytrade(this.transactionService.saveAndFlush(transaction.copy(
-            isSellout = transaction.asset.amount == 0
-        )))
+        val transactionDaytradeProcessed = processDaytrade(transaction)
         this.walletService.updateBalance(
             transactionDaytradeProcessed,
             this.monthlyWalletService
@@ -62,14 +60,10 @@ internal class TransactionServiceFacadeImpl(
     }
 
     private fun processDaytrade(transaction: Transaction)
-    = this.transactionService.findTransactionsOnSameDate(transaction).let {
-        this.transactionService.saveAll(AccountantUtil.accountForNewTransaction(
-            transaction,
-            this.transactionService.findFromLastIsSellout(transaction),
-            it
-        ))
-    }.find {
-        processedTransaction ->
+    = this.transactionService.saveAll(AccountantUtil.accountForNewTransaction(
+        transaction,
+        this.transactionService.findFromLastIsSellout(transaction)
+    )).find { processedTransaction ->
         processedTransaction.id == transaction.id
     } ?: transaction
 

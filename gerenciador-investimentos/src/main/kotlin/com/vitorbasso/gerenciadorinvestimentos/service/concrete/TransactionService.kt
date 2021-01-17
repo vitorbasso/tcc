@@ -23,24 +23,24 @@ internal class TransactionService(
 
     fun saveAll(transactions: List<Transaction>) = this.transactionRepository.saveAll(transactions)
 
+    fun findFromLastIsSellout(transaction: Transaction)
+        = if(this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(
+            transaction.asset,
+            transaction.transactionDate
+        ))
+        this.transactionRepository.findFromLastIsSellout(
+            transaction.asset.id,
+            transaction.transactionDate
+        ).takeIf { it.isNotEmpty() } ?: this.transactionRepository.findAllByAsset(transaction.asset)
+    else
+        findTransactionsOnSameDate(transaction)
+
     fun findTransactionsOnSameDate(transaction: Transaction)
         = this.transactionRepository.findByAssetAndTransactionDateBetweenOrderByTransactionDate(
         transaction.asset,
         transaction.transactionDate.atStartOfDay(),
         transaction.transactionDate.plusDays(1).atStartOfDay()
     )
-
-    fun findFromLastIsSellout(transaction: Transaction)
-    = if(this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(
-            transaction.asset,
-            transaction.transactionDate
-        ))
-        this.transactionRepository.findFromLastIsSellout(
-        transaction.asset.id,
-        transaction.transactionDate
-    ).takeIf { it.isNotEmpty() } ?: this.transactionRepository.findAllByAsset(transaction.asset)
-    else
-        findTransactionsOnSameDate(transaction)
 
     fun deleteTransaction(transaction: Transaction) = this.transactionRepository.delete(transaction)
 
