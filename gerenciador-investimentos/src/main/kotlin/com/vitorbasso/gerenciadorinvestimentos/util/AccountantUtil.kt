@@ -30,29 +30,41 @@ object AccountantUtil {
         staleTransactions: List<Transaction>
     ): List<Transaction> {
         val accountedFor = mutableListOf<Transaction>()
+        println("staleTransactions = ${staleTransactions.map { it.id }}")
 
-        val (beforeTransactions, afterTransactions) = staleTransactions.partition {
+        val (before, after) = staleTransactions.partition {
             it.transactionDate.isBefore(newTransaction.transactionDate)
         }
-        val (valueAtStart, quantityAtStart) = beforeTransactions.fold(Pair(BigDecimal.ZERO, 0)) { total, trans ->
-            Pair(total.first.add(trans.value), total.second + trans.quantity)
+        val (beforeNotSameDay, beforeSameDay) = before.partition {
+            !it.transactionDate.toLocalDate().isEqual(newTransaction.transactionDate.toLocalDate())
         }
 
-        calculateStuff(valueAtStart, quantityAtStart, afterTransactions.toMutableList().also { it.add(newTransaction) })
+        val (afterNotSameDay, afterSameDay) = after.partition {
+            !it.transactionDate.toLocalDate().isEqual(newTransaction.transactionDate.toLocalDate())
+        }
 
+        val temp = reprocessTransactionsForDaytrade(beforeSameDay+newTransaction+afterSameDay)
 
-//        val (transactionsOnSameMonth, rest) = staleTransactions.partition {
-//            it.transactionDate.atStartOfMonth() == staleTransactions.first().transactionDate.atStartOfMonth()
-//        }
+        val teste = (beforeNotSameDay + temp + afterNotSameDay).sortedBy { it.transactionDate }
 
-        val samedayTransactions = staleTransactions.filter {
-            it.transactionDate.toLocalDate() == newTransaction.transactionDate.toLocalDate()
-        }.toMutableList()
-        samedayTransactions.add(newTransaction)
-        return reprocessTransactionsForDaytrade(samedayTransactions)
+        val temp1 = calculateStuff(transactions = staleTransactions)
+        println("before = $temp1")
+        val temp2 = calculateStuff( transactions = teste)
+        println("after = $temp2")
+
+        println("changes = ${
+            WalletReport(
+                newNormalValue = temp2.newNormalValue.subtract(temp1.newNormalValue),
+                newDaytradeValue = temp2.newDaytradeValue.subtract(temp1.newDaytradeValue),
+                newWithdrawn = temp2.newWithdrawn.subtract(temp1.newWithdrawn),
+                newDaytradeWithdrawn = temp2.newDaytradeWithdrawn.subtract(temp1.newDaytradeWithdrawn)
+            )
+        }}")
+
+        return temp
     }
 
-    private fun calculateStuff(initialValue: BigDecimal, initialQuantity: Int, transactions: List<Transaction>) {
+    private fun calculateStuff(initialValue: BigDecimal = BigDecimal.ZERO, initialQuantity: Int = 0, transactions: List<Transaction>) : WalletReport{
         var totalValue = initialValue
         var totalQuantity = initialQuantity
         var withdrawn = BigDecimal.ZERO
@@ -61,61 +73,91 @@ object AccountantUtil {
         var balanceDaytrade = BigDecimal.ZERO
         var checkingQuantity = initialQuantity
         var state = false
-        println("=============== NEW ONE ===============")
         transactions.forEach {
+            val normalQuantity = it.quantity - it.daytradeQuantity
             when (it.type) {
                 TransactionType.BUY -> {
                     if (checkingQuantity < 0) {
-                        balance += getAverageCost(totalValue.abs(), abs(totalQuantity))
+                        balanceDaytrade += getAverageCost(totalValue.abs(), abs(totalQuantity))
                             .subtract(getAverageCost(it.value, it.quantity))
                             .multiply(BigDecimal(
-                                if (abs(checkingQuantity) < it.quantity) {
+                                if (abs(checkingQuantity) < it.daytradeQuantity) {
                                     state = true
                                     abs(checkingQuantity)
-                                } else it.quantity
+                                } else it.daytradeQuantity
                             ))
+                        checkingQuantity += it.daytradeQuantity
+                        if (checkingQuantity < 0) {
+                            balance += getAverageCost(totalValue.abs(), abs(totalQuantity))
+                                .subtract(getAverageCost(it.value, it.quantity))
+                                .multiply(BigDecimal(
+                                    if (abs(checkingQuantity) < normalQuantity) {
+                                        state = true
+                                        abs(checkingQuantity)
+                                    } else normalQuantity
+                                ))
+                        }
+                        checkingQuantity += normalQuantity
                     } else {
                         totalValue += it.value
                         totalQuantity += it.quantity
+                        checkingQuantity += it.quantity
                     }
-                    checkingQuantity += it.quantity
                 }
                 TransactionType.SELL -> {
                     if (checkingQuantity > 0) {
-                        balance += getAverageCost(it.value, it.quantity)
+                        balanceDaytrade += getAverageCost(it.value, it.quantity)
                             .subtract(getAverageCost(totalValue, totalQuantity))
                             .multiply(BigDecimal(
-                                if (checkingQuantity < it.quantity) {
+                                if (checkingQuantity < it.daytradeQuantity) {
                                     state = true
                                     checkingQuantity
-                                } else it.quantity
+                                } else it.daytradeQuantity
                             ))
+                        checkingQuantity -= it.daytradeQuantity
+                        if (checkingQuantity > 0) {
+                            balance += getAverageCost(it.value, it.quantity)
+                                .subtract(getAverageCost(totalValue, totalQuantity))
+                                .multiply(BigDecimal(
+                                    if (checkingQuantity < normalQuantity) {
+                                        state = true
+                                        checkingQuantity
+                                    } else normalQuantity
+                                ))
+                        }
+                        checkingQuantity -= normalQuantity
                     } else {
                         totalQuantity -= it.quantity
                         totalValue -= it.value
+                        checkingQuantity -= it.quantity
                     }
-                    checkingQuantity -= it.quantity
+                    withdrawn += getAverageCost(it.value, it.quantity).multiply(BigDecimal(normalQuantity))
+                    withdrawnDaytrade += getAverageCost(it.value, it.quantity).multiply(BigDecimal(it.daytradeQuantity))
                 }
             }
-            println("totalValue = $totalValue - totalQuantity = $totalQuantity - checkingQuantity = $checkingQuantity - balance = $balance - state = $state")
-            if(state || checkingQuantity == 0) {
+            if (state || checkingQuantity == 0) {
                 state = false
                 totalQuantity = checkingQuantity
                 totalValue = getAverageCost(it.value, it.quantity).multiply(BigDecimal(checkingQuantity))
-                println("CHANGED: state = $state - totalQuantity = $totalQuantity - totalValue = $totalValue -> isSellout = true")
             }
-            println("--------------")
         }
+        return WalletReport(
+            newNormalValue = balance,
+            newDaytradeValue = balanceDaytrade,
+            newWithdrawn = withdrawn,
+            newDaytradeWithdrawn = withdrawnDaytrade
+        )
     }
 
     fun getTransactionNormalAndDaytradeValue(averageTickerValue: BigDecimal, transaction: Transaction) = Pair(
         averageTickerValue.multiply(
-            BigDecimal(transaction.quantity).subtract(BigDecimal(transaction.daytradeQuantity)).abs()
+            BigDecimal(transaction.quantity - transaction.daytradeQuantity).abs()
         ),
         averageTickerValue.multiply(BigDecimal(transaction.daytradeQuantity))
     )
 
-    private fun getAverageCost(value: BigDecimal = BigDecimal.ZERO, quantity: Int = 1) = value.divide(BigDecimal(quantity).takeIf { it.compareTo(BigDecimal.ZERO) > 0 }
+    private fun getAverageCost(value: BigDecimal = BigDecimal.ZERO, quantity: Int = 1)
+    = value.divide(BigDecimal(quantity).takeIf { it.compareTo(BigDecimal.ZERO) > 0 }
         ?: BigDecimal.ONE, 20, RoundingMode.HALF_EVEN)
 
     fun reprocessTransactionsForDaytrade(sameDayTransactions: List<Transaction>): List<Transaction> {
@@ -176,5 +218,8 @@ object AccountantUtil {
     }).let { Pair(it.first.toMutableList(), it.second.toMutableList()) }
 
 }
+
+private fun LocalDateTime.atStartOfDay()
+    = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
 
 private fun LocalDateTime.atStartOfMonth() = this.toLocalDate().withDayOfMonth(1)

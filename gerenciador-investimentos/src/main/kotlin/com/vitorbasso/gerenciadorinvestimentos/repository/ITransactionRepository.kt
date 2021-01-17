@@ -35,6 +35,6 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
 
     fun existsByAssetAndTransactionDateGreaterThanEqual(asset: Asset, transactionDate: LocalDateTime): Boolean
 
-    fun findAllByAsset(asset: Asset): List<Transaction>
+    fun findAllByAssetOrderByTransactionDate(asset: Asset): List<Transaction>
 
 }

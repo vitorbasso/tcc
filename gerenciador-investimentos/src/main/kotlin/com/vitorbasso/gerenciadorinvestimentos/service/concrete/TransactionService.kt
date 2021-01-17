@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 
 @Service
 internal class TransactionService(
-        val transactionRepository: ITransactionRepository
+    val transactionRepository: ITransactionRepository
 ) {
 
     fun getTransaction(transactionId: Long, clientId: Long)
@@ -23,20 +23,25 @@ internal class TransactionService(
 
     fun saveAll(transactions: List<Transaction>) = this.transactionRepository.saveAll(transactions)
 
-    fun findFromLastIsSellout(transaction: Transaction)
-        = if(this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(
-            transaction.asset,
-            transaction.transactionDate
-        ))
-        this.transactionRepository.findFromLastIsSellout(
-            transaction.asset.id,
-            transaction.transactionDate
-        ).takeIf { it.isNotEmpty() } ?: this.transactionRepository.findAllByAsset(transaction.asset)
-    else
-        findTransactionsOnSameDate(transaction)
+    fun findFromLastIsSellout(transaction: Transaction) = findTransactionsOnSameDate(transaction).let {
+        if (this.transactionRepository.existsByAssetAndTransactionDateGreaterThanEqual(
+                transaction.asset,
+                transaction.transactionDate
+            ))
+            (
+                this.transactionRepository.findFromLastIsSellout(
+                    transaction.asset.id,
+                    transaction.transactionDate
+                ).takeIf { last -> last.isNotEmpty() }
+                    ?: this.transactionRepository.findAllByAssetOrderByTransactionDate(transaction.asset)
+            ).takeIf { last -> last.size > it.size }
+            ?: it
+        else
+            it
+    }
 
     fun findTransactionsOnSameDate(transaction: Transaction)
-        = this.transactionRepository.findByAssetAndTransactionDateBetweenOrderByTransactionDate(
+    = this.transactionRepository.findByAssetAndTransactionDateBetweenOrderByTransactionDate(
         transaction.asset,
         transaction.transactionDate.atStartOfDay(),
         transaction.transactionDate.plusDays(1).atStartOfDay()
@@ -46,5 +51,4 @@ internal class TransactionService(
 
 }
 
-private fun LocalDateTime.atStartOfDay()
-= this.withHour(0).withMinute(0).withSecond(0).withNano(0)
+private fun LocalDateTime.atStartOfDay() = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
