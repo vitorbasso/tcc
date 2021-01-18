@@ -88,61 +88,55 @@ object AccountantUtil {
                         balanceDaytrade += getAverageCost(totalValue.abs(), abs(totalQuantity))
                             .subtract(getAverageCost(it.value, it.quantity))
                             .multiply(BigDecimal(
-                                if (abs(checkingQuantity) < it.daytradeQuantity) {
-                                    state = true
+                                if (abs(checkingQuantity) <= it.daytradeQuantity) {
                                     abs(checkingQuantity)
                                 } else it.daytradeQuantity
                             ))
-                        checkingQuantity += it.daytradeQuantity
                         if (checkingQuantity < 0) {
                             balance += getAverageCost(totalValue.abs(), abs(totalQuantity))
                                 .subtract(getAverageCost(it.value, it.quantity))
                                 .multiply(BigDecimal(
-                                    if (abs(checkingQuantity) < normalQuantity) {
+                                    if (abs(checkingQuantity) <= normalQuantity) {
                                         state = true
                                         abs(checkingQuantity)
                                     } else normalQuantity
                                 ))
                         }
-                        checkingQuantity += normalQuantity
                     } else {
                         totalValue += it.value
                         totalQuantity += it.quantity
-                        checkingQuantity += it.quantity
                     }
+                    checkingQuantity += normalQuantity
                 }
                 TransactionType.SELL -> {
                     if (checkingQuantity > 0) {
                         balanceDaytrade += getAverageCost(it.value, it.quantity)
                             .subtract(getAverageCost(totalValue, totalQuantity))
                             .multiply(BigDecimal(
-                                if (checkingQuantity < it.daytradeQuantity) {
-                                    state = true
+                                if (checkingQuantity <= it.daytradeQuantity) {
                                     checkingQuantity
                                 } else it.daytradeQuantity
                             ))
-                        checkingQuantity -= it.daytradeQuantity
                         if (checkingQuantity > 0) {
                             balance += getAverageCost(it.value, it.quantity)
                                 .subtract(getAverageCost(totalValue, totalQuantity))
                                 .multiply(BigDecimal(
-                                    if (checkingQuantity < normalQuantity) {
+                                    if (checkingQuantity <= normalQuantity) {
                                         state = true
                                         checkingQuantity
                                     } else normalQuantity
                                 ))
                         }
-                        checkingQuantity -= normalQuantity
                     } else {
                         totalQuantity -= it.quantity
                         totalValue -= it.value
-                        checkingQuantity -= it.quantity
                     }
+                    checkingQuantity -= normalQuantity
                     withdrawn += getAverageCost(it.value, it.quantity).multiply(BigDecimal(normalQuantity))
                     withdrawnDaytrade += getAverageCost(it.value, it.quantity).multiply(BigDecimal(it.daytradeQuantity))
                 }
             }
-            if (state || checkingQuantity == 0) {
+            if (state) {
                 state = false
                 totalQuantity = checkingQuantity
                 totalValue = getAverageCost(it.value, it.quantity).multiply(BigDecimal(checkingQuantity))
