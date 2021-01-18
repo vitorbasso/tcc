@@ -19,6 +19,13 @@ object AccountantUtil {
         val newDaytradeWithdrawn: BigDecimal = BigDecimal.ZERO
     )
 
+    private fun WalletReport.subtract(other: WalletReport?) = WalletReport(
+        newNormalValue = this.newNormalValue.subtract(other?.newNormalValue ?: BigDecimal.ZERO),
+        newDaytradeValue = this.newDaytradeValue.subtract(other?.newDaytradeValue ?: BigDecimal.ZERO),
+        newWithdrawn = this.newWithdrawn.subtract(other?.newWithdrawn ?: BigDecimal.ZERO),
+        newDaytradeWithdrawn = this.newDaytradeWithdrawn.subtract(other?.newDaytradeWithdrawn ?: BigDecimal.ZERO),
+    )
+
     data class AccountantReport(
         val walletsReport: Map<LocalDate, WalletReport> = mapOf(),
         val assetReport: BigDecimal = BigDecimal.ZERO,
@@ -52,12 +59,9 @@ object AccountantUtil {
 
         return AccountantReport(
             transactionReport = accountedFor,
-            walletsReport = mapOf(newTransaction.transactionDate.atStartOfMonth() to WalletReport(
-                newNormalValue = temp2.newNormalValue.subtract(temp1.newNormalValue),
-                newDaytradeValue = temp2.newDaytradeValue.subtract(temp1.newDaytradeValue),
-                newWithdrawn = temp2.newWithdrawn.subtract(temp1.newWithdrawn),
-                newDaytradeWithdrawn = temp2.newDaytradeWithdrawn.subtract(temp1.newDaytradeWithdrawn)
-            ))
+            walletsReport = temp2.mapValues {
+                it.value.subtract(temp1[it.key])
+            }
         )
     }
 
@@ -66,7 +70,7 @@ object AccountantUtil {
         initialQuantity: Int = 0,
         transactions: List<Transaction>,
         changedTransactions: MutableList<Transaction> = mutableListOf()
-    ): WalletReport {
+    ): Map<LocalDate, WalletReport> {
         val mapOfTransactions = mutableMapOf<LocalDate, List<Transaction>>()
         transactions.map { it.transactionDate.atStartOfMonth() to it }.forEach {
             mapOfTransactions[it.first] = mapOfTransactions[it.first]?.plus(listOf(it.second))?: listOf(it.second)
@@ -80,77 +84,81 @@ object AccountantUtil {
         var balanceDaytrade = BigDecimal.ZERO
         var checkingQuantity = initialQuantity
         var state = false
-        transactions.forEach {
-            val normalQuantity = it.quantity - it.daytradeQuantity
-            when (it.type) {
-                TransactionType.BUY -> {
-                    if (checkingQuantity < 0) {
-                        balanceDaytrade += getAverageCost(totalValue.abs(), abs(totalQuantity))
-                            .subtract(getAverageCost(it.value, it.quantity))
-                            .multiply(BigDecimal(
-                                if (abs(checkingQuantity) <= it.daytradeQuantity) {
-                                    abs(checkingQuantity)
-                                } else it.daytradeQuantity
-                            ))
-                        if (checkingQuantity < 0) {
-                            balance += getAverageCost(totalValue.abs(), abs(totalQuantity))
-                                .subtract(getAverageCost(it.value, it.quantity))
-                                .multiply(BigDecimal(
-                                    if (abs(checkingQuantity) <= normalQuantity) {
-                                        state = true
-                                        abs(checkingQuantity)
-                                    } else normalQuantity
-                                ))
+
+        val report = mapOfTransactions.map { map ->
+            map.key to map.value.let { transactionsList ->
+                transactionsList.forEach {
+                    val normalQuantity = it.quantity - it.daytradeQuantity
+                    when (it.type) {
+                        TransactionType.BUY -> {
+                            if (checkingQuantity < 0) {
+                                balanceDaytrade += getAverageCost(totalValue.abs(), abs(totalQuantity))
+                                    .subtract(getAverageCost(it.value, it.quantity))
+                                    .multiply(BigDecimal(it.daytradeQuantity))
+                                if (checkingQuantity < 0) {
+                                    balance += getAverageCost(totalValue.abs(), abs(totalQuantity))
+                                        .subtract(getAverageCost(it.value, it.quantity))
+                                        .multiply(BigDecimal(
+                                            if (abs(checkingQuantity) <= normalQuantity) {
+                                                state = true
+                                                abs(checkingQuantity)
+                                            } else normalQuantity
+                                        ))
+                                }
+                            } else {
+                                totalValue += it.value
+                                totalQuantity += it.quantity
+                            }
+                            checkingQuantity += normalQuantity
                         }
-                    } else {
-                        totalValue += it.value
-                        totalQuantity += it.quantity
-                    }
-                    checkingQuantity += normalQuantity
-                }
-                TransactionType.SELL -> {
-                    if (checkingQuantity > 0) {
-                        balanceDaytrade += getAverageCost(it.value, it.quantity)
-                            .subtract(getAverageCost(totalValue, totalQuantity))
-                            .multiply(BigDecimal(
-                                if (checkingQuantity <= it.daytradeQuantity) {
-                                    checkingQuantity
-                                } else it.daytradeQuantity
-                            ))
-                        if (checkingQuantity > 0) {
-                            balance += getAverageCost(it.value, it.quantity)
-                                .subtract(getAverageCost(totalValue, totalQuantity))
-                                .multiply(BigDecimal(
-                                    if (checkingQuantity <= normalQuantity) {
-                                        state = true
-                                        checkingQuantity
-                                    } else normalQuantity
-                                ))
+                        TransactionType.SELL -> {
+                            if (checkingQuantity > 0) {
+                                balanceDaytrade += getAverageCost(it.value, it.quantity)
+                                    .subtract(getAverageCost(totalValue, totalQuantity))
+                                    .multiply(BigDecimal(it.daytradeQuantity))
+                                if (checkingQuantity > 0) {
+                                    balance += getAverageCost(it.value, it.quantity)
+                                        .subtract(getAverageCost(totalValue, totalQuantity))
+                                        .multiply(BigDecimal(
+                                            if (checkingQuantity <= normalQuantity) {
+                                                state = true
+                                                checkingQuantity
+                                            } else normalQuantity
+                                        ))
+                                }
+                            } else {
+                                totalQuantity -= it.quantity
+                                totalValue -= it.value
+                            }
+                            checkingQuantity -= normalQuantity
+                            withdrawn += getAverageCost(it.value, it.quantity).multiply(BigDecimal(normalQuantity))
+                            withdrawnDaytrade += getAverageCost(it.value, it.quantity).multiply(BigDecimal(it.daytradeQuantity))
                         }
-                    } else {
-                        totalQuantity -= it.quantity
-                        totalValue -= it.value
                     }
-                    checkingQuantity -= normalQuantity
-                    withdrawn += getAverageCost(it.value, it.quantity).multiply(BigDecimal(normalQuantity))
-                    withdrawnDaytrade += getAverageCost(it.value, it.quantity).multiply(BigDecimal(it.daytradeQuantity))
+                    if (state) {
+                        state = false
+                        totalQuantity = checkingQuantity
+                        totalValue = getAverageCost(it.value, it.quantity).multiply(BigDecimal(checkingQuantity))
+                        changedTransactions.add(it.copy(isSellout = true))
+                    } else {
+                        changedTransactions.add(it.copy(isSellout = false))
+                    }
                 }
+                val report = WalletReport(
+                    newNormalValue = balance,
+                    newDaytradeValue = balanceDaytrade,
+                    newWithdrawn = withdrawn,
+                    newDaytradeWithdrawn = withdrawnDaytrade
+                )
+                withdrawn = BigDecimal.ZERO
+                withdrawnDaytrade = BigDecimal.ZERO
+                balance = BigDecimal.ZERO
+                balanceDaytrade = BigDecimal.ZERO
+                report
             }
-            if (state) {
-                state = false
-                totalQuantity = checkingQuantity
-                totalValue = getAverageCost(it.value, it.quantity).multiply(BigDecimal(checkingQuantity))
-                changedTransactions.add(it.copy(isSellout = true))
-            } else {
-                changedTransactions.add(it.copy(isSellout = false))
-            }
-        }
-        return WalletReport(
-            newNormalValue = balance,
-            newDaytradeValue = balanceDaytrade,
-            newWithdrawn = withdrawn,
-            newDaytradeWithdrawn = withdrawnDaytrade
-        )
+        }.toMap()
+
+        return report
     }
 
     fun getTransactionNormalAndDaytradeValue(averageTickerValue: BigDecimal, transaction: Transaction) = Pair(
