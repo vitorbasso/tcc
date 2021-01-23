@@ -31,10 +31,13 @@ internal class WalletService(
     ) = this.walletRepository.findByIdOrNull(walletId)?.takeIf { it.client.id == clientId } ?: throw exception
 
     fun saveWallet(client: Client, walletToSave: Wallet) = if (!exists(client, walletToSave))
-        this.walletRepository.save(walletToSave.copy(walletMonth = walletToSave.walletMonth.withDayOfMonth(1), client = client))
+        this.walletRepository.save(
+            walletToSave.copy(walletMonth = walletToSave.walletMonth.withDayOfMonth(1), client = client)
+        )
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
-    fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest) = this.walletRepository.save(walletToUpdate.copy(
+    fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest)
+    = this.walletRepository.save(walletToUpdate.copy(
         name = walletUpdateRequest.name ?: walletToUpdate.name,
         broker = walletUpdateRequest.broker ?: walletToUpdate.broker
     ))
@@ -42,7 +45,8 @@ internal class WalletService(
     fun deleteWallet(wallet: Wallet) = this.walletRepository.delete(wallet)
 
     @Transactional
-    fun enforceWalletMonth(wallet: Wallet) = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
+    fun enforceWalletMonth(wallet: Wallet)
+    = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
         this.monthlyWalletRepository.save(wallet.toMonthlyWallet())
         wallet.copy(
             monthlyBalanceDaytrade = BigDecimal.ZERO,
@@ -189,7 +193,8 @@ internal class WalletService(
 //        }
 //    }
 
-    private fun exists(client: Client, wallet: Wallet) = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
+    private fun exists(client: Client, wallet: Wallet)
+    = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
 
 }
 
