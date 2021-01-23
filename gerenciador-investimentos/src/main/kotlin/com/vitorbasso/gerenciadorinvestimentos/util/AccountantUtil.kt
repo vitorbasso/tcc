@@ -73,7 +73,7 @@ object AccountantUtil {
     ): Map<LocalDate, WalletReport> {
         val mapOfTransactions = mutableMapOf<LocalDate, List<Transaction>>()
         transactions.map { it.transactionDate.atStartOfMonth() to it }.forEach {
-            mapOfTransactions[it.first] = mapOfTransactions[it.first]?.plus(listOf(it.second))?: listOf(it.second)
+            mapOfTransactions[it.first] = mapOfTransactions[it.first]?.plus(listOf(it.second)) ?: listOf(it.second)
         }
 
         var totalValue = initialValue
@@ -95,16 +95,14 @@ object AccountantUtil {
                                 balanceDaytrade += getAverageCost(totalValue.abs(), abs(totalQuantity))
                                     .subtract(getAverageCost(it.value, it.quantity))
                                     .multiply(BigDecimal(it.daytradeQuantity))
-                                if (checkingQuantity < 0) {
-                                    balance += getAverageCost(totalValue.abs(), abs(totalQuantity))
-                                        .subtract(getAverageCost(it.value, it.quantity))
-                                        .multiply(BigDecimal(
-                                            if (abs(checkingQuantity) <= normalQuantity) {
-                                                state = true
-                                                abs(checkingQuantity)
-                                            } else normalQuantity
-                                        ))
-                                }
+                                balance += getAverageCost(totalValue.abs(), abs(totalQuantity))
+                                    .subtract(getAverageCost(it.value, it.quantity))
+                                    .multiply(BigDecimal(
+                                        if (abs(checkingQuantity) <= normalQuantity) {
+                                            state = true
+                                            abs(checkingQuantity)
+                                        } else normalQuantity
+                                    ))
                             } else {
                                 totalValue += it.value
                                 totalQuantity += it.quantity
@@ -116,16 +114,14 @@ object AccountantUtil {
                                 balanceDaytrade += getAverageCost(it.value, it.quantity)
                                     .subtract(getAverageCost(totalValue, totalQuantity))
                                     .multiply(BigDecimal(it.daytradeQuantity))
-                                if (checkingQuantity > 0) {
-                                    balance += getAverageCost(it.value, it.quantity)
-                                        .subtract(getAverageCost(totalValue, totalQuantity))
-                                        .multiply(BigDecimal(
-                                            if (checkingQuantity <= normalQuantity) {
-                                                state = true
-                                                checkingQuantity
-                                            } else normalQuantity
-                                        ))
-                                }
+                                balance += getAverageCost(it.value, it.quantity)
+                                    .subtract(getAverageCost(totalValue, totalQuantity))
+                                    .multiply(BigDecimal(
+                                        if (checkingQuantity <= normalQuantity) {
+                                            state = true
+                                            checkingQuantity
+                                        } else normalQuantity
+                                    ))
                             } else {
                                 totalQuantity -= it.quantity
                                 totalValue -= it.value

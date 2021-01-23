@@ -30,6 +30,10 @@ data class Transaction(
 
     val isSellout: Boolean = false,
 
+    val checkingValue: BigDecimal = BigDecimal.ZERO,
+
+    val checkingQuantity: Int = 0,
+
     val daytrade: Boolean = false,
 
     val daytradeQuantity: Int = 0,

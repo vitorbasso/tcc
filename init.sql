@@ -83,6 +83,8 @@ create table if not exists `transaction`(
     `value` decimal(13,2) default 0,
     `transaction_date` timestamp not null default NOW(),
     `is_sellout` boolean not null default false,
+    `checking_value` decimal(13,2) default 0,
+    `checking_quantity` int default 0,
     `daytrade` boolean not null default false,
     `daytrade_quantity` int not null default 0,
     `asset_id` bigint not null,

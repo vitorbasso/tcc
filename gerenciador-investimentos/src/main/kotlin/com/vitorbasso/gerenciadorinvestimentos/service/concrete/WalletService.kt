@@ -59,7 +59,6 @@ internal class WalletService(
         walletMonth: LocalDate,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
     ) {
-        println("walletMonth = $walletMonth = wallet.walletMonth = ${wallet.walletMonth} == ${walletMonth.isEqual(wallet.walletMonth)}")
         if (walletMonth.isEqual(wallet.walletMonth)) {
             this.walletRepository.save(
                 wallet.copy(
