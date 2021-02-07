@@ -29,7 +29,14 @@ object AccountantUtil {
     data class AccountantReport(
         val walletsReport: Map<LocalDate, WalletReport> = mapOf(),
         val assetReport: BigDecimal = BigDecimal.ZERO,
-        val transactionReport: List<Transaction> = listOf()
+        val transactionsReport: List<Transaction> = listOf()
+    )
+
+    private data class AccountantNotes(
+        var quantityForAverage: Int = 0,
+        var valueForAverage: BigDecimal = BigDecimal.ZERO,
+        var quantityCount: Int = 0,
+        var balanceContribution: BigDecimal = BigDecimal.ZERO
     )
 
     fun accountForNewTransaction(
@@ -42,7 +49,6 @@ object AccountantUtil {
             it.transactionDate.isBefore(newTransaction.transactionDate)
         }
         accountNormalBalance(staleTransactions)
-
 
         val daytradeProcessed = processDaytrade(
             beforeNewTransaction.filter {
@@ -69,10 +75,8 @@ object AccountantUtil {
 
         return AccountantReport(
             walletsReport = temp,
-            transactionReport = accountedFor
-        ).also {
-            println("walletsReport = ${it.walletsReport}")
-        }
+            transactionsReport = accountedFor
+        )
     }
 
     private fun accountDaytradeBalance(
@@ -100,110 +104,141 @@ object AccountantUtil {
         transactions: List<Transaction>,
         updatedTransactions: MutableList<Transaction> = mutableListOf()
     ): Map<LocalDate, WalletReport> {
-        val mapOfTransactions = mutableMapOf<LocalDate, List<Transaction>>()
-        transactions.map { it.transactionDate.atStartOfMonth() to it }.forEach {
-            mapOfTransactions[it.first] = mapOfTransactions[it.first]?.plus(listOf(it.second)) ?: listOf(it.second)
-        }
-        var quantityForAverage = transactions.firstOrNull()?.checkingQuantity ?: 0
-        var valueForAverage = transactions.firstOrNull()?.checkingValue ?: BigDecimal.ZERO
-        var quantityCount = transactions.firstOrNull()?.checkingQuantity ?: 0
-        var balanceContribution = BigDecimal.ZERO
+        val mapOfTransactions = mapTransactionsToMonth(transactions)
+
+        val accountantNotes = AccountantNotes(
+            quantityForAverage = transactions.firstOrNull()?.checkingQuantity ?: 0,
+            valueForAverage = transactions.firstOrNull()?.checkingValue ?: BigDecimal.ZERO,
+            quantityCount = transactions.firstOrNull()?.checkingQuantity ?: 0,
+            balanceContribution = BigDecimal.ZERO
+        )
 
         return mapOfTransactions.map { map ->
             map.key to map.value.let { transactionList ->
                 transactionList.forEach {
-                    val transaction = it.copy(checkingQuantity = quantityForAverage, checkingValue = valueForAverage)
+                    val transaction = it.copy(
+                        checkingQuantity = accountantNotes.quantityForAverage,
+                        checkingValue = accountantNotes.valueForAverage
+                    )
                     updatedTransactions.add(transaction)
-                    val normalQuantity = transaction.quantity - transaction.daytradeQuantity
-                    when (it.type) {
-                        TransactionType.BUY -> {
-                            when {
-                                quantityCount >= 0 -> {
-                                    valueForAverage = valueForAverage.add(
-                                        getAverageCost(it.value, it.quantity).multiply(
-                                            BigDecimal(normalQuantity)
-                                        )
-                                    )
-                                    quantityForAverage += normalQuantity
-                                }
-                                abs(quantityCount) < normalQuantity -> {
-                                    balanceContribution = balanceContribution.add(
-                                        getAverageCost(it.value, it.quantity).subtract(
-                                            getAverageCost(
-                                                valueForAverage,
-                                                quantityForAverage
-                                            ).abs()
-                                        ).multiply(BigDecimal(quantityCount))
-                                    )
-                                    quantityForAverage = normalQuantity - abs(quantityCount)
-                                    valueForAverage =
-                                        getAverageCost(it.value, it.quantity).multiply(BigDecimal(quantityForAverage))
-                                }
-                                else -> {
-                                    balanceContribution = balanceContribution.add(
-                                        getAverageCost(valueForAverage, quantityForAverage).abs()
-                                            .subtract(getAverageCost(it.value, it.quantity))
-                                            .multiply(BigDecimal(normalQuantity))
-                                    )
-                                }
-                            }
-                            quantityCount += normalQuantity
-                        }
-                        TransactionType.SELL -> {
-                            when {
-                                quantityCount <= 0 -> {
-                                    valueForAverage = valueForAverage.subtract(
-                                        getAverageCost(it.value, it.quantity).multiply(
-                                            BigDecimal(normalQuantity)
-                                        )
-                                    )
-                                    quantityForAverage -= normalQuantity
-                                }
-                                quantityCount < normalQuantity -> {
-                                    balanceContribution = balanceContribution.add(
-                                        getAverageCost(it.value, it.quantity).subtract(
-                                            getAverageCost(
-                                                valueForAverage,
-                                                quantityForAverage
-                                            )
-                                        ).multiply(BigDecimal(quantityCount))
-                                    )
-                                    quantityForAverage = quantityCount - normalQuantity
-                                    valueForAverage =
-                                        getAverageCost(it.value, it.quantity).multiply(BigDecimal(quantityForAverage))
-                                }
-                                else -> {
-                                    balanceContribution = balanceContribution.add(
-                                        getAverageCost(it.value, it.quantity).subtract(
-                                            getAverageCost(
-                                                valueForAverage,
-                                                quantityForAverage
-                                            )
-                                        ).multiply(BigDecimal(normalQuantity))
-                                    )
-                                }
-                            }
-                            quantityCount -= normalQuantity
-                        }
-                    }
-                    if (quantityCount == 0) {
-                        valueForAverage = BigDecimal.ZERO
-                        quantityForAverage = 0
-                    }
+                    processTransaction(
+                        transaction = transaction,
+                        accountantNotes = accountantNotes
+                    )
                 }
                 WalletReport(
-                    newNormalValue = balanceContribution
+                    newNormalValue = accountantNotes.balanceContribution
                 )
             }
         }.toMap()
     }
 
-    fun getTransactionNormalAndDaytradeValue(averageTickerValue: BigDecimal, transaction: Transaction) = Pair(
-        averageTickerValue.multiply(
-            BigDecimal(transaction.quantity - transaction.daytradeQuantity).abs()
-        ),
-        averageTickerValue.multiply(BigDecimal(transaction.daytradeQuantity))
-    )
+    private fun processTransaction(
+        transaction: Transaction,
+        accountantNotes: AccountantNotes
+    ) {
+        when (transaction.type) {
+            TransactionType.BUY -> processBuyTransaction(transaction, accountantNotes)
+            TransactionType.SELL -> processSellTransaction(transaction, accountantNotes)
+        }
+        if (accountantNotes.quantityCount == 0) {
+            accountantNotes.valueForAverage = BigDecimal.ZERO
+            accountantNotes.quantityForAverage = 0
+        }
+    }
+
+    private fun processSellTransaction(
+        transaction: Transaction,
+        accountantNotes: AccountantNotes
+    ) {
+        val normalQuantity = transaction.quantity - transaction.daytradeQuantity
+        when {
+            accountantNotes.quantityCount <= 0 -> {
+                accountantNotes.valueForAverage = accountantNotes.valueForAverage.subtract(
+                    getAverageCost(transaction.value, transaction.quantity).multiply(
+                        BigDecimal(normalQuantity)
+                    )
+                )
+                accountantNotes.quantityForAverage -= normalQuantity
+            }
+            accountantNotes.quantityCount < normalQuantity -> {
+                accountantNotes.balanceContribution = accountantNotes.balanceContribution.add(
+                    getAverageCost(transaction.value, transaction.quantity).subtract(
+                        getAverageCost(
+                            accountantNotes.valueForAverage,
+                            accountantNotes.quantityForAverage
+                        )
+                    ).multiply(BigDecimal(accountantNotes.quantityCount))
+                )
+                accountantNotes.quantityForAverage = accountantNotes.quantityCount - normalQuantity
+                accountantNotes.valueForAverage =
+                    getAverageCost(
+                        transaction.value,
+                        transaction.quantity
+                    ).multiply(BigDecimal(accountantNotes.quantityForAverage))
+            }
+            else -> {
+                accountantNotes.balanceContribution = accountantNotes.balanceContribution.add(
+                    getAverageCost(transaction.value, transaction.quantity).subtract(
+                        getAverageCost(
+                            accountantNotes.valueForAverage,
+                            accountantNotes.quantityForAverage
+                        )
+                    ).multiply(BigDecimal(normalQuantity))
+                )
+            }
+        }
+        accountantNotes.quantityCount -= normalQuantity
+    }
+
+    private fun processBuyTransaction(
+        transaction: Transaction,
+        accountantNotes: AccountantNotes
+    ) {
+        val normalQuantity = transaction.quantity - transaction.daytradeQuantity
+        when {
+            accountantNotes.quantityCount >= 0 -> {
+                accountantNotes.valueForAverage = accountantNotes.valueForAverage.add(
+                    getAverageCost(transaction.value, transaction.quantity).multiply(
+                        BigDecimal(normalQuantity)
+                    )
+                )
+                accountantNotes.quantityForAverage += normalQuantity
+            }
+            abs(accountantNotes.quantityCount) < normalQuantity -> {
+                accountantNotes.balanceContribution = accountantNotes.balanceContribution.add(
+                    getAverageCost(transaction.value, transaction.quantity).subtract(
+                        getAverageCost(
+                            accountantNotes.valueForAverage,
+                            accountantNotes.quantityForAverage
+                        ).abs()
+                    ).multiply(BigDecimal(accountantNotes.quantityCount))
+                )
+                accountantNotes.quantityForAverage = normalQuantity - abs(accountantNotes.quantityCount)
+                accountantNotes.valueForAverage =
+                    getAverageCost(
+                        transaction.value,
+                        transaction.quantity
+                    ).multiply(BigDecimal(accountantNotes.quantityForAverage))
+            }
+            else -> {
+                accountantNotes.balanceContribution = accountantNotes.balanceContribution.add(
+                    getAverageCost(accountantNotes.valueForAverage, accountantNotes.quantityForAverage).abs()
+                        .subtract(getAverageCost(transaction.value, transaction.quantity))
+                        .multiply(BigDecimal(normalQuantity))
+                )
+            }
+        }
+        accountantNotes.quantityCount += normalQuantity
+    }
+
+    private fun mapTransactionsToMonth(transactions: List<Transaction>) =
+        mutableMapOf<LocalDate, List<Transaction>>().let { map ->
+            transactions.map { it.transactionDate.atStartOfMonth() to it }.forEach {
+                map[it.first] = map[it.first]?.plus(it.second) ?: listOf(it.second)
+            }
+            map
+        }
 
     private fun getAverageCost(value: BigDecimal = BigDecimal.ZERO, quantity: Int = 1) =
         value.divide(BigDecimal(quantity).takeIf { it.compareTo(BigDecimal.ZERO) != 0 }
@@ -273,7 +308,5 @@ object AccountantUtil {
     }).let { Pair(it.first.toMutableList(), it.second.toMutableList()) }
 
 }
-
-private fun LocalDateTime.atStartOfDay() = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
 
 private fun LocalDateTime.atStartOfMonth() = this.toLocalDate().withDayOfMonth(1)

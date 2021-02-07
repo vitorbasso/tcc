@@ -55,7 +55,7 @@ internal class TransactionServiceFacadeImpl(
             transaction,
             this.transactionService.findFromLastIsSellout(transaction)
         )
-        this.transactionService.saveAll(accountantReport.transactionReport)
+        this.transactionService.saveAll(accountantReport.transactionsReport)
 
         this.walletService.processWalletReport(
             transaction.asset.wallet,
@@ -63,7 +63,7 @@ internal class TransactionServiceFacadeImpl(
             this.monthlyWalletService
         )
 
-        return accountantReport.transactionReport.findLast { it.transactionDate.isEqual(transaction.transactionDate) }
+        return accountantReport.transactionsReport.findLast { it.transactionDate.isEqual(transaction.transactionDate) }
             ?: transaction
     }
 
