@@ -46,42 +46,36 @@ object AccountantUtil {
     ): AccountantReport {
         val accountedFor = mutableListOf<Transaction>()
 
-        val (beforeNewTransaction, afterNewTransacion) = staleTransactions.partition {
-            it.transactionDate.isBefore(newTransaction.transactionDate)
+        val (sameDayTransactions, otherDayTransactions)
+            = staleTransactions.filterByDate(newTransaction.transactionDate.toLocalDate())
+
+        val beforeNewTransaction = accountNormalBalance(staleTransactions, sameDayTransactions)
+
+        val daytradeProcessed = processDaytrade((sameDayTransactions + newTransaction).sortedBy {
+            it.transactionDate
         }
-        accountNormalBalance(staleTransactions)
+        )
 
-        val daytradeProcessed = processDaytrade(
-            beforeNewTransaction.filter {
-                it.transactionDate.toLocalDate().isEqual(newTransaction.transactionDate.toLocalDate())
-            }
-                + newTransaction + afterNewTransacion.filter {
-                it.transactionDate.toLocalDate().isEqual(newTransaction.transactionDate.toLocalDate())
-            }
-        ).sortedBy { it.transactionDate }
-        val temp = accountNormalBalance((daytradeProcessed + staleTransactions.filter {
-            !it.transactionDate.toLocalDate().isEqual(newTransaction.transactionDate.toLocalDate())
-        }).sortedBy { it.transactionDate }, accountedFor).toMutableMap()
-
-        temp[newTransaction.transactionDate.atStartOfMonth()] =
-            temp[newTransaction.transactionDate.atStartOfMonth()]?.copy(
-                newDaytradeValue = accountDaytradeBalance(daytradeProcessed).subtract(
-                    accountDaytradeBalance(
-                        staleTransactions.filter {
-                            it.transactionDate.toLocalDate().isEqual(newTransaction.transactionDate.toLocalDate())
-                        })
-                )
-            ) ?: WalletReport()
+        val walletReport = accountNormalBalance(
+            transactions = (daytradeProcessed + otherDayTransactions).sortedBy { it.transactionDate },
+            daytradeTransactions = daytradeProcessed,
+            updatedTransactions = accountedFor
+        ).map {
+            it.key to it.value.subtract(beforeNewTransaction[it.key])
+        }.toMap()
 
         return AccountantReport(
-            walletsReport = temp.also { println(it) },
+            walletsReport = walletReport,
             transactionsReport = accountedFor
         )
     }
 
+    private fun List<Transaction>.filterByDate(date: LocalDate) =
+        this.partition { it.transactionDate.toLocalDate().isEqual(date) }
+
     private fun accountDaytradeBalance(
         transactions: List<Transaction>
-    ): BigDecimal {
+    ): Pair<BigDecimal, BigDecimal> {
         val (buyTransactions, sellTransactions) = transactions.partition {
             it.type == TransactionType.BUY
         }
@@ -97,11 +91,12 @@ object AccountantUtil {
                 transaction.quantity
             ).multiply(BigDecimal(transaction.daytradeQuantity))
         }
-        return sellValue.subtract(buyValue)
+        return Pair(sellValue.subtract(buyValue), sellValue)
     }
 
     private fun accountNormalBalance(
         transactions: List<Transaction>,
+        daytradeTransactions: List<Transaction>,
         updatedTransactions: MutableList<Transaction> = mutableListOf()
     ): Map<LocalDate, WalletReport> {
         val mapOfTransactions = mapTransactionsToMonth(transactions)
@@ -127,13 +122,29 @@ object AccountantUtil {
                         accountantNotes = accountantNotes
                     )
                 }
+
+                val (dtBalance, dtWithdrawn)
+                    = if (isCorrectMonth(map, daytradeTransactions))
+                    accountDaytradeBalance(daytradeTransactions)
+                else
+                    Pair(BigDecimal.ZERO, BigDecimal.ZERO)
+
                 WalletReport(
                     newNormalValue = accountantNotes.balanceContribution,
-                    newWithdrawn = accountantNotes.withdrawnContribution
+                    newWithdrawn = accountantNotes.withdrawnContribution,
+                    newDaytradeValue = dtBalance,
+                    newDaytradeWithdrawn = dtWithdrawn
                 )
             }
         }.toMap()
     }
+
+    private fun isCorrectMonth(
+        map: Map.Entry<LocalDate, List<Transaction>>,
+        daytradeTransactions: List<Transaction>
+    ) = map.key.isEqual(
+        daytradeTransactions.firstOrNull()?.transactionDate?.atStartOfMonth() ?: map.key.withDayOfMonth(2)
+    )
 
     private fun processTransaction(
         transaction: Transaction,
