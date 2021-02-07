@@ -46,7 +46,7 @@ internal class TransactionServiceFacadeImpl(
         )
         val transactions = this.transactionService.findTransactionsOnSameDate(transactionToDelete).toMutableList()
         transactions.remove(transactionToDelete)
-        this.transactionService.saveAll(AccountantUtil.reprocessTransactionsForDaytrade(transactions))
+        this.transactionService.saveAll(AccountantUtil.processDaytrade(transactions))
         this.transactionService.deleteTransaction(transactionToDelete)
     }
 
