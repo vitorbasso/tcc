@@ -36,7 +36,8 @@ object AccountantUtil {
         var quantityForAverage: Int = 0,
         var valueForAverage: BigDecimal = BigDecimal.ZERO,
         var quantityCount: Int = 0,
-        var balanceContribution: BigDecimal = BigDecimal.ZERO
+        var balanceContribution: BigDecimal = BigDecimal.ZERO,
+        var withdrawnContribution: BigDecimal = BigDecimal.ZERO
     )
 
     fun accountForNewTransaction(
@@ -72,9 +73,8 @@ object AccountantUtil {
                 )
             ) ?: WalletReport()
 
-
         return AccountantReport(
-            walletsReport = temp,
+            walletsReport = temp.also { println(it) },
             transactionsReport = accountedFor
         )
     }
@@ -109,12 +109,13 @@ object AccountantUtil {
         val accountantNotes = AccountantNotes(
             quantityForAverage = transactions.firstOrNull()?.checkingQuantity ?: 0,
             valueForAverage = transactions.firstOrNull()?.checkingValue ?: BigDecimal.ZERO,
-            quantityCount = transactions.firstOrNull()?.checkingQuantity ?: 0,
-            balanceContribution = BigDecimal.ZERO
+            quantityCount = transactions.firstOrNull()?.checkingQuantity ?: 0
         )
 
         return mapOfTransactions.map { map ->
             map.key to map.value.let { transactionList ->
+                accountantNotes.balanceContribution = BigDecimal.ZERO
+                accountantNotes.withdrawnContribution = BigDecimal.ZERO
                 transactionList.forEach {
                     val transaction = it.copy(
                         checkingQuantity = accountantNotes.quantityForAverage,
@@ -127,7 +128,8 @@ object AccountantUtil {
                     )
                 }
                 WalletReport(
-                    newNormalValue = accountantNotes.balanceContribution
+                    newNormalValue = accountantNotes.balanceContribution,
+                    newWithdrawn = accountantNotes.withdrawnContribution
                 )
             }
         }.toMap()
@@ -152,6 +154,11 @@ object AccountantUtil {
         accountantNotes: AccountantNotes
     ) {
         val normalQuantity = transaction.quantity - transaction.daytradeQuantity
+        accountantNotes.withdrawnContribution = accountantNotes.withdrawnContribution.add(
+            getAverageCost(transaction.value, transaction.quantity).multiply(
+                BigDecimal(normalQuantity)
+            )
+        )
         when {
             accountantNotes.quantityCount <= 0 -> {
                 accountantNotes.valueForAverage = accountantNotes.valueForAverage.subtract(
