@@ -4,7 +4,6 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
-import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
@@ -20,7 +19,7 @@ import java.time.LocalDateTime
 internal class TransactionServiceFacadeImpl(
     private val transactionService: TransactionService,
     private val stockService: StockService,
-    private val assetService: IAssetService,
+    private val assetService: AssetServiceFacadeImpl,
     private val walletService: WalletServiceFacadeImpl,
     private val monthlyWalletService: MonthlyWalletServiceFacadeImpl
 ) : ITransactionService {
@@ -59,23 +58,18 @@ internal class TransactionServiceFacadeImpl(
 
         this.walletService.processWalletReport(
             transaction.asset.wallet,
-            accountantReport.walletsReport,
+            accountantReport,
             this.monthlyWalletService
+        )
+
+        this.assetService.processAssetReport(
+            transaction.asset,
+            accountantReport
         )
 
         return accountantReport.transactionsReport.findLast { it.transactionDate.isEqual(transaction.transactionDate) }
             ?: transaction
     }
-
-
-//
-//    private fun processDaytrade(transaction: Transaction)
-//    = AccountantUtil.accountForNewTransaction(
-//        transaction,
-//        this.transactionService.findFromLastIsSellout(transaction)
-//    ).let { this.transactionService.saveAll(it.transactionReport).find { processedTransaction ->
-//        processedTransaction.id == transaction.id
-//    } ?: transaction }
 
     private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
         !it.toLocalDate().isAfter(LocalDate.now()) &&

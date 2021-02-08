@@ -1,16 +1,18 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Stock
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
+import com.vitorbasso.gerenciadorinvestimentos.util.AccountantUtil
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
 @Service
-internal class AssetServiceFacadeImpl (
+internal class AssetServiceFacadeImpl(
     private val assetService: AssetService,
     private val walletService: WalletServiceFacadeImpl,
     private val stockService: StockService
@@ -40,6 +42,14 @@ internal class AssetServiceFacadeImpl (
             )
         }
     }).let { this.assetService.saveAsset(it) }
+
+    fun processAssetReport(asset: Asset, accountantReport: AccountantUtil.AccountantReport) =
+        this.assetService.saveAsset(
+            asset.copy(
+                averageCost = accountantReport.assetReport,
+                lifetimeBalance = asset.lifetimeBalance.add(accountantReport.lifetimeBalanceChange)
+            )
+        )
 
     override fun deleteAsset(walletId: Long, ticker: String) = this.assetService.deleteAsset(
         asset = this.assetService.getAsset(

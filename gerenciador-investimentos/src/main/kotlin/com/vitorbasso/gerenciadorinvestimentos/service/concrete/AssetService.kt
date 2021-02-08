@@ -8,7 +8,6 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundExc
 import com.vitorbasso.gerenciadorinvestimentos.repository.IAssetRepository
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 @Service
 internal class AssetService(
@@ -37,22 +36,9 @@ internal class AssetService(
         wallet: Wallet,
         stock: Stock
     ) = asset?.copy(
-        averageCost = updateAverageAssetCost(
-            cost = cost,
-            amount = amount,
-            averageValueCount = asset.averageValueCount,
-            averageQuantityCount = asset.averageQuantityCount
-        ),
-        amount = asset.amount + amount,
-        lifetimeBalance = asset.lifetimeBalance - cost,
-        averageQuantityCount = asset.averageQuantityCount + amount,
-        averageValueCount = asset.averageValueCount.add(cost)
+        amount = asset.amount + amount
     ) ?: Asset(
-        averageCost = updateAverageAssetCost(cost, amount),
         amount = amount,
-        lifetimeBalance = -cost,
-        averageQuantityCount = amount,
-        averageValueCount = cost,
         wallet = wallet,
         stock = stock
     )
@@ -64,22 +50,9 @@ internal class AssetService(
         wallet: Wallet,
         stock: Stock
     ) = asset?.copy(
-        amount = asset.amount - amount,
-        lifetimeBalance = asset.lifetimeBalance + cost
+        amount = asset.amount - amount
     ) ?: Asset(
-        averageCost = updateAverageAssetCost(BigDecimal.ZERO, amount),
-        amount = -amount,
-        lifetimeBalance = cost,
-        wallet = wallet,
-        stock = stock
+        amount = -amount
     )
-
-    private fun updateAverageAssetCost(
-        cost: BigDecimal,
-        amount: Int,
-        averageValueCount: BigDecimal = BigDecimal(0),
-        averageQuantityCount: Int = 0
-    ) = averageValueCount.add(cost)
-        .divide(BigDecimal(averageQuantityCount + amount), 20, RoundingMode.HALF_EVEN)
 
 }

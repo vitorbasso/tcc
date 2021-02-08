@@ -52,10 +52,10 @@ internal class WalletServiceFacadeImpl(
 
     fun processWalletReport(
         wallet: Wallet,
-        walletReport: Map<LocalDate, AccountantUtil.WalletReport>,
+        accountantReport: AccountantUtil.AccountantReport,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
     ) = wallet.validate().let { walletValidated ->
-        walletReport.forEach {
+        accountantReport.walletsReport.forEach {
             this.walletService.processWalletReport(
                 walletValidated,
                 it.value,
@@ -64,15 +64,6 @@ internal class WalletServiceFacadeImpl(
             )
         }
     }
-
-//    fun updateBalance(
-//        newTransaction: Transaction,
-//        monthlyWalletService: MonthlyWalletServiceFacadeImpl
-//    ) = this.walletService.processTransaction(
-//        wallet = newTransaction.asset.wallet.validate(),
-//        transaction = newTransaction,
-//        monthlyWalletService = monthlyWalletService
-//    )
 
     private fun isValid(wallet: Wallet)
     = wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)
