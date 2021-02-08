@@ -8,8 +8,8 @@ data class MonthlyWalletDto(
     val id: Long,
     val name: String,
     val broker: String,
-    val monthlyBalanceDaytrade: BigDecimal,
-    val monthlyBalance: BigDecimal,
+    val balanceDaytrade: BigDecimal,
+    val balance: BigDecimal,
     val walletId: Long,
     val walletMonth: LocalDate
 ) : IMonthlyWallet

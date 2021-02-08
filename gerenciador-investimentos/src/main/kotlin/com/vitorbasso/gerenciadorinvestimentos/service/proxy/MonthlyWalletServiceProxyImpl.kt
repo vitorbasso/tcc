@@ -24,16 +24,15 @@ internal class MonthlyWalletServiceProxyImpl(
 
     override fun deleteMonthlyWallet(monthlyWalletId: Long)
     = this.monthlyWalletService.deleteMonthlyWallet(monthlyWalletId)
-
-
+    
 }
 
 private fun IMonthlyWallet.getDto() = MonthlyWalletDto(
     id = (this as MonthlyWallet).id,
     name = this.name,
     broker = this.broker,
-    monthlyBalanceDaytrade = this.monthlyBalanceDaytrade,
-    monthlyBalance = this.monthlyBalance,
+    balanceDaytrade = this.balanceDaytrade,
+    balance = this.balance,
     walletId = this.walletId,
     walletMonth = this.walletMonth
 )

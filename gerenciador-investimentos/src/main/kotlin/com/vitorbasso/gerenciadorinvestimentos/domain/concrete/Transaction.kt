@@ -28,8 +28,6 @@ data class Transaction(
 
     val transactionDate: LocalDateTime = LocalDateTime.now(),
 
-    val isSellout: Boolean = false,
-
     val checkingValue: BigDecimal = BigDecimal.ZERO,
 
     val checkingQuantity: Int = 0,

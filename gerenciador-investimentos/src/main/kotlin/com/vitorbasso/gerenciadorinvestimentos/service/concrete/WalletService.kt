@@ -49,8 +49,8 @@ internal class WalletService(
     = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
         this.monthlyWalletRepository.save(wallet.toMonthlyWallet())
         wallet.copy(
-            monthlyBalanceDaytrade = BigDecimal.ZERO,
-            monthlyBalance = BigDecimal.ZERO,
+            balanceDaytrade = BigDecimal.ZERO,
+            balance = BigDecimal.ZERO,
             walletMonth = LocalDate.now().withDayOfMonth(1)
         ).let {
             this.walletRepository.save(it)
@@ -66,8 +66,8 @@ internal class WalletService(
         if (walletMonth.isEqual(wallet.walletMonth)) {
             this.walletRepository.save(
                 wallet.copy(
-                    monthlyBalance = wallet.monthlyBalance.add(walletReport.newNormalValue),
-                    monthlyBalanceDaytrade = wallet.monthlyBalanceDaytrade.add(walletReport.newDaytradeValue),
+                    balance = wallet.balance.add(walletReport.newNormalValue),
+                    balanceDaytrade = wallet.balanceDaytrade.add(walletReport.newDaytradeValue),
                     withdrawn = wallet.withdrawn.add(walletReport.newWithdrawn),
                     withdrawnDaytrade = wallet.withdrawnDaytrade.add(walletReport.newDaytradeWithdrawn)
                 )
@@ -79,8 +79,8 @@ internal class WalletService(
                 walletMonth = walletMonth
             ).let {
                 it.copy(
-                    monthlyBalance = it.monthlyBalance.add(walletReport.newNormalValue),
-                    monthlyBalanceDaytrade = it.monthlyBalanceDaytrade.add(walletReport.newDaytradeValue),
+                    balance = it.balance.add(walletReport.newNormalValue),
+                    balanceDaytrade = it.balanceDaytrade.add(walletReport.newDaytradeValue),
                     withdrawn = it.withdrawn.add(walletReport.newWithdrawn),
                     withdrawnDaytrade = it.withdrawnDaytrade.add(walletReport.newDaytradeWithdrawn)
                 )
@@ -97,8 +97,8 @@ internal class WalletService(
         ?: MonthlyWallet(
             name = wallet.name,
             broker = wallet.broker,
-            monthlyBalanceDaytrade = BigDecimal.ZERO,
-            monthlyBalance = BigDecimal.ZERO,
+            balanceDaytrade = BigDecimal.ZERO,
+            balance = BigDecimal.ZERO,
             walletMonth = walletMonth.withDayOfMonth(1),
             walletId = wallet.id,
             client = wallet.client
@@ -112,8 +112,8 @@ internal class WalletService(
 private fun Wallet.toMonthlyWallet() = MonthlyWallet(
     name = this.name,
     broker = this.broker,
-    monthlyBalanceDaytrade = this.monthlyBalanceDaytrade,
-    monthlyBalance = this.monthlyBalance,
+    balanceDaytrade = this.balanceDaytrade,
+    balance = this.balance,
     walletId = this.id,
     walletMonth = this.walletMonth,
     client = this.client
