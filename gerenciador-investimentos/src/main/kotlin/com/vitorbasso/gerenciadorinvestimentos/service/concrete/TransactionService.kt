@@ -19,11 +19,9 @@ internal class TransactionService(
 
     fun save(transaction: Transaction) = this.transactionRepository.save(transaction)
 
-    //fun saveAndFlush(transaction: Transaction) = this.transactionRepository.saveAndFlush(transaction)
-
     fun saveAll(transactions: List<Transaction>) : List<Transaction> = this.transactionRepository.saveAll(transactions)
 
-    fun findFromLastIsSellout(transaction: Transaction)
+    fun findFromOneBeforeTransactionDate(transaction: Transaction)
     = this.transactionRepository.findAllFromTransactionBeforeTransactionDate(
         transaction.asset.id,
         transaction.transactionDate.atStartOfDay()

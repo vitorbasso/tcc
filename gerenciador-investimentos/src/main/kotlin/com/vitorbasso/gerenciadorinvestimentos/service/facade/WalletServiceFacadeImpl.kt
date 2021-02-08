@@ -50,7 +50,7 @@ internal class WalletServiceFacadeImpl(
         )
     }
 
-    fun processWalletReport(
+    fun processAccountantReport(
         wallet: Wallet,
         accountantReport: AccountantUtil.AccountantReport,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl

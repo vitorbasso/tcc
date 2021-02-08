@@ -66,10 +66,10 @@ internal class WalletService(
         if (walletMonth.isEqual(wallet.walletMonth)) {
             this.walletRepository.save(
                 wallet.copy(
-                    balance = wallet.balance.add(walletReport.newNormalValue),
-                    balanceDaytrade = wallet.balanceDaytrade.add(walletReport.newDaytradeValue),
-                    withdrawn = wallet.withdrawn.add(walletReport.newWithdrawn),
-                    withdrawnDaytrade = wallet.withdrawnDaytrade.add(walletReport.newDaytradeWithdrawn)
+                    balance = wallet.balance.add(walletReport.balanceContribution),
+                    balanceDaytrade = wallet.balanceDaytrade.add(walletReport.daytradeBalanceContribution),
+                    withdrawn = wallet.withdrawn.add(walletReport.withdrawnContribution),
+                    withdrawnDaytrade = wallet.withdrawnDaytrade.add(walletReport.daytradeWithdrawnContribution)
                 )
             )
         } else {
@@ -79,10 +79,10 @@ internal class WalletService(
                 walletMonth = walletMonth
             ).let {
                 it.copy(
-                    balance = it.balance.add(walletReport.newNormalValue),
-                    balanceDaytrade = it.balanceDaytrade.add(walletReport.newDaytradeValue),
-                    withdrawn = it.withdrawn.add(walletReport.newWithdrawn),
-                    withdrawnDaytrade = it.withdrawnDaytrade.add(walletReport.newDaytradeWithdrawn)
+                    balance = it.balance.add(walletReport.balanceContribution),
+                    balanceDaytrade = it.balanceDaytrade.add(walletReport.daytradeBalanceContribution),
+                    withdrawn = it.withdrawn.add(walletReport.withdrawnContribution),
+                    withdrawnDaytrade = it.withdrawnDaytrade.add(walletReport.daytradeWithdrawnContribution)
                 )
             }
             )

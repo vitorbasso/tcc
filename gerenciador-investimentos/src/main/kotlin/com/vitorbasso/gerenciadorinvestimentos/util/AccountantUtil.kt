@@ -13,17 +13,21 @@ import kotlin.math.abs
 object AccountantUtil {
 
     data class WalletReport(
-        val newNormalValue: BigDecimal = BigDecimal.ZERO,
-        val newDaytradeValue: BigDecimal = BigDecimal.ZERO,
-        val newWithdrawn: BigDecimal = BigDecimal.ZERO,
-        val newDaytradeWithdrawn: BigDecimal = BigDecimal.ZERO
+        val balanceContribution: BigDecimal = BigDecimal.ZERO,
+        val daytradeBalanceContribution: BigDecimal = BigDecimal.ZERO,
+        val withdrawnContribution: BigDecimal = BigDecimal.ZERO,
+        val daytradeWithdrawnContribution: BigDecimal = BigDecimal.ZERO
     )
 
     private fun WalletReport.subtract(other: WalletReport?) = WalletReport(
-        newNormalValue = this.newNormalValue.subtract(other?.newNormalValue ?: BigDecimal.ZERO),
-        newDaytradeValue = this.newDaytradeValue.subtract(other?.newDaytradeValue ?: BigDecimal.ZERO),
-        newWithdrawn = this.newWithdrawn.subtract(other?.newWithdrawn ?: BigDecimal.ZERO),
-        newDaytradeWithdrawn = this.newDaytradeWithdrawn.subtract(other?.newDaytradeWithdrawn ?: BigDecimal.ZERO),
+        balanceContribution = this.balanceContribution.subtract(other?.balanceContribution ?: BigDecimal.ZERO),
+        daytradeBalanceContribution = this.daytradeBalanceContribution.subtract(
+            other?.daytradeBalanceContribution ?: BigDecimal.ZERO
+        ),
+        withdrawnContribution = this.withdrawnContribution.subtract(other?.withdrawnContribution ?: BigDecimal.ZERO),
+        daytradeWithdrawnContribution = this.daytradeWithdrawnContribution.subtract(
+            other?.daytradeWithdrawnContribution ?: BigDecimal.ZERO
+        ),
     )
 
     data class AccountantReport(
@@ -48,18 +52,18 @@ object AccountantUtil {
         val accountedFor = mutableListOf<Transaction>()
 
         val (sameDayTransactions, otherDayTransactions)
-            = staleTransactions.filterByDate(newTransaction.transactionDate.toLocalDate())
+            = staleTransactions.partitionByDate(newTransaction.transactionDate.toLocalDate())
 
-        val beforeNewTransaction = accountNormalBalance(staleTransactions, sameDayTransactions).first
+        val beforeNewTransaction = calculateContribution(staleTransactions, sameDayTransactions).first
 
         val daytradeProcessed = processDaytrade(
             (sameDayTransactions + newTransaction).sortedBy { it.transactionDate }
         )
 
-        val (walletsReport, assetReport) = accountNormalBalance(
+        val (walletsReport, assetReport) = calculateContribution(
             transactions = (daytradeProcessed + otherDayTransactions).sortedBy { it.transactionDate },
             daytradeTransactions = daytradeProcessed,
-            updatedTransactions = accountedFor
+            accountedFor = accountedFor
         )
 
         val lifetimeBalanceChange =
@@ -86,12 +90,12 @@ object AccountantUtil {
         )
     }
 
-    private fun accountNormalBalance(
+    private fun calculateContribution(
         transactions: List<Transaction>,
         daytradeTransactions: List<Transaction>,
-        updatedTransactions: MutableList<Transaction> = mutableListOf()
+        accountedFor: MutableList<Transaction> = mutableListOf()
     ): Pair<Map<LocalDate, WalletReport>, BigDecimal> {
-        val mapOfTransactions = mapTransactionsToMonth(transactions)
+        val transactionsByMonth = mapTransactionsToMonth(transactions)
 
         val accountantNotes = AccountantNotes(
             quantityForAverage = transactions.firstOrNull()?.checkingQuantity ?: 0,
@@ -99,7 +103,7 @@ object AccountantUtil {
             quantityCount = transactions.firstOrNull()?.checkingQuantity ?: 0
         )
 
-        return mapOfTransactions.map { map ->
+        return transactionsByMonth.map { map ->
             map.key to map.value.let { transactionList ->
                 accountantNotes.balanceContribution = BigDecimal.ZERO
                 accountantNotes.withdrawnContribution = BigDecimal.ZERO
@@ -108,24 +112,24 @@ object AccountantUtil {
                         checkingQuantity = accountantNotes.quantityForAverage,
                         checkingValue = accountantNotes.valueForAverage
                     )
-                    updatedTransactions.add(transaction)
-                    processTransaction(
+                    accountedFor.add(transaction)
+                    calculateTransactionContribution(
                         transaction = transaction,
                         accountantNotes = accountantNotes
                     )
                 }
 
-                val (dtBalance, dtWithdrawn)
-                    = if (isCorrectMonth(map, daytradeTransactions))
-                    accountDaytradeBalance(daytradeTransactions)
+                val (daytradeBalance, daytradeWithdrawn)
+                    = if (isDaytradeMonth(map, daytradeTransactions))
+                    calculateContributionDaytrade(daytradeTransactions)
                 else
                     Pair(BigDecimal.ZERO, BigDecimal.ZERO)
 
                 WalletReport(
-                    newNormalValue = accountantNotes.balanceContribution,
-                    newWithdrawn = accountantNotes.withdrawnContribution,
-                    newDaytradeValue = dtBalance,
-                    newDaytradeWithdrawn = dtWithdrawn
+                    balanceContribution = accountantNotes.balanceContribution,
+                    withdrawnContribution = accountantNotes.withdrawnContribution,
+                    daytradeBalanceContribution = daytradeBalance,
+                    daytradeWithdrawnContribution = daytradeWithdrawn
                 )
             }
         }.toMap() to (
@@ -135,13 +139,13 @@ object AccountantUtil {
             )
     }
 
-    private fun processTransaction(
+    private fun calculateTransactionContribution(
         transaction: Transaction,
         accountantNotes: AccountantNotes
     ) {
         when (transaction.type) {
-            TransactionType.BUY -> processBuyTransaction(transaction, accountantNotes)
-            TransactionType.SELL -> processSellTransaction(transaction, accountantNotes)
+            TransactionType.BUY -> processBuyTransactionContribution(transaction, accountantNotes)
+            TransactionType.SELL -> processSellTransactionContribution(transaction, accountantNotes)
         }
         if (accountantNotes.quantityCount == 0) {
             accountantNotes.valueForAverage = BigDecimal.ZERO
@@ -149,7 +153,7 @@ object AccountantUtil {
         }
     }
 
-    private fun processBuyTransaction(
+    private fun processBuyTransactionContribution(
         transaction: Transaction,
         accountantNotes: AccountantNotes
     ) {
@@ -190,7 +194,7 @@ object AccountantUtil {
         accountantNotes.quantityCount += normalQuantity
     }
 
-    private fun processSellTransaction(
+    private fun processSellTransactionContribution(
         transaction: Transaction,
         accountantNotes: AccountantNotes
     ) {
@@ -239,7 +243,7 @@ object AccountantUtil {
         accountantNotes.quantityCount -= normalQuantity
     }
 
-    private fun accountDaytradeBalance(
+    private fun calculateContributionDaytrade(
         transactions: List<Transaction>
     ): Pair<BigDecimal, BigDecimal> {
         val (buyTransactions, sellTransactions) = transactions.partition {
@@ -262,19 +266,19 @@ object AccountantUtil {
 
     fun processDaytrade(sameDayTransactions: List<Transaction>): List<Transaction> {
 
-        val changedTransactions = mutableListOf<Transaction>()
+        val processedTransactions = mutableListOf<Transaction>()
 
         val (buyTransactions, sellTransactions) = getBuyAndSellLists(sameDayTransactions)
 
         if (buyTransactions.isEmpty() || sellTransactions.isEmpty()) return buyTransactions + sellTransactions
 
         for (buyTransaction in buyTransactions) {
-            if (!attemptToFillAvailableDaytradeQuantity(buyTransaction, sellTransactions, changedTransactions))
+            if (!attemptToFillAvailableDaytradeQuantity(buyTransaction, sellTransactions, processedTransactions))
                 break
         }
 
-        return changedTransactions + sellTransactions + buyTransactions.filterNot {
-            changedTransactions.map { changed -> changed.id }.contains(it.id)
+        return processedTransactions + sellTransactions + buyTransactions.filterNot {
+            processedTransactions.map { changed -> changed.id }.contains(it.id)
         }
     }
 
@@ -314,7 +318,7 @@ object AccountantUtil {
         return typeTwoTransactions.isNotEmpty()
     }
 
-    private fun isCorrectMonth(
+    private fun isDaytradeMonth(
         map: Map.Entry<LocalDate, List<Transaction>>,
         daytradeTransactions: List<Transaction>
     ) = map.key.isEqual(
@@ -344,7 +348,7 @@ object AccountantUtil {
 
 }
 
-private fun List<Transaction>.filterByDate(date: LocalDate) =
+private fun List<Transaction>.partitionByDate(date: LocalDate) =
     this.partition { it.transactionDate.toLocalDate().isEqual(date) }
 
 private fun LocalDateTime.atStartOfMonth() = this.toLocalDate().withDayOfMonth(1)

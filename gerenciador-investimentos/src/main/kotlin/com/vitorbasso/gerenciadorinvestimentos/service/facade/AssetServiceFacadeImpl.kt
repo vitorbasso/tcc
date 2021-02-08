@@ -43,7 +43,7 @@ internal class AssetServiceFacadeImpl(
         }
     }).let { this.assetService.saveAsset(it) }
 
-    fun processAssetReport(asset: Asset, accountantReport: AccountantUtil.AccountantReport) =
+    fun processAccountantReport(asset: Asset, accountantReport: AccountantUtil.AccountantReport) =
         this.assetService.saveAsset(
             asset.copy(
                 averageCost = accountantReport.assetReport,

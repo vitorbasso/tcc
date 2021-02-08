@@ -52,17 +52,17 @@ internal class TransactionServiceFacadeImpl(
     private fun processTransaction(transaction: Transaction): Transaction {
         val accountantReport = AccountantUtil.accountForNewTransaction(
             transaction,
-            this.transactionService.findFromLastIsSellout(transaction)
+            this.transactionService.findFromOneBeforeTransactionDate(transaction)
         )
         this.transactionService.saveAll(accountantReport.transactionsReport)
 
-        this.walletService.processWalletReport(
+        this.walletService.processAccountantReport(
             transaction.asset.wallet,
             accountantReport,
             this.monthlyWalletService
         )
 
-        this.assetService.processAssetReport(
+        this.assetService.processAccountantReport(
             transaction.asset,
             accountantReport
         )
