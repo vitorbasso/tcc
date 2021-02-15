@@ -17,7 +17,7 @@ class JwtUtil(
         private val expirationTime: Long
 ) {
 
-    fun generateToken(userDetails: UserDetails) = generateToken(hashMapOf(), userDetails)
+    fun generateToken(userDetails: UserDetails): String = generateToken(hashMapOf(), userDetails)
 
     fun getTokenBody(token: String) = try{
         Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).body

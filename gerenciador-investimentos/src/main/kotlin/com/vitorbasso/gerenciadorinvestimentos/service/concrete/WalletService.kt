@@ -11,7 +11,6 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.repository.IMonthlyWalletRepository
 import com.vitorbasso.gerenciadorinvestimentos.repository.IWalletRepository
 import com.vitorbasso.gerenciadorinvestimentos.service.facade.MonthlyWalletServiceFacadeImpl
-import com.vitorbasso.gerenciadorinvestimentos.util.AccountantUtil
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,30 +35,31 @@ internal class WalletService(
         )
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
-    fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest)
-    = this.walletRepository.save(walletToUpdate.copy(
-        name = walletUpdateRequest.name ?: walletToUpdate.name,
-        broker = walletUpdateRequest.broker ?: walletToUpdate.broker
-    ))
+    fun updateWallet(walletToUpdate: Wallet, walletUpdateRequest: WalletUpdateRequest) = this.walletRepository.save(
+        walletToUpdate.copy(
+            name = walletUpdateRequest.name ?: walletToUpdate.name,
+            broker = walletUpdateRequest.broker ?: walletToUpdate.broker
+        )
+    )
 
     fun deleteWallet(wallet: Wallet) = this.walletRepository.delete(wallet)
 
     @Transactional
-    fun enforceWalletMonth(wallet: Wallet)
-    = if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
-        this.monthlyWalletRepository.save(wallet.toMonthlyWallet())
-        wallet.copy(
-            balanceDaytrade = BigDecimal.ZERO,
-            balance = BigDecimal.ZERO,
-            walletMonth = LocalDate.now().withDayOfMonth(1)
-        ).let {
-            this.walletRepository.save(it)
-        }
-    } else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
+    fun enforceWalletMonth(wallet: Wallet) =
+        if (!this.monthlyWalletRepository.existsByWalletIdAndWalletMonth(wallet.id, wallet.walletMonth)) {
+            this.monthlyWalletRepository.save(wallet.toMonthlyWallet())
+            wallet.copy(
+                balanceDaytrade = BigDecimal.ZERO,
+                balance = BigDecimal.ZERO,
+                walletMonth = LocalDate.now().withDayOfMonth(1)
+            ).let {
+                this.walletRepository.save(it)
+            }
+        } else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
     fun processWalletReport(
         wallet: Wallet,
-        walletReport: AccountantUtil.WalletReport,
+        walletReport: AccountingService.WalletReport,
         walletMonth: LocalDate,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
     ) {
@@ -104,8 +104,8 @@ internal class WalletService(
             client = wallet.client
         )
 
-    private fun exists(client: Client, wallet: Wallet)
-    = this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
+    private fun exists(client: Client, wallet: Wallet) =
+        this.walletRepository.existsByBrokerAndClient(wallet.broker, client)
 
 }
 

@@ -25,30 +25,4 @@ internal class AssetService(
         this.assetRepository.save(asset.copy(averageCost = BigDecimal(0)))
     else this.assetRepository.save(asset)
 
-    fun processBuyTransaction(
-        asset: Asset?,
-        amount: Int,
-        cost: BigDecimal,
-        wallet: Wallet,
-        stock: Stock
-    ) = asset?.copy(
-        amount = asset.amount + amount
-    ) ?: Asset(
-        amount = amount,
-        wallet = wallet,
-        stock = stock
-    )
-
-    fun processSellTransaction(
-        asset: Asset?,
-        amount: Int,
-        cost: BigDecimal,
-        wallet: Wallet,
-        stock: Stock
-    ) = asset?.copy(
-        amount = asset.amount - amount
-    ) ?: Asset(
-        amount = -amount
-    )
-
 }

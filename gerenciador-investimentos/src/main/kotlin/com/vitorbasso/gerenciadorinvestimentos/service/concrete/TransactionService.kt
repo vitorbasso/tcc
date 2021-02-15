@@ -4,9 +4,9 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
 import com.vitorbasso.gerenciadorinvestimentos.repository.ITransactionRepository
+import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfDay
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 internal class TransactionService(
@@ -37,5 +37,3 @@ internal class TransactionService(
     fun deleteTransaction(transaction: Transaction) = this.transactionRepository.delete(transaction)
 
 }
-
-private fun LocalDateTime.atStartOfDay() = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
