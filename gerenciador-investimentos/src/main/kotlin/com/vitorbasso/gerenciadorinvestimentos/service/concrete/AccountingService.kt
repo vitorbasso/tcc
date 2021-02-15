@@ -18,59 +18,75 @@ class AccountingService(
     fun account(
         newTransaction: Transaction,
         staleTransactions: List<Transaction>
-    ) = accountForNewTransaction(newTransaction, staleTransactions).also { accountantReport ->
+    ) = getAccountantReport(newTransaction, staleTransactions).also { accountantReport ->
         subscribers.forEach {
             it.processAccountantReport(newTransaction, accountantReport)
         }
     }
 
-    private fun accountForNewTransaction(
+    private fun getAccountantReport(
         newTransaction: Transaction,
         staleTransactions: List<Transaction>
     ): AccountantReport {
         val accountedFor = mutableListOf<Transaction>()
 
-        val (sameDayTransactions, otherDayTransactions)
-            = staleTransactions.partitionByDate(newTransaction.transactionDate.toLocalDate())
-
-        val beforeNewTransactionWalletsReport = calculateContribution(staleTransactions, sameDayTransactions)
-
-        val daytradeProcessed = DaytradeService.processDaytrade(
-            (sameDayTransactions + newTransaction).sortedBy { it.transactionDate }
-        )
-
-        val walletsReport = calculateContribution(
-            transactions = (daytradeProcessed + otherDayTransactions).sortedBy { it.transactionDate },
-            daytradeTransactions = daytradeProcessed,
-            accountedFor = accountedFor
-        )
-
-        val average = accountedFor.last().let {
-            when (it.type) {
-                TransactionType.BUY -> Util.getAverageCost(
-                    it.checkingValue.add(
-                        (Util.getAverageCost(it.value, it.quantity).multiply(
-                            BigDecimal(it.quantity - it.daytradeQuantity)
-                        ))
-                    ), it.checkingQuantity + (it.quantity - it.daytradeQuantity)
-                )
-                TransactionType.SELL ->
-                    if (it.checkingQuantity - (it.quantity - it.daytradeQuantity) <= 0) BigDecimal.ZERO
-                    else Util.getAverageCost(it.checkingValue, it.checkingQuantity)
-            }
-        }
-
         return AccountantReport(
-            walletsReport = walletsReport.map {
-                it.key to it.value.subtract(beforeNewTransactionWalletsReport[it.key])
-            }.toMap(),
+            walletsReport = getWalletsReport(
+                staleTransactions = staleTransactions,
+                newTransaction = newTransaction,
+                accountedFor = accountedFor
+            ),
             transactionsReport = accountedFor,
-            assetReport = average,
+            assetReport = getAssetReport(accountedFor),
             lifetimeBalanceChange = when (newTransaction.type) {
                 TransactionType.BUY -> newTransaction.value.negate()
                 TransactionType.SELL -> newTransaction.value
             }
         )
+    }
+
+    private fun getWalletsReport(
+        staleTransactions: List<Transaction>,
+        newTransaction: Transaction,
+        accountedFor: MutableList<Transaction>
+    ): Map<LocalDate, WalletReport> {
+        val (sameDayTransactions, otherDayTransactions)
+            = staleTransactions.partitionByDate(newTransaction.transactionDate.toLocalDate())
+
+        val beforeNewTransactionContribution = calculateContribution(staleTransactions, sameDayTransactions)
+
+        val daytradeProcessed = DaytradeService.processDaytrade(
+            (sameDayTransactions + newTransaction).sortedBy { it.transactionDate }
+        )
+
+        val afterNewTransactionContribution = calculateContribution(
+            transactions = (daytradeProcessed + otherDayTransactions).sortedBy { it.transactionDate },
+            daytradeTransactions = daytradeProcessed,
+            accountedFor = accountedFor
+        )
+        return calculateContributionDelta(afterNewTransactionContribution, beforeNewTransactionContribution)
+    }
+
+    private fun calculateContributionDelta(
+        afterNewTransactionContribution: Map<LocalDate, WalletReport>,
+        beforeNewTransactionContribution: Map<LocalDate, WalletReport>
+    ) = afterNewTransactionContribution.map {
+        it.key to it.value.subtract(beforeNewTransactionContribution[it.key])
+    }.toMap()
+
+    private fun getAssetReport(accountedFor: MutableList<Transaction>) = accountedFor.last().let {
+        when (it.type) {
+            TransactionType.BUY -> Util.getAverageCost(
+                it.checkingValue.add(
+                    (Util.getAverageCost(it.value, it.quantity).multiply(
+                        BigDecimal(it.quantity - it.daytradeQuantity)
+                    ))
+                ), it.checkingQuantity + (it.quantity - it.daytradeQuantity)
+            )
+            TransactionType.SELL ->
+                if (it.checkingQuantity - (it.quantity - it.daytradeQuantity) <= 0) BigDecimal.ZERO
+                else Util.getAverageCost(it.checkingValue, it.checkingQuantity)
+        }
     }
 
     private fun calculateContribution(
