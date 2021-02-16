@@ -9,6 +9,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.IStockService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingService
+import com.vitorbasso.gerenciadorinvestimentos.service.concrete.DaytradeService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.beans.factory.annotation.Qualifier
@@ -40,7 +41,7 @@ internal class TransactionServiceFacadeImpl(
         )
         val transactions = this.transactionService.findTransactionsOnSameDate(transactionToDelete).toMutableList()
         transactions.remove(transactionToDelete)
-//        this.transactionService.saveAll(AccountantService.processDaytrade(transactions))
+        this.transactionService.saveAll(DaytradeService.processDaytrade(transactions))
         this.transactionService.deleteTransaction(transactionToDelete)
     }
 
