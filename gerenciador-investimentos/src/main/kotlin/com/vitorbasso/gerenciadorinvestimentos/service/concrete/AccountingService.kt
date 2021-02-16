@@ -15,14 +15,17 @@ class AccountingService(
     private val subscribers: List<IAccountingServiceSubscriber>
 ) {
 
-    fun account(
+    fun accountFor(
         newTransaction: Transaction,
         staleTransactions: List<Transaction>
-    ) = getAccountantReport(newTransaction, staleTransactions).also { accountantReport ->
+    ) = getAccountantReport(newTransaction, staleTransactions).also {
+        callSubscribers(newTransaction, it)
+    }
+
+    private fun callSubscribers(newTransaction: Transaction, accountantReport: AccountantReport) =
         subscribers.forEach {
             it.processAccountantReport(newTransaction, accountantReport)
         }
-    }
 
     private fun getAccountantReport(
         newTransaction: Transaction,
@@ -75,16 +78,17 @@ class AccountingService(
     }.toMap()
 
     private fun getAssetReport(accountedFor: MutableList<Transaction>) = accountedFor.last().let {
+        val normalQuantity = getTransactionNormalQuantity(it)
         when (it.type) {
             TransactionType.BUY -> Util.getAverageCost(
                 it.checkingValue.add(
                     (Util.getAverageCost(it.value, it.quantity).multiply(
-                        BigDecimal(it.quantity - it.daytradeQuantity)
+                        BigDecimal(normalQuantity)
                     ))
-                ), it.checkingQuantity + (it.quantity - it.daytradeQuantity)
+                ), it.checkingQuantity + normalQuantity
             )
             TransactionType.SELL ->
-                if (it.checkingQuantity - (it.quantity - it.daytradeQuantity) <= 0) BigDecimal.ZERO
+                if (it.checkingQuantity - normalQuantity <= 0) BigDecimal.ZERO
                 else Util.getAverageCost(it.checkingValue, it.checkingQuantity)
         }
     }
@@ -148,8 +152,10 @@ class AccountingService(
         transaction: Transaction,
         accountantNotes: AccountantNotes
     ) {
-        val normalQuantity = transaction.quantity - transaction.daytradeQuantity
+        val normalQuantity = getTransactionNormalQuantity(transaction)
         when {
+            //If it has a positive or null quantity of the asset (meaning if bought more than sold) than it contributes
+            //to the average value of said asset
             accountantNotes.quantityCount >= 0 -> {
                 accountantNotes.valueForAverage = accountantNotes.valueForAverage.add(
                     Util.getAverageCost(transaction.value, transaction.quantity).multiply(
@@ -158,6 +164,9 @@ class AccountingService(
                 )
                 accountantNotes.quantityForAverage += normalQuantity
             }
+            //Else if it has a negative quantity of the asset and it is being bought more than that quantity, then it
+            //contributes to the balance corresponding to the negative quantity that it had before and it starts a new
+            //average value corresponding to the now positive quantity of the asset
             abs(accountantNotes.quantityCount) < normalQuantity -> {
                 accountantNotes.balanceContribution = accountantNotes.balanceContribution.add(
                     Util.getAverageCost(transaction.value, transaction.quantity).subtract(
@@ -174,6 +183,8 @@ class AccountingService(
                         transaction.quantity
                     ).multiply(BigDecimal(accountantNotes.quantityForAverage))
             }
+            //Finally, if it has a negative quantity of the asset and it is not being bought more than that quantity,
+            //then it just contributes to the balance corresponding to the quantity being bought
             else -> {
                 accountantNotes.balanceContribution = accountantNotes.balanceContribution.add(
                     Util.getAverageCost(accountantNotes.valueForAverage, accountantNotes.quantityForAverage)
@@ -190,12 +201,13 @@ class AccountingService(
         transaction: Transaction,
         accountantNotes: AccountantNotes
     ) {
-        val normalQuantity = transaction.quantity - transaction.daytradeQuantity
+        val normalQuantity = getTransactionNormalQuantity(transaction)
         accountantNotes.withdrawnContribution = accountantNotes.withdrawnContribution.add(
             Util.getAverageCost(transaction.value, transaction.quantity).multiply(
                 BigDecimal(normalQuantity)
             )
         )
+        //The idea here is mirrored the processBuyTransactionContribution() method on the asset quantities.
         when {
             accountantNotes.quantityCount <= 0 -> {
                 accountantNotes.valueForAverage = accountantNotes.valueForAverage.subtract(
@@ -234,6 +246,9 @@ class AccountingService(
         }
         accountantNotes.quantityCount -= normalQuantity
     }
+
+    private fun getTransactionNormalQuantity(transaction: Transaction) =
+        transaction.quantity - transaction.daytradeQuantity
 
     data class WalletReport(
         val balanceContribution: BigDecimal = BigDecimal.ZERO,

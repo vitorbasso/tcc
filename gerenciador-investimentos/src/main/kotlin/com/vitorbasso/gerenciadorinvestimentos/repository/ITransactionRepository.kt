@@ -32,11 +32,6 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
     )
     fun findAllFromTransactionBeforeTransactionDate(assetId: Long, transactionDate: LocalDateTime) : List<Transaction>
 
-    fun findAllByAssetAndTransactionDateGreaterThanEqualOrderByTransactionDate(
-        asset: Asset,
-        transactionDate: LocalDateTime
-    ) : List<Transaction>
-
     fun findAllByAssetOrderByTransactionDate(asset: Asset): List<Transaction>
 
 }

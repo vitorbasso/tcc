@@ -61,7 +61,7 @@ internal class WalletServiceFacadeImpl(
                 this.walletService.processWalletReport(
                     wallet = walletValidated,
                     walletReport = it.value,
-                    walletMonth = it.key,
+                    reportMonth = it.key,
                     monthlyWalletService = monthlyWalletService
                 )
             }
@@ -69,8 +69,8 @@ internal class WalletServiceFacadeImpl(
         return accountantReport
     }
 
-    private fun isValid(wallet: Wallet) = wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)
-
     private fun Wallet.validate() = this.takeIf { isValid(it) } ?: walletService.enforceWalletMonth(this)
+
+    private fun isValid(wallet: Wallet) = wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)
 
 }

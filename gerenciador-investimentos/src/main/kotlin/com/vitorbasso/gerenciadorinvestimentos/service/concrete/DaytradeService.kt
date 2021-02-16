@@ -11,11 +11,6 @@ import java.time.LocalDate
 @Service
 object DaytradeService {
 
-    data class DaytradeContribution(
-        val balanceContribution: BigDecimal = BigDecimal.ZERO,
-        val withdrawnContribution: BigDecimal = BigDecimal.ZERO
-    )
-
     fun calculateDaytradeContribution(
         month: LocalDate,
         transactions: List<Transaction>
@@ -112,6 +107,11 @@ object DaytradeService {
         daytradeTransactions: List<Transaction>
     ) = month.isEqual(
         daytradeTransactions.firstOrNull()?.transactionDate?.atStartOfMonth() ?: month.withDayOfMonth(2)
+    )
+
+    data class DaytradeContribution(
+        val balanceContribution: BigDecimal = BigDecimal.ZERO,
+        val withdrawnContribution: BigDecimal = BigDecimal.ZERO
     )
 
 }

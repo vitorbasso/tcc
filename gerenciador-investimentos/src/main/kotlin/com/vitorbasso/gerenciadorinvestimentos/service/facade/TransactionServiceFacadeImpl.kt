@@ -45,7 +45,7 @@ internal class TransactionServiceFacadeImpl(
     }
 
     private fun processTransaction(transaction: Transaction): Transaction {
-        val accountantReport = accountingService.account(
+        val accountantReport = accountingService.accountFor(
             transaction,
             this.transactionService.findFromOneBeforeTransactionDate(transaction)
         )

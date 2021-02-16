@@ -60,10 +60,10 @@ internal class WalletService(
     fun processWalletReport(
         wallet: Wallet,
         walletReport: AccountingService.WalletReport,
-        walletMonth: LocalDate,
+        reportMonth: LocalDate,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl
     ) {
-        if (walletMonth.isEqual(wallet.walletMonth)) {
+        if (reportMonth.isEqual(wallet.walletMonth)) {
             this.walletRepository.save(
                 wallet.copy(
                     balance = wallet.balance.add(walletReport.balanceContribution),
@@ -76,7 +76,7 @@ internal class WalletService(
             this.monthlyWalletRepository.save(getTheMonthlyWallet(
                 wallet = wallet,
                 monthlyWalletService = monthlyWalletService,
-                walletMonth = walletMonth
+                walletMonth = reportMonth
             ).let {
                 it.copy(
                     balance = it.balance.add(walletReport.balanceContribution),
