@@ -14,17 +14,17 @@ import javax.servlet.http.HttpServletResponse
 
 @Component
 class AuthenticationFilter(
-        private val clientDetailsService: ClientDetailsService,
-        private val jwtUtil: JwtUtil
-) : OncePerRequestFilter(){
+    private val clientDetailsService: ClientDetailsService,
+    private val jwtUtil: JwtUtil
+) : OncePerRequestFilter() {
 
     private val tokenPrefix = "Bearer "
     private val requestHeader = "Authorization"
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
-        val authenticationHeader : String? = request.getHeader(this.requestHeader)
+        val authenticationHeader: String? = request.getHeader(this.requestHeader)
 
-        if(!authenticationHeader.isNullOrBlank() && authenticationHeader.startsWith(this.tokenPrefix)) {
+        if (!authenticationHeader.isNullOrBlank() && authenticationHeader.startsWith(this.tokenPrefix)) {
 
             val tokenClaims = this.jwtUtil.getTokenBody(authenticationHeader.replace(this.tokenPrefix, ""))
 
@@ -41,9 +41,9 @@ class AuthenticationFilter(
         val userDetails = this.clientDetailsService.loadUserByUsername(tokenClaims.subject)
         if (userDetails != null) {
             val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.authorities
+                userDetails,
+                null,
+                userDetails.authorities
             )
             usernamePasswordAuthenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
             SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/\${api-version}/wallets")
 class WalletController(
-        private val walletService: IWalletService
+    private val walletService: IWalletService
 ) {
 
     @GetMapping
@@ -27,11 +27,11 @@ class WalletController(
     fun getWallet(@PathVariable id: Long) = this.walletService.getWallet(id)
 
     @PostMapping
-    fun saveWallet(@RequestBody walletRequest: WalletRequest)= this.walletService.saveWallet(walletRequest)
+    fun saveWallet(@RequestBody walletRequest: WalletRequest) = this.walletService.saveWallet(walletRequest)
 
     @PutMapping("/{id}")
-    fun updateWallet(@PathVariable id: Long, @RequestBody walletUpdateRequest: WalletUpdateRequest)
-            = this.walletService.updateWallet(id, walletUpdateRequest)
+    fun updateWallet(@PathVariable id: Long, @RequestBody walletUpdateRequest: WalletUpdateRequest) =
+        this.walletService.updateWallet(id, walletUpdateRequest)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

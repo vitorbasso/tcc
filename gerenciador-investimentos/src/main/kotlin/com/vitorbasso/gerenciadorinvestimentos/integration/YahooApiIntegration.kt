@@ -13,8 +13,7 @@ class YahooApiIntegration(
     private val financeKey: String
 ) {
 
-    fun autoComplete(query: String)
-        = this.yahooApi.searchStock(financeKey, query).quotes.filter { listItem ->
+    fun autoComplete(query: String) = this.yahooApi.searchStock(financeKey, query).quotes.filter { listItem ->
         listItem.symbol.endsWith(YahooApiIntegration.SYMBOL_SUFFIX)
     }
 

@@ -30,7 +30,7 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
             "order by t1.transaction_date desc limit 1) " +
             "order by t.transaction_date"
     )
-    fun findAllFromTransactionBeforeTransactionDate(assetId: Long, transactionDate: LocalDateTime) : List<Transaction>
+    fun findAllFromTransactionBeforeTransactionDate(assetId: Long, transactionDate: LocalDateTime): List<Transaction>
 
     fun findAllByAssetOrderByTransactionDate(asset: Asset): List<Transaction>
 

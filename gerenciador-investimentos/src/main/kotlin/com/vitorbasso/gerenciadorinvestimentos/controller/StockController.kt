@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/\${api-version}/stocks")
 class StockController(
-        private val stockService: IStockService
+    private val stockService: IStockService
 ) {
 
     @GetMapping("/{ticker}")
     fun getStock(@PathVariable ticker: String) = this.stockService.getStock(ticker)
 
     @GetMapping
-    fun getStocksBatch(@RequestParam(required = true) symbols: String)
-        = this.stockService.getStocksBatch(symbols.split(","))
+    fun getStocksBatch(@RequestParam(required = true) symbols: String) =
+        this.stockService.getStocksBatch(symbols.split(","))
 
     @GetMapping("/search")
     fun searchStock(@RequestParam(required = true) query: String) = this.stockService.getStockStartingWith(query)

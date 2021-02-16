@@ -24,19 +24,17 @@ class WalletServiceProxyImpl(
     private val walletService: IWalletService
 ) : IWalletService {
 
-    override fun getWalletCollection()
-        = this.walletService.getWalletCollection().map { it.getSmallDto() }
+    override fun getWalletCollection() = this.walletService.getWalletCollection().map { it.getSmallDto() }
 
     override fun getWallet(walletId: Long) = this.walletService.getWallet(walletId).getDto()
 
-    override fun saveWallet(walletToSave: IWallet)
-        = this.walletService.saveWallet(walletToSave.getEntity()).getDto()
+    override fun saveWallet(walletToSave: IWallet) = this.walletService.saveWallet(walletToSave.getEntity()).getDto()
 
-    override fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest)
-        = this.walletService.updateWallet(
-        walletId = walletId,
-        walletUpdateRequest = walletUpdateRequest
-    ).getDto()
+    override fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest) =
+        this.walletService.updateWallet(
+            walletId = walletId,
+            walletUpdateRequest = walletUpdateRequest
+        ).getDto()
 
     override fun deleteWallet(walletId: Long) {
         this.walletService.deleteWallet(walletId)

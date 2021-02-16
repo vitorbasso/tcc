@@ -16,15 +16,14 @@ internal class MonthlyWalletServiceProxyImpl(
     private val monthlyWalletService: IMonthlyWalletService
 ) : IMonthlyWalletService {
 
-    override fun getMonthlyWallets()
-    = this.monthlyWalletService.getMonthlyWallets().map { it.getSmallDto() }
+    override fun getMonthlyWallets() = this.monthlyWalletService.getMonthlyWallets().map { it.getSmallDto() }
 
-    override fun getMonthlyWallet(monthlyWalletId: Long)
-    = this.monthlyWalletService.getMonthlyWallet(monthlyWalletId).getDto()
+    override fun getMonthlyWallet(monthlyWalletId: Long) =
+        this.monthlyWalletService.getMonthlyWallet(monthlyWalletId).getDto()
 
-    override fun deleteMonthlyWallet(monthlyWalletId: Long)
-    = this.monthlyWalletService.deleteMonthlyWallet(monthlyWalletId)
-    
+    override fun deleteMonthlyWallet(monthlyWalletId: Long) =
+        this.monthlyWalletService.deleteMonthlyWallet(monthlyWalletId)
+
 }
 
 private fun IMonthlyWallet.getDto() = MonthlyWalletDto(

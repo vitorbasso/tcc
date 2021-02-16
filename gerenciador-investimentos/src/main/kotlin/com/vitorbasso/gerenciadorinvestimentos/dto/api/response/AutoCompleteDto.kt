@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class AutoCompleteDto(
-        val quotes: List<AutoCompleteOptionDto>
+    val quotes: List<AutoCompleteOptionDto>
 )
 
 data class AutoCompleteOptionDto(
-        val symbol: String
+    val symbol: String
 )

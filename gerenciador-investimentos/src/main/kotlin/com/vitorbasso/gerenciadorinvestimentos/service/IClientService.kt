@@ -7,9 +7,9 @@ interface IClientService {
 
     fun getClient(): IClient
 
-    fun saveClient(clientToSave: IClient) : IClient
+    fun saveClient(clientToSave: IClient): IClient
 
-    fun updateClient(clientUpdateRequest: ClientUpdateRequest) : IClient
+    fun updateClient(clientUpdateRequest: ClientUpdateRequest): IClient
 
     fun deleteClient()
 

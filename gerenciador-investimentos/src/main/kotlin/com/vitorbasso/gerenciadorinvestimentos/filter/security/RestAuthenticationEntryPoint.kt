@@ -14,15 +14,15 @@ import javax.servlet.http.HttpServletResponse
 
 @Component
 class RestAuthenticationEntryPoint(
-        private val messageSource: MessageSource
+    private val messageSource: MessageSource
 ) : AuthenticationEntryPoint {
 
     private val contentType = "application/json"
 
     override fun commence(
-            request: HttpServletRequest?,
-            response: HttpServletResponse?,
-            exception: AuthenticationException?
+        request: HttpServletRequest?,
+        response: HttpServletResponse?,
+        exception: AuthenticationException?
     ) {
 
         val responseDto = ApiErrorDto(ManagerErrorCode.MANAGER_09) {
