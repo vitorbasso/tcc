@@ -3,13 +3,13 @@ package com.vitorbasso.gerenciadorinvestimentos.service.facade
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
+import com.vitorbasso.gerenciadorinvestimentos.enum.AccountingOperation
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
 import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.IStockService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingService
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.DaytradeService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import org.springframework.beans.factory.annotation.Qualifier
@@ -39,22 +39,23 @@ internal class TransactionServiceFacadeImpl(
             transactionId,
             SecurityContextUtil.getClientDetails().id
         )
-        val transactions = this.transactionService.findTransactionsOnSameDate(transactionToDelete).toMutableList()
-        transactions.remove(transactionToDelete)
-        this.transactionService.saveAll(DaytradeService.processDaytrade(transactions))
+        val transactions = this.transactionService.findFromOneBeforeTransactionDate(transactionToDelete)
+        val accountantReport =
+            this.accountingService.accountFor(transactionToDelete, transactions, AccountingOperation.REMOVE_TRANSACTION)
+        this.transactionService.saveAll(accountantReport.transactionsReport)
         this.transactionService.deleteTransaction(transactionToDelete)
     }
 
     private fun processTransaction(transaction: Transaction): Transaction {
+        val staleTransactions = this.transactionService.findFromOneBeforeTransactionDate(transaction)
+        val newTransaction = this.transactionService.save(transaction)
         val accountantReport = accountingService.accountFor(
-            transaction,
-            this.transactionService.findFromOneBeforeTransactionDate(transaction)
+            newTransaction,
+            staleTransactions
         )
 
-        this.transactionService.saveAll(accountantReport.transactionsReport)
-
-        return accountantReport.transactionsReport.findLast { it.transactionDate.isEqual(transaction.transactionDate) }
-            ?: transaction
+        return this.transactionService.saveAll(accountantReport.transactionsReport)
+            .findLast { it.id == newTransaction.id } ?: newTransaction
     }
 
     private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {

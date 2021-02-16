@@ -9,7 +9,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 @Service
-object DaytradeService {
+internal object DaytradeService {
 
     fun calculateDaytradeContribution(
         month: LocalDate,
