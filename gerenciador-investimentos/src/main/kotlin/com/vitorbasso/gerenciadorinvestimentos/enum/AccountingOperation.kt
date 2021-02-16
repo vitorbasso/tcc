@@ -5,4 +5,5 @@ enum class AccountingOperation (
     ) {
     ADD_TRANSACTION(1),
     REMOVE_TRANSACTION(-1),
+    REMOVE_ASSET(-1)
 }

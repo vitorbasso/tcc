@@ -54,9 +54,8 @@ internal class TransactionServiceFacadeImpl(
             staleTransactions
         )
 
-        val saved = this.transactionService.saveAll(accountantReport.transactionsReport)
-
-        return saved.findLast { it.id == newTransaction.id } ?: newTransaction
+        return this.transactionService.saveAll(accountantReport.transactionsReport)
+            .findLast { it.id == newTransaction.id } ?: newTransaction
     }
 
     private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {

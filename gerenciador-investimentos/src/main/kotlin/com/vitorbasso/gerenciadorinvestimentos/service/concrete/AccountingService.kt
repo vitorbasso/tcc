@@ -3,6 +3,7 @@ package com.vitorbasso.gerenciadorinvestimentos.service.concrete
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.enum.AccountingOperation
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
+import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.service.IAccountingServiceSubscriber
 import com.vitorbasso.gerenciadorinvestimentos.util.Util
 import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
@@ -60,10 +61,23 @@ internal class AccountingService(
         accountedFor: MutableList<Transaction>,
         accountingOperation: AccountingOperation
     ): Map<LocalDate, WalletReport> {
+        if (accountingOperation == AccountingOperation.REMOVE_ASSET) return calculateContributionDelta(
+            staleTransactions.toMonthMap().mapValues { WalletReport() },
+            calculateContribution(
+                transactions = staleTransactions,
+                daytradeTransactions = staleTransactions.filter { it.daytrade },
+                accountingOperation = accountingOperation
+            )
+        )
+
         val (sameDayTransactions, otherDayTransactions)
             = staleTransactions.partitionByDate(transaction.transactionDate)
 
-        val beforeOperation = calculateContribution(staleTransactions, sameDayTransactions)
+        val beforeOperation = calculateContribution(
+            transactions = staleTransactions,
+            daytradeTransactions = sameDayTransactions,
+            accountingOperation = accountingOperation
+        )
 
         val daytradeProcessed = when (accountingOperation) {
             AccountingOperation.ADD_TRANSACTION -> DaytradeService.processDaytrade(
@@ -72,12 +86,14 @@ internal class AccountingService(
             AccountingOperation.REMOVE_TRANSACTION -> DaytradeService.processDaytrade(
                 sameDayTransactions.filterNot { it == transaction }
             )
+            AccountingOperation.REMOVE_ASSET -> throw CustomManagerException()
         }
 
         val afterOperation = calculateContribution(
             transactions = (daytradeProcessed + otherDayTransactions).sortedBy { it.transactionDate },
             daytradeTransactions = daytradeProcessed,
-            accountedFor = accountedFor
+            accountedFor = accountedFor,
+            accountingOperation = accountingOperation
         )
         return calculateContributionDelta(afterOperation, beforeOperation)
     }
@@ -108,7 +124,8 @@ internal class AccountingService(
     private fun calculateContribution(
         transactions: List<Transaction>,
         daytradeTransactions: List<Transaction>,
-        accountedFor: MutableList<Transaction> = mutableListOf()
+        accountedFor: MutableList<Transaction> = mutableListOf(),
+        accountingOperation: AccountingOperation = AccountingOperation.ADD_TRANSACTION
     ): Map<LocalDate, WalletReport> {
         val transactionsByMonth = transactions.toMonthMap()
 
@@ -134,7 +151,11 @@ internal class AccountingService(
                     )
                 }
 
-                val daytradeContribution = DaytradeService.calculateDaytradeContribution(map.key, daytradeTransactions)
+                val daytradeContribution = DaytradeService.calculateDaytradeContribution(
+                    map.key,
+                    if (accountingOperation != AccountingOperation.REMOVE_ASSET) daytradeTransactions
+                    else daytradeTransactions.toMonthMap()[map.key] ?: listOf()
+                )
 
                 WalletReport(
                     balanceContribution = accountantNotes.balanceContribution,
