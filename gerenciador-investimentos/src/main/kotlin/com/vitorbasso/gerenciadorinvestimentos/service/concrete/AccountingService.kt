@@ -1,6 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
+import com.vitorbasso.gerenciadorinvestimentos.enum.AccountingOperation
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import com.vitorbasso.gerenciadorinvestimentos.service.IAccountingServiceSubscriber
 import com.vitorbasso.gerenciadorinvestimentos.util.Util
@@ -8,18 +9,20 @@ import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.math.abs
 
 @Service
-class AccountingService(
+internal class AccountingService(
     private val subscribers: List<IAccountingServiceSubscriber>
 ) {
 
     fun accountFor(
-        newTransaction: Transaction,
-        staleTransactions: List<Transaction>
-    ) = getAccountantReport(newTransaction, staleTransactions).also {
-        callSubscribers(newTransaction, it)
+        transaction: Transaction,
+        staleTransactions: List<Transaction>,
+        accountingOperation: AccountingOperation = AccountingOperation.ADD_TRANSACTION
+    ) = getAccountantReport(transaction, staleTransactions, accountingOperation).also {
+        callSubscribers(transaction, it)
     }
 
     private fun callSubscribers(newTransaction: Transaction, accountantReport: AccountantReport) =
@@ -28,46 +31,55 @@ class AccountingService(
         }
 
     private fun getAccountantReport(
-        newTransaction: Transaction,
-        staleTransactions: List<Transaction>
+        transaction: Transaction,
+        staleTransactions: List<Transaction>,
+        accountingOperation: AccountingOperation
     ): AccountantReport {
         val accountedFor = mutableListOf<Transaction>()
 
         return AccountantReport(
             walletsReport = getWalletsReport(
+                transaction = transaction,
                 staleTransactions = staleTransactions,
-                newTransaction = newTransaction,
-                accountedFor = accountedFor
+                accountedFor = accountedFor,
+                accountingOperation = accountingOperation
             ),
             transactionsReport = accountedFor,
             assetReport = getAssetReport(accountedFor),
-            lifetimeBalanceChange = when (newTransaction.type) {
-                TransactionType.BUY -> newTransaction.value.negate()
-                TransactionType.SELL -> newTransaction.value
-            }
+            lifetimeBalanceChange = when (transaction.type) {
+                TransactionType.BUY -> transaction.value.negate()
+                TransactionType.SELL -> transaction.value
+            }.multiply(BigDecimal(accountingOperation.multiplier)),
+            accountingOperation = accountingOperation
         )
     }
 
     private fun getWalletsReport(
+        transaction: Transaction,
         staleTransactions: List<Transaction>,
-        newTransaction: Transaction,
-        accountedFor: MutableList<Transaction>
+        accountedFor: MutableList<Transaction>,
+        accountingOperation: AccountingOperation
     ): Map<LocalDate, WalletReport> {
         val (sameDayTransactions, otherDayTransactions)
-            = staleTransactions.partitionByDate(newTransaction.transactionDate.toLocalDate())
+            = staleTransactions.partitionByDate(transaction.transactionDate)
 
-        val beforeNewTransactionContribution = calculateContribution(staleTransactions, sameDayTransactions)
+        val beforeOperation = calculateContribution(staleTransactions, sameDayTransactions)
 
-        val daytradeProcessed = DaytradeService.processDaytrade(
-            (sameDayTransactions + newTransaction).sortedBy { it.transactionDate }
-        )
+        val daytradeProcessed = when (accountingOperation) {
+            AccountingOperation.ADD_TRANSACTION -> DaytradeService.processDaytrade(
+                (sameDayTransactions + transaction).sortedBy { it.transactionDate }
+            )
+            AccountingOperation.REMOVE_TRANSACTION -> DaytradeService.processDaytrade(
+                sameDayTransactions.filterNot { it == transaction }
+            )
+        }
 
-        val afterNewTransactionContribution = calculateContribution(
+        val afterOperation = calculateContribution(
             transactions = (daytradeProcessed + otherDayTransactions).sortedBy { it.transactionDate },
             daytradeTransactions = daytradeProcessed,
             accountedFor = accountedFor
         )
-        return calculateContributionDelta(afterNewTransactionContribution, beforeNewTransactionContribution)
+        return calculateContributionDelta(afterOperation, beforeOperation)
     }
 
     private fun calculateContributionDelta(
@@ -77,7 +89,7 @@ class AccountingService(
         it.key to it.value.subtract(beforeNewTransactionContribution[it.key])
     }.toMap()
 
-    private fun getAssetReport(accountedFor: MutableList<Transaction>) = accountedFor.last().let {
+    private fun getAssetReport(accountedFor: MutableList<Transaction>) = accountedFor.lastOrNull()?.let {
         val normalQuantity = getTransactionNormalQuantity(it)
         when (it.type) {
             TransactionType.BUY -> Util.getAverageCost(
@@ -91,7 +103,7 @@ class AccountingService(
                 if (it.checkingQuantity - normalQuantity <= 0) BigDecimal.ZERO
                 else Util.getAverageCost(it.checkingValue, it.checkingQuantity)
         }
-    }
+    } ?: BigDecimal.ZERO
 
     private fun calculateContribution(
         transactions: List<Transaction>,
@@ -261,7 +273,8 @@ class AccountingService(
         val walletsReport: Map<LocalDate, WalletReport> = mapOf(),
         val assetReport: BigDecimal = BigDecimal.ZERO,
         val transactionsReport: List<Transaction> = listOf(),
-        val lifetimeBalanceChange: BigDecimal = BigDecimal.ZERO
+        val lifetimeBalanceChange: BigDecimal = BigDecimal.ZERO,
+        val accountingOperation: AccountingOperation = AccountingOperation.ADD_TRANSACTION
     )
 
     private data class AccountantNotes(
@@ -282,8 +295,8 @@ private fun List<Transaction>.toMonthMap() =
         map
     }
 
-private fun List<Transaction>.partitionByDate(date: LocalDate) =
-    this.partition { it.transactionDate.toLocalDate().isEqual(date) }
+private fun List<Transaction>.partitionByDate(date: LocalDateTime) =
+    this.partition { it.transactionDate.toLocalDate().isEqual(date.toLocalDate()) }
 
 private fun AccountingService.WalletReport.subtract(other: AccountingService.WalletReport?) =
     AccountingService.WalletReport(

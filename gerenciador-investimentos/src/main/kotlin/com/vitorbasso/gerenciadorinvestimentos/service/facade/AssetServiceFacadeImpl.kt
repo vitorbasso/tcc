@@ -46,7 +46,7 @@ internal class AssetServiceFacadeImpl(
                 amount = transaction.asset.amount + when (transaction.type) {
                     TransactionType.BUY -> transaction.quantity
                     TransactionType.SELL -> (-transaction.quantity)
-                },
+                }.times(accountantReport.accountingOperation.multiplier),
                 averageCost = accountantReport.assetReport,
                 lifetimeBalance = transaction.asset.lifetimeBalance.add(accountantReport.lifetimeBalanceChange)
             )
