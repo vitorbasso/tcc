@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/\${api-version}/assets")
-class AssetController (
+class AssetController(
     private val assetService: IAssetService
-){
+) {
 
     @DeleteMapping("/{walletId}/{ticker}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteAsset(
         @PathVariable walletId: Long,
         @PathVariable ticker: String
-    )= this.assetService.deleteAsset(walletId, ticker)
+    ) = this.assetService.deleteAsset(walletId, ticker)
 
 }

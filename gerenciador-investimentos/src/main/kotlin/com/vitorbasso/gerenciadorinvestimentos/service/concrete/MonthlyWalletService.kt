@@ -28,12 +28,11 @@ internal class MonthlyWalletService(
         month: LocalDate,
         clientId: Long
     ) = this.monthlyWalletRepository.findByWalletMonth(month.withDayOfMonth(1))?.let {
-        if(it.client.id == clientId) it
+        if (it.client.id == clientId) it
         else throw CustomBadRequestException(ManagerErrorCode.MANAGER_05)
     }
 
-    fun save(monthlyWallet: MonthlyWallet, clientId: Long)
-    = if(monthlyWallet.client.id == clientId)
+    fun save(monthlyWallet: MonthlyWallet, clientId: Long) = if (monthlyWallet.client.id == clientId)
         this.monthlyWalletRepository.save(monthlyWallet)
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_05)
 

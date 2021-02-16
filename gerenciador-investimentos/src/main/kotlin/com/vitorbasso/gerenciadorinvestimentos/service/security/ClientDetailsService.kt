@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ClientDetailsService(
-        private val clientRepository: IClientRepository
+    private val clientRepository: IClientRepository
 ) : UserDetailsService {
     override fun loadUserByUsername(username: String) = this.clientRepository.findByEmail(username)
 }

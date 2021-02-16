@@ -12,27 +12,27 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
-internal class ClientService (
+internal class ClientService(
     private val clientRepository: IClientRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
 
     fun getClient(
-            id: Long,
-            exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
-    )= clientRepository.findByIdOrNull(id) ?: throw exception
+        id: Long,
+        exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
+    ) = clientRepository.findByIdOrNull(id) ?: throw exception
 
-    fun saveClient(clientToSave: Client)
-            = if(!exists(clientToSave.cpf, clientToSave.email))
+    fun saveClient(clientToSave: Client) = if (!exists(clientToSave.cpf, clientToSave.email))
         this.clientRepository.save(clientToSave.copy(password = this.passwordEncoder.encode(clientToSave.password)))
-        else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
+    else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
-    fun updateClient(clientToUpdate: Client, updateRequest: ClientUpdateRequest)
-            = this.clientRepository.save(clientToUpdate.copy(
+    fun updateClient(clientToUpdate: Client, updateRequest: ClientUpdateRequest) = this.clientRepository.save(
+        clientToUpdate.copy(
             firstName = updateRequest.firstName ?: clientToUpdate.firstName,
             lastName = updateRequest.lastName ?: clientToUpdate.lastName,
             avatarImage = updateRequest.avatarImage ?: clientToUpdate.avatarImage
-    ))
+        )
+    )
 
     fun deleteClient(clientToDelete: Client) {
         this.clientRepository.delete(clientToDelete)

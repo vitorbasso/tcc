@@ -1,6 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.enum
 
-enum class ManagerErrorCode (val cause: String) {
+enum class ManagerErrorCode(val cause: String) {
     MANAGER_00("error.unexpected"),
     MANAGER_01("error.json"),
     MANAGER_02("error.request.body.fields"),

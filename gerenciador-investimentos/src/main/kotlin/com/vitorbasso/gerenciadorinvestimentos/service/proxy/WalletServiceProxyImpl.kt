@@ -24,19 +24,17 @@ class WalletServiceProxyImpl(
     private val walletService: IWalletService
 ) : IWalletService {
 
-    override fun getWalletCollection()
-        = this.walletService.getWalletCollection().map { it.getSmallDto() }
+    override fun getWalletCollection() = this.walletService.getWalletCollection().map { it.getSmallDto() }
 
     override fun getWallet(walletId: Long) = this.walletService.getWallet(walletId).getDto()
 
-    override fun saveWallet(walletToSave: IWallet)
-        = this.walletService.saveWallet(walletToSave.getEntity()).getDto()
+    override fun saveWallet(walletToSave: IWallet) = this.walletService.saveWallet(walletToSave.getEntity()).getDto()
 
-    override fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest)
-        = this.walletService.updateWallet(
-        walletId = walletId,
-        walletUpdateRequest = walletUpdateRequest
-    ).getDto()
+    override fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest) =
+        this.walletService.updateWallet(
+            walletId = walletId,
+            walletUpdateRequest = walletUpdateRequest
+        ).getDto()
 
     override fun deleteWallet(walletId: Long) {
         this.walletService.deleteWallet(walletId)
@@ -55,12 +53,11 @@ private fun IWallet.getDto() = WalletDto(
     id = (this as Wallet).id,
     name = this.name,
     broker = this.broker,
-    monthlyBalanceDaytrade = this.monthlyBalanceDaytrade,
-    monthlyBalance = this.monthlyBalance,
-    lifetimeBalanceDaytrade = this.lifetimeBalanceDaytrade,
-    lifetimeBalance = this.lifetimeBalance,
+    balanceDaytrade = this.balanceDaytrade,
+    balance = this.balance,
     withdrawn = this.withdrawn,
     withdrawnDaytrade = this.withdrawnDaytrade,
+    walletMonth = this.walletMonth,
     stockAsset = this.asset.map { it.getDto() }
 )
 

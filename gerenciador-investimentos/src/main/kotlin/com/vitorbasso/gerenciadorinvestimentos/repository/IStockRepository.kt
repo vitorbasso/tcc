@@ -9,5 +9,5 @@ interface IStockRepository {
 
     fun findByTicker(ticker: String): Stock?
 
-    fun findByTickerBatch(tickers: List<String>) : List<Stock>
+    fun findByTickerBatch(tickers: List<String>): List<Stock>
 }

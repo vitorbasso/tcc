@@ -18,8 +18,8 @@ class TransactionController(
 ) {
 
     @PostMapping
-    fun getTransactions(@RequestBody transactionRequest: TransactionRequest)
-        = this.transactionService.performTransaction(transactionRequest)
+    fun getTransactions(@RequestBody transactionRequest: TransactionRequest) =
+        this.transactionService.performTransaction(transactionRequest)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

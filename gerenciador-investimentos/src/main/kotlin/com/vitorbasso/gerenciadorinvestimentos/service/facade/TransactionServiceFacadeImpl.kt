@@ -1,41 +1,37 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomWrongDateException
 import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
+import com.vitorbasso.gerenciadorinvestimentos.service.IStockService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.StockService
+import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
+import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingService
+import com.vitorbasso.gerenciadorinvestimentos.service.concrete.DaytradeService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
-import com.vitorbasso.gerenciadorinvestimentos.util.DaytradeUtil
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 internal class TransactionServiceFacadeImpl(
     private val transactionService: TransactionService,
-    private val stockService: StockService,
+    private val stockService: IStockService,
     private val assetService: IAssetService,
-    private val walletService: WalletServiceFacadeImpl,
-    private val monthlyWalletService: MonthlyWalletServiceFacadeImpl
+    @Qualifier("walletServiceFacadeImpl")
+    private val walletService: IWalletService,
+    private val accountingService: AccountingService
 ) : ITransactionService {
 
     @Transactional
-    override fun performTransaction(transactionRequest: TransactionRequest) = this.assetService.addTransactionToAsset(
-        wallet = this.walletService.getWallet(transactionRequest.walletId),
-        stock = this.stockService.getStock(transactionRequest.ticker),
-        amount = transactionRequest.quantity,
-        cost = transactionRequest.value,
-        type = transactionRequest.type
-    ).let {
-        transactionRequest.getTransaction(it)
-    }.let {
-        processTransaction(it)
-    }
+    override fun performTransaction(transactionRequest: TransactionRequest) =
+        processTransaction(transactionRequest.getTransaction())
 
     @Transactional
     override fun deleteTransaction(transactionId: Long) {
@@ -45,38 +41,35 @@ internal class TransactionServiceFacadeImpl(
         )
         val transactions = this.transactionService.findTransactionsOnSameDate(transactionToDelete).toMutableList()
         transactions.remove(transactionToDelete)
-        this.transactionService.saveAll(DaytradeUtil.reprocessTransactionsForDaytrade(transactions))
+        this.transactionService.saveAll(DaytradeService.processDaytrade(transactions))
         this.transactionService.deleteTransaction(transactionToDelete)
     }
 
     private fun processTransaction(transaction: Transaction): Transaction {
-        val transactionProcessed = processDaytrade(this.transactionService.saveAndFlush(transaction.copy(
-            isSellout = transaction.asset.amount == 0
-        )))
-        this.walletService.updateBalance(
-            transactionProcessed,
-            this.monthlyWalletService
+        val accountantReport = accountingService.accountFor(
+            transaction,
+            this.transactionService.findFromOneBeforeTransactionDate(transaction)
         )
-        return transactionProcessed
+
+        this.transactionService.saveAll(accountantReport.transactionsReport)
+
+        return accountantReport.transactionsReport.findLast { it.transactionDate.isEqual(transaction.transactionDate) }
+            ?: transaction
     }
 
-    private fun processDaytrade(transaction: Transaction)
-    = this.transactionService.findTransactionsOnSameDate(transaction).let {
-        this.transactionService.saveAll(DaytradeUtil.reprocessTransactionsForDaytrade(it)).find {
-            processedTransaction ->
-            processedTransaction.id == transaction.id
-        } ?: transaction
-    }
-
-    private fun checkDate(dateToCheck: LocalDate) = dateToCheck.takeIf {
-        !it.isAfter(LocalDate.now()) && (it.dayOfWeek != DayOfWeek.SATURDAY || it.dayOfWeek != DayOfWeek.SUNDAY)
+    private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
+        !it.toLocalDate().isAfter(LocalDate.now()) &&
+            (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY)
     } ?: throw CustomWrongDateException()
 
-    private fun TransactionRequest.getTransaction(asset: Asset) = Transaction(
+    private fun TransactionRequest.getTransaction() = Transaction(
         type = this.type,
         quantity = this.quantity,
         value = this.value,
-        asset = asset,
+        asset = assetService.getAsset(
+            wallet = walletService.getWallet(this.walletId) as Wallet,
+            stock = stockService.getStock(this.ticker)
+        ),
         transactionDate = checkDate(this.date)
     )
 

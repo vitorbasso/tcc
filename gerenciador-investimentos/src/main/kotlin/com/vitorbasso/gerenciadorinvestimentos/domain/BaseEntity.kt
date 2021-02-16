@@ -8,11 +8,11 @@ import javax.persistence.Column
 import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
-abstract class BaseEntity (
-        @field:CreationTimestamp
-        @Column(updatable = false, nullable = false)
-        val dateCreated: LocalDateTime = LocalDateTime.now(),
-        @field:UpdateTimestamp
-        @Column(nullable = false)
-        val dateUpdated: LocalDateTime = LocalDateTime.now()
+abstract class BaseEntity(
+    @field:CreationTimestamp
+    @Column(updatable = false, nullable = false)
+    val dateCreated: LocalDateTime = LocalDateTime.now(),
+    @field:UpdateTimestamp
+    @Column(nullable = false)
+    val dateUpdated: LocalDateTime = LocalDateTime.now()
 ) : Serializable

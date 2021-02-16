@@ -10,5 +10,5 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 class GerenciadorInvestimentosApplication : SpringBootServletInitializer()
 
 fun main(args: Array<String>) {
-	runApplication<GerenciadorInvestimentosApplication>(*args)
+    runApplication<GerenciadorInvestimentosApplication>(*args)
 }

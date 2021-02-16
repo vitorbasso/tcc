@@ -2,7 +2,7 @@ package com.vitorbasso.gerenciadorinvestimentos.dto.request
 
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import java.math.BigDecimal
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
 
@@ -17,5 +17,5 @@ data class TransactionRequest(
     val ticker: String,
     @field:NotBlank(message = "error.request.body.fields.transaction.walletId")
     val walletId: Long,
-    val date: LocalDate = LocalDate.now()
+    val date: LocalDateTime = LocalDateTime.now()
 )

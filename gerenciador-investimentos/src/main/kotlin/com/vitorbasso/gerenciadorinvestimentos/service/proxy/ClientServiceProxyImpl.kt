@@ -21,8 +21,8 @@ class ClientServiceProxyImpl(
 
     override fun saveClient(clientToSave: IClient) = this.clientService.saveClient(clientToSave.getEntity()).getDto()
 
-    override fun updateClient(clientUpdateRequest: ClientUpdateRequest)
-    = this.clientService.updateClient(clientUpdateRequest).getDto()
+    override fun updateClient(clientUpdateRequest: ClientUpdateRequest) =
+        this.clientService.updateClient(clientUpdateRequest).getDto()
 
     override fun deleteClient() {
         this.clientService.deleteClient()

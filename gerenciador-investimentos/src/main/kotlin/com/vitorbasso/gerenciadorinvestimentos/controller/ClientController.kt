@@ -17,23 +17,22 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/\${api-version}/clients")
 class ClientController(
-        val clientService: IClientService
+    val clientService: IClientService
 ) {
 
     @GetMapping
     fun getClient() = this.clientService.getClient()
 
     @PostMapping
-    fun saveClient(@RequestBody @Valid clientRequest: ClientRequest)
-            = this.clientService.saveClient(clientRequest)
+    fun saveClient(@RequestBody @Valid clientRequest: ClientRequest) = this.clientService.saveClient(clientRequest)
 
     @PutMapping
-    fun updateClient(@RequestBody @Valid clientUpdateRequest: ClientUpdateRequest)
-            = this.clientService.updateClient(clientUpdateRequest)
+    fun updateClient(@RequestBody @Valid clientUpdateRequest: ClientUpdateRequest) =
+        this.clientService.updateClient(clientUpdateRequest)
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteClient(){
+    fun deleteClient() {
         this.clientService.deleteClient()
     }
 

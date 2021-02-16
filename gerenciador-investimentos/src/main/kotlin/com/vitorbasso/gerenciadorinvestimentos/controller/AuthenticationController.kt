@@ -11,11 +11,11 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/\${api-version}/authentication")
 class AuthenticationController(
-        private val authenticationService: AuthenticationService
+    private val authenticationService: AuthenticationService
 ) {
 
     @PostMapping
-    fun authenticate(@RequestBody @Valid authenticationRequest: AuthenticationRequest)
-            = this.authenticationService.authenticate(authenticationRequest)
+    fun authenticate(@RequestBody @Valid authenticationRequest: AuthenticationRequest) =
+        this.authenticationService.authenticate(authenticationRequest)
 
 }
