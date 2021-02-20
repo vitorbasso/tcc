@@ -10,6 +10,7 @@ data class MonthlyWalletDto(
     val broker: String,
     val balanceDaytrade: BigDecimal,
     val balance: BigDecimal,
+    val taxDeducted: BigDecimal,
     val walletId: Long,
     val walletMonth: LocalDate
 ) : IMonthlyWallet

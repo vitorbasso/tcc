@@ -32,8 +32,6 @@ data class Transaction(
 
     val checkingQuantity: Int = 0,
 
-    val daytrade: Boolean = false,
-
     val daytradeQuantity: Int = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)

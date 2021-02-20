@@ -24,6 +24,7 @@ data class Wallet(
     val balance: BigDecimal = BigDecimal.ZERO,
     val withdrawn: BigDecimal = BigDecimal.ZERO,
     val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
+    val taxDeducted: BigDecimal = BigDecimal.ZERO,
     val walletMonth: LocalDate = LocalDate.now(),
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -65,7 +65,7 @@ internal class AccountingService(
             staleTransactions.toMonthMap().mapValues { WalletReport() },
             calculateContribution(
                 transactions = staleTransactions,
-                daytradeTransactions = staleTransactions.filter { it.daytrade },
+                daytradeTransactions = staleTransactions.filter { it.daytradeQuantity > 0 },
                 accountingOperation = accountingOperation
             )
         )

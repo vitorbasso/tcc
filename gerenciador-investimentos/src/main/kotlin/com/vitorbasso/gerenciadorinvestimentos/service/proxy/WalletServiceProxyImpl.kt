@@ -57,6 +57,7 @@ private fun IWallet.getDto() = WalletDto(
     balance = this.balance,
     withdrawn = this.withdrawn,
     withdrawnDaytrade = this.withdrawnDaytrade,
+    taxDeducted = this.taxDeducted,
     walletMonth = this.walletMonth,
     stockAsset = this.asset.map { it.getDto() }
 )

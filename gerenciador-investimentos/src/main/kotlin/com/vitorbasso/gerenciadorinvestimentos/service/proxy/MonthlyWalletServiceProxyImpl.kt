@@ -32,6 +32,7 @@ private fun IMonthlyWallet.getDto() = MonthlyWalletDto(
     broker = this.broker,
     balanceDaytrade = this.balanceDaytrade,
     balance = this.balance,
+    taxDeducted = this.taxDeducted,
     walletId = this.walletId,
     walletMonth = this.walletMonth
 )
