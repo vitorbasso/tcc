@@ -8,6 +8,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.IMonthlyWalletService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
+import java.math.RoundingMode
 
 @Service
 @Primary
@@ -30,8 +31,10 @@ private fun IMonthlyWallet.getDto() = MonthlyWalletDto(
     id = (this as MonthlyWallet).id,
     name = this.name,
     broker = this.broker,
-    balanceDaytrade = this.balanceDaytrade,
-    balance = this.balance,
+    balanceDaytrade = this.balanceDaytrade.setScale(2, RoundingMode.CEILING),
+    balance = this.balance.setScale(2, RoundingMode.CEILING),
+    withdrawn = this.withdrawn.setScale(2, RoundingMode.CEILING),
+    withdrawnDaytrade = this.withdrawnDaytrade.setScale(2, RoundingMode.CEILING),
     walletId = this.walletId,
     walletMonth = this.walletMonth
 )

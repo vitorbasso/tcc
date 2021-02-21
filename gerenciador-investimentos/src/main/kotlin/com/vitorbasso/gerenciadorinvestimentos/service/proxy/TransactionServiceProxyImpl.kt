@@ -8,6 +8,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
+import java.math.RoundingMode
 
 @Service
 @Primary
@@ -27,7 +28,7 @@ private fun ITransaction.getDto() = TransactionDto(
     id = (this as Transaction).id,
     type = this.type.name,
     quantity = this.quantity,
-    value = this.value,
+    value = this.value.setScale(2, RoundingMode.CEILING),
     ticker = this.asset.stock.ticker,
     transactionDate = this.transactionDate,
     daytradeQuantity = this.daytradeQuantity

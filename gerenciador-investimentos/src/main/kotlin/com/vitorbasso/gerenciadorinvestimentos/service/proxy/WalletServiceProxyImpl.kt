@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import java.math.RoundingMode
 import java.time.LocalDate
 
 @Service
@@ -53,10 +54,10 @@ private fun IWallet.getDto() = WalletDto(
     id = (this as Wallet).id,
     name = this.name,
     broker = this.broker,
-    balanceDaytrade = this.balanceDaytrade,
-    balance = this.balance,
-    withdrawn = this.withdrawn,
-    withdrawnDaytrade = this.withdrawnDaytrade,
+    balanceDaytrade = this.balanceDaytrade.setScale(2, RoundingMode.CEILING),
+    balance = this.balance.setScale(2, RoundingMode.CEILING),
+    withdrawn = this.withdrawn.setScale(2, RoundingMode.CEILING),
+    withdrawnDaytrade = this.withdrawnDaytrade.setScale(2, RoundingMode.CEILING),
     walletMonth = this.walletMonth,
     stockAsset = this.asset.map { it.getDto() }
 )
@@ -70,7 +71,7 @@ private fun IWallet.getSmallDto() = WalletSmallDto(
 private fun IAsset.getDto() = AssetDto(
     id = (this as Asset).id,
     stockSymbol = this.stock.ticker,
-    averageCost = this.averageCost,
+    averageCost = this.averageCost.setScale(2, RoundingMode.CEILING),
     amount = this.amount,
-    lifetimeBalance = this.lifetimeBalance
+    lifetimeBalance = this.lifetimeBalance.setScale(2, RoundingMode.CEILING)
 )
