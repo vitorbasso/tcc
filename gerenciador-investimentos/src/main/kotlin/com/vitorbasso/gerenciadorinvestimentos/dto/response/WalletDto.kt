@@ -12,7 +12,6 @@ data class WalletDto(
     val balance: BigDecimal,
     val withdrawn: BigDecimal,
     val withdrawnDaytrade: BigDecimal,
-    val taxDeducted: BigDecimal,
     val walletMonth: LocalDate,
     val stockAsset: List<AssetDto>
 ) : IWallet
