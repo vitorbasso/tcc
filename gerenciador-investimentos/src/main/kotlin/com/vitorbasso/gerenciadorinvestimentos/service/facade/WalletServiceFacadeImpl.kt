@@ -12,6 +12,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingServic
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.ClientService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
+import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -22,7 +23,8 @@ internal class WalletServiceFacadeImpl(
     private val clientService: ClientService
 ) : IWalletService, IAccountingServiceSubscriber {
 
-    override fun getWalletCollection() = this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet
+    override fun getWalletCollection() =
+        this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet.map { it.validate() }
 
     override fun getWallet(walletId: Long) =
         this.walletService.getWallet(walletId, SecurityContextUtil.getClientDetails().id).validate()
@@ -71,6 +73,6 @@ internal class WalletServiceFacadeImpl(
 
     private fun Wallet.validate() = this.takeIf { isValid(it) } ?: walletService.enforceWalletMonth(this)
 
-    private fun isValid(wallet: Wallet) = wallet.walletMonth.withDayOfMonth(1) == LocalDate.now().withDayOfMonth(1)
+    private fun isValid(wallet: Wallet) = wallet.walletMonth.atStartOfMonth() == LocalDate.now().atStartOfMonth()
 
 }

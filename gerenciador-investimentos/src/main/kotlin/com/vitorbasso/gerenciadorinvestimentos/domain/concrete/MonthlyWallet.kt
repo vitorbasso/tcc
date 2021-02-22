@@ -2,6 +2,8 @@ package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
 import com.vitorbasso.gerenciadorinvestimentos.domain.IMonthlyWallet
+import com.vitorbasso.gerenciadorinvestimentos.domain.ITaxable
+import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.Entity
@@ -19,15 +21,15 @@ data class MonthlyWallet(
     val id: Long = 0,
     val name: String = "",
     val broker: String = "",
-    val balanceDaytrade: BigDecimal = BigDecimal.ZERO,
-    val balance: BigDecimal = BigDecimal.ZERO,
-    val withdrawn: BigDecimal = BigDecimal.ZERO,
-    val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
+    override val balanceDaytrade: BigDecimal = BigDecimal.ZERO,
+    override val balance: BigDecimal = BigDecimal.ZERO,
+    override val withdrawn: BigDecimal = BigDecimal.ZERO,
+    override val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
     val walletId: Long = 0,
-    val walletMonth: LocalDate = LocalDate.now(),
+    override val walletMonth: LocalDate = LocalDate.now().atStartOfMonth(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     val client: Client = Client()
 
-) : BaseEntity(), IMonthlyWallet
+) : BaseEntity(), IMonthlyWallet, ITaxable

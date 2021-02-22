@@ -13,14 +13,10 @@ create table if not exists `client`(
     primary key (`id`)
 )engine=InnoDB;
 
-create table if not exists `tax` (
+create table if not exists `tax_deductible` (
 	`id` bigint auto_increment,
-    `tax` decimal(20,2) default 0,
-    `daytrade_tax` decimal(20,2) default 0,
     `deducted` decimal(20,2) default 0,
     `daytrade_deducted` decimal(20,2) default 0,
-    `available_to_deduct` decimal(20,2) default 0,
-    `daytrade_available_to_deduct` decimal(20,2) default 0,
     `month` date not null,
     `client_id` bigint not null,
     `date_created` timestamp not null default NOW(),
@@ -105,5 +101,6 @@ create table if not exists `transaction`(
 )engine=InnoDB;
 
 CREATE INDEX `transaction_date` ON `transaction` (`transaction_date`);
+ALTER TABLE `transaction` ADD UNIQUE `unique_transactino` (`transaction_date`, `asset_id`);
 ALTER TABLE `monthly_wallet` ADD UNIQUE `unique_monthly_wallet` (`wallet_month`, `wallet_id`);
-ALTER TABLE `tax` ADD UNIQUE `unique_tax` (`client_id`, `month`);
+ALTER TABLE `tax_deductible` ADD UNIQUE `unique_tax` (`client_id`, `month`);

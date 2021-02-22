@@ -15,6 +15,10 @@ object Util {
 
 }
 
-fun LocalDateTime.atStartOfMonth(): LocalDate = this.toLocalDate().withDayOfMonth(1)
+fun BigDecimal.setScale(): BigDecimal = this.setScale(2, RoundingMode.CEILING)
+
+fun LocalDateTime.atStartOfMonth(): LocalDate = this.toLocalDate().atStartOfMonth()
+
+fun LocalDate.atStartOfMonth(): LocalDate = this.withDayOfMonth(1)
 
 fun LocalDateTime.atStartOfDay(): LocalDateTime = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
