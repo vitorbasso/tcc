@@ -5,6 +5,7 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.MonthlyWallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.response.MonthlyWalletDto
 import com.vitorbasso.gerenciadorinvestimentos.dto.response.MonthlyWalletSmallDto
 import com.vitorbasso.gerenciadorinvestimentos.service.IMonthlyWalletService
+import com.vitorbasso.gerenciadorinvestimentos.util.setScale
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
@@ -30,8 +31,10 @@ private fun IMonthlyWallet.getDto() = MonthlyWalletDto(
     id = (this as MonthlyWallet).id,
     name = this.name,
     broker = this.broker,
-    balanceDaytrade = this.balanceDaytrade,
-    balance = this.balance,
+    balanceDaytrade = this.balanceDaytrade.setScale(),
+    balance = this.balance.setScale(),
+    withdrawn = this.withdrawn.setScale(),
+    withdrawnDaytrade = this.withdrawnDaytrade.setScale(),
     walletId = this.walletId,
     walletMonth = this.walletMonth
 )

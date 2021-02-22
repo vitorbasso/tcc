@@ -69,7 +69,6 @@ internal object DaytradeService {
             if (typeTwoAvailableQuantity <= quantityAvailable) {
                 modifiedTransactions.add(
                     typeTwoTransaction.copy(
-                        daytrade = true,
                         daytradeQuantity = typeTwoTransaction.quantity
                     )
                 )
@@ -77,7 +76,6 @@ internal object DaytradeService {
             } else {
                 typeTwoTransactions.add(
                     0, typeTwoTransaction.copy(
-                        daytrade = true,
                         daytradeQuantity = typeTwoTransaction.daytradeQuantity + quantityAvailable
                     )
                 )
@@ -86,7 +84,6 @@ internal object DaytradeService {
         }
         modifiedTransactions.add(
             typeOneTransaction.copy(
-                daytrade = true,
                 daytradeQuantity = typeOneTransaction.quantity - quantityAvailable
             )
         )
@@ -95,7 +92,6 @@ internal object DaytradeService {
 
     private fun getBuyAndSellLists(sameDayTransactions: List<Transaction>) = (sameDayTransactions.map {
         it.copy(
-            daytrade = false,
             daytradeQuantity = 0
         )
     }.partition {

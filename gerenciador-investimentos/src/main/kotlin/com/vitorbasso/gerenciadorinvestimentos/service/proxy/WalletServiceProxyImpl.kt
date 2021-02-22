@@ -11,6 +11,7 @@ import com.vitorbasso.gerenciadorinvestimentos.dto.response.AssetDto
 import com.vitorbasso.gerenciadorinvestimentos.dto.response.WalletDto
 import com.vitorbasso.gerenciadorinvestimentos.dto.response.WalletSmallDto
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
+import com.vitorbasso.gerenciadorinvestimentos.util.setScale
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.security.core.context.SecurityContextHolder
@@ -53,10 +54,10 @@ private fun IWallet.getDto() = WalletDto(
     id = (this as Wallet).id,
     name = this.name,
     broker = this.broker,
-    balanceDaytrade = this.balanceDaytrade,
-    balance = this.balance,
-    withdrawn = this.withdrawn,
-    withdrawnDaytrade = this.withdrawnDaytrade,
+    balanceDaytrade = this.balanceDaytrade.setScale(),
+    balance = this.balance.setScale(),
+    withdrawn = this.withdrawn.setScale(),
+    withdrawnDaytrade = this.withdrawnDaytrade.setScale(),
     walletMonth = this.walletMonth,
     stockAsset = this.asset.map { it.getDto() }
 )
@@ -70,7 +71,7 @@ private fun IWallet.getSmallDto() = WalletSmallDto(
 private fun IAsset.getDto() = AssetDto(
     id = (this as Asset).id,
     stockSymbol = this.stock.ticker,
-    averageCost = this.averageCost,
+    averageCost = this.averageCost.setScale(),
     amount = this.amount,
-    lifetimeBalance = this.lifetimeBalance
+    lifetimeBalance = this.lifetimeBalance.setScale()
 )

@@ -11,6 +11,7 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.repository.IMonthlyWalletRepository
 import com.vitorbasso.gerenciadorinvestimentos.repository.IWalletRepository
 import com.vitorbasso.gerenciadorinvestimentos.service.facade.MonthlyWalletServiceFacadeImpl
+import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,7 +32,7 @@ internal class WalletService(
 
     fun saveWallet(client: Client, walletToSave: Wallet) = if (!exists(client, walletToSave))
         this.walletRepository.save(
-            walletToSave.copy(walletMonth = walletToSave.walletMonth.withDayOfMonth(1), client = client)
+            walletToSave.copy(walletMonth = walletToSave.walletMonth.atStartOfMonth(), client = client)
         )
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
@@ -51,7 +52,7 @@ internal class WalletService(
             wallet.copy(
                 balanceDaytrade = BigDecimal.ZERO,
                 balance = BigDecimal.ZERO,
-                walletMonth = LocalDate.now().withDayOfMonth(1)
+                walletMonth = LocalDate.now().atStartOfMonth()
             ).let {
                 this.walletRepository.save(it)
             }
@@ -93,13 +94,13 @@ internal class WalletService(
         wallet: Wallet,
         monthlyWalletService: MonthlyWalletServiceFacadeImpl,
         walletMonth: LocalDate
-    ) = monthlyWalletService.getMonthlyWalletByMonth(walletMonth.withDayOfMonth(1))
+    ) = monthlyWalletService.getMonthlyWalletByMonth(walletMonth.atStartOfMonth())
         ?: MonthlyWallet(
             name = wallet.name,
             broker = wallet.broker,
             balanceDaytrade = BigDecimal.ZERO,
             balance = BigDecimal.ZERO,
-            walletMonth = walletMonth.withDayOfMonth(1),
+            walletMonth = walletMonth.atStartOfMonth(),
             walletId = wallet.id,
             client = wallet.client
         )

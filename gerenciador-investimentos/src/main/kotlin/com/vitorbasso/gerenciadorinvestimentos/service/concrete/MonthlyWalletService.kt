@@ -6,6 +6,7 @@ import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestExcepti
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.repository.IMonthlyWalletRepository
+import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -27,7 +28,7 @@ internal class MonthlyWalletService(
     fun getMonthlyWalletByMonth(
         month: LocalDate,
         clientId: Long
-    ) = this.monthlyWalletRepository.findByWalletMonth(month.withDayOfMonth(1))?.let {
+    ) = this.monthlyWalletRepository.findByWalletMonth(month.atStartOfMonth())?.let {
         if (it.client.id == clientId) it
         else throw CustomBadRequestException(ManagerErrorCode.MANAGER_05)
     }

@@ -10,7 +10,6 @@ data class TransactionDto(
     val quantity: Int,
     val value: BigDecimal,
     val ticker: String,
+    val daytradeQuantity: Int,
     val transactionDate: LocalDateTime,
-    val daytrade: Boolean,
-    val daytradeQuantity: Int
 ) : ITransaction

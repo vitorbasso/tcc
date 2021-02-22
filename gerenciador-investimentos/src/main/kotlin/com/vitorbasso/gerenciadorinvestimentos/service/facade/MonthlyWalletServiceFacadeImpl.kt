@@ -1,11 +1,11 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.MonthlyWallet
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestException
 import com.vitorbasso.gerenciadorinvestimentos.service.IMonthlyWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.MonthlyWalletService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
+import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -23,12 +23,7 @@ internal class MonthlyWalletServiceFacadeImpl(
     )
 
     fun getMonthlyWalletByMonth(month: LocalDate) = this.monthlyWalletService.getMonthlyWalletByMonth(
-        month.withDayOfMonth(1),
-        SecurityContextUtil.getClientDetails().id
-    )
-
-    fun saveMonthlyWallet(monthlyWallet: MonthlyWallet) = this.monthlyWalletService.save(
-        monthlyWallet.copy(walletMonth = monthlyWallet.walletMonth.withDayOfMonth(1)),
+        month.atStartOfMonth(),
         SecurityContextUtil.getClientDetails().id
     )
 

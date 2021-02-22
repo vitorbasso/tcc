@@ -1,5 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TransactionRequest
@@ -58,20 +59,23 @@ internal class TransactionServiceFacadeImpl(
             .findLast { it.id == newTransaction.id } ?: newTransaction
     }
 
-    private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
+    private fun checkDate(dateToCheck: LocalDateTime, asset: Asset) = dateToCheck.takeIf {
         !it.toLocalDate().isAfter(LocalDate.now()) &&
-            (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY)
+            (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY) &&
+            this.transactionService.validateTransaction(dateToCheck, asset)
     } ?: throw CustomWrongDateException()
 
-    private fun TransactionRequest.getTransaction() = Transaction(
-        type = this.type,
-        quantity = this.quantity,
-        value = this.value,
-        asset = assetService.getAsset(
-            wallet = walletService.getWallet(this.walletId) as Wallet,
-            stock = stockService.getStock(this.ticker)
-        ),
-        transactionDate = checkDate(this.date)
-    )
+    private fun TransactionRequest.getTransaction() = assetService.getAsset(
+        wallet = walletService.getWallet(this.walletId) as Wallet,
+        stock = stockService.getStock(this.ticker)
+    ).let {
+        Transaction(
+            type = this.type,
+            quantity = this.quantity,
+            value = this.value,
+            asset = it,
+            transactionDate = checkDate(this.date, it)
+        )
+    }
 
 }

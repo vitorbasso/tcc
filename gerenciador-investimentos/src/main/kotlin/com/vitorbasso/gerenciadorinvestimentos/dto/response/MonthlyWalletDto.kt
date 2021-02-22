@@ -10,6 +10,8 @@ data class MonthlyWalletDto(
     val broker: String,
     val balanceDaytrade: BigDecimal,
     val balance: BigDecimal,
+    val withdrawn: BigDecimal = BigDecimal.ZERO,
+    val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
     val walletId: Long,
     val walletMonth: LocalDate
 ) : IMonthlyWallet
