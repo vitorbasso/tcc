@@ -10,12 +10,6 @@ import java.time.LocalDateTime
 @Repository
 interface ITransactionRepository : JpaRepository<Transaction, Long> {
 
-    fun findByAssetAndTransactionDateBetweenOrderByTransactionDate(
-        asset: Asset,
-        transactionDateStart: LocalDateTime,
-        transactionDateEnd: LocalDateTime
-    ): List<Transaction>
-
     @Query(
         nativeQuery = true,
         value = "" +
@@ -33,5 +27,7 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
     fun findAllFromTransactionBeforeTransactionDate(assetId: Long, transactionDate: LocalDateTime): List<Transaction>
 
     fun findAllByAssetOrderByTransactionDate(asset: Asset): List<Transaction>
+
+    fun existsByAssetAndTransactionDate(asset: Asset, transactionDate: LocalDateTime): Boolean
 
 }

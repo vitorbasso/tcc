@@ -9,5 +9,4 @@ import java.time.LocalDate
 @Repository
 interface ITaxRepository : JpaRepository<TaxDeductible, Long> {
     fun findAllByClientAndMonthLessThanEqual(client: Client, month: LocalDate): List<TaxDeductible>
-    fun findByClientAndMonth(client: Client, month: LocalDate): TaxDeductible?
 }
