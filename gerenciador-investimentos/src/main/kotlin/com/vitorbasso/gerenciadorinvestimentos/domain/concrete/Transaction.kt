@@ -1,6 +1,10 @@
 package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
+import com.vitorbasso.gerenciadorinvestimentos.domain.ITransaction
+import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
+import java.math.BigDecimal
+import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -12,22 +16,26 @@ import javax.persistence.ManyToOne
 @Entity
 data class Transaction(
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = -1,
 
-        val type: String,
+    val type: TransactionType = TransactionType.BUY,
 
-        val quantity: Int,
+    val quantity: Int = 0,
 
-        val value: java.math.BigDecimal,
+    val value: BigDecimal = BigDecimal.ZERO,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "stock_symbol", referencedColumnName = "symbol")
-        val stock: Stock,
+    val transactionDate: LocalDateTime = LocalDateTime.now(),
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "asset_id", referencedColumnName = "id")
-        val asset: Asset
+    val checkingValue: BigDecimal = BigDecimal.ZERO,
 
-) : BaseEntity()
+    val checkingQuantity: Int = 0,
+
+    val daytradeQuantity: Int = 0,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asset_id", referencedColumnName = "id")
+    val asset: Asset = Asset()
+
+) : BaseEntity(), ITransaction
