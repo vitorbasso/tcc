@@ -3,7 +3,7 @@ name: "BACK: Gerenciador de Investimentos PULL REQUEST"
 on:
   pull_request:
     branches: [develop, release, master]
-    paths: ['gerenciador-investimento/**']
+    paths: ['gerenciador-investimentos/**']
 
 jobs:
   pr-verification:
