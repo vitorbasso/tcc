@@ -18,17 +18,11 @@ data class Client(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    val cpf: String = "",
-
     val email: String = "",
 
     private val password: String = "",
 
-    val firstName: String = "",
-
-    val lastName: String? = null,
-
-    val avatarImage: String? = null,
+    val name: String = "",
 
     @OneToMany(mappedBy = "client", cascade = [CascadeType.ALL])
     val wallet: List<Wallet> = listOf()

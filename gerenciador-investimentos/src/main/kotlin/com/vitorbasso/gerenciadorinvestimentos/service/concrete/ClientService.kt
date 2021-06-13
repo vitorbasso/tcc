@@ -22,15 +22,13 @@ internal class ClientService(
         exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
     ) = clientRepository.findByIdOrNull(id) ?: throw exception
 
-    fun saveClient(clientToSave: Client) = if (!exists(clientToSave.cpf, clientToSave.email))
+    fun saveClient(clientToSave: Client) = if (!exists(clientToSave.email))
         this.clientRepository.save(clientToSave.copy(password = this.passwordEncoder.encode(clientToSave.password)))
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_04)
 
     fun updateClient(clientToUpdate: Client, updateRequest: ClientUpdateRequest) = this.clientRepository.save(
         clientToUpdate.copy(
-            firstName = updateRequest.firstName ?: clientToUpdate.firstName,
-            lastName = updateRequest.lastName ?: clientToUpdate.lastName,
-            avatarImage = updateRequest.avatarImage ?: clientToUpdate.avatarImage
+            name = updateRequest.name ?: clientToUpdate.name
         )
     )
 
@@ -38,6 +36,6 @@ internal class ClientService(
         this.clientRepository.delete(clientToDelete)
     }
 
-    private fun exists(cpf: String, email: String) = this.clientRepository.existsByCpfOrEmail(cpf, email)
+    private fun exists(email: String) = this.clientRepository.existsByEmail(email)
 
 }

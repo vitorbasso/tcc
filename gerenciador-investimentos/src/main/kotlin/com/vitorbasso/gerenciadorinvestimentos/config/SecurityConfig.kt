@@ -31,7 +31,7 @@ class SecurityConfig(
     }
 
     override fun configure(http: HttpSecurity) {
-        http
+        http.cors().and()
             .csrf().disable()
             .authorizeRequests()
             .antMatchers(HttpMethod.POST, "${apiVersion}/clients").permitAll()

@@ -2,12 +2,9 @@ use `gerenciador_investimento`;
 
 create table if not exists `client`(
 	`id` bigint auto_increment,
-	`cpf` varchar(20) not null unique,
 	`email` varchar(255) not null unique,
     `password` varchar(255) not null,
-	`first_name` varchar(255) not null,
-    `last_name` varchar(255) default null,
-    `avatar_image` varchar(255) default null,
+	`name` varchar(255) not null,
     `date_created` timestamp not null,
     `date_updated` timestamp default NOW(),
     primary key (`id`)
