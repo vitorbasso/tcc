@@ -1,6 +1,7 @@
 import { Link, useHistory } from "react-router-dom";
 import { useRef, useState } from "react";
 import styles from "./SignUp.module.css";
+import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 
 function isNameValid(name) {
   return name.trim() !== "";
@@ -28,6 +29,7 @@ function SignUp() {
   const [passwordError, setPasswordError] = useState(false);
   const confirmPasswordRef = useRef();
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   function checkFields() {
     const nameIsValid = isNameValid(nameRef.current.value);
@@ -48,8 +50,12 @@ function SignUp() {
 
   async function submitHandler(event) {
     event.preventDefault();
+    setIsLoading(true);
     const formIsValid = checkFields();
-    if (!formIsValid) return;
+    if (!formIsValid) {
+      setIsLoading(false);
+      return;
+    }
     try {
       const response = await fetch("http://localhost:8080/v1/clients", {
         method: "POST",
@@ -63,19 +69,21 @@ function SignUp() {
         },
       });
       if (!response.ok) throw new Error("Couldn't register");
-      console.log("registered!");
       history.replace("/login");
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <main className={styles.main}>
+      {isLoading && <LoadingOverlay />}
       <h2>Faça seu cadastro</h2>
       <form onSubmit={submitHandler}>
         <div className={styles["form-control"]}>
-          <p className={!nameError && styles.hidden}>Digite um nome</p>
+          <p className={nameError ? "" : styles.hidden}>Digite um nome</p>
           <input
             ref={nameRef}
             type="text"
@@ -86,7 +94,9 @@ function SignUp() {
           />
         </div>
         <div className={styles["form-control"]}>
-          <p className={!emailError && styles.hidden}>Digite um email válido</p>
+          <p className={emailError ? "" : styles.hidden}>
+            Digite um email válido
+          </p>
           <input
             ref={emailRef}
             type="email"
@@ -97,7 +107,7 @@ function SignUp() {
           />
         </div>
         <div className={styles["form-control"]}>
-          <p className={!passwordError && styles.hidden}>
+          <p className={passwordError ? "" : styles.hidden}>
             No mínimo 8 caracteres
           </p>
           <input
@@ -110,7 +120,7 @@ function SignUp() {
           />
         </div>
         <div className={styles["form-control"]}>
-          <p className={!confirmPasswordError && styles.hidden}>
+          <p className={confirmPasswordError ? "" : styles.hidden}>
             Suas senhas não batem
           </p>
           <input
