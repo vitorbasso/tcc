@@ -30,6 +30,7 @@ function SignUp() {
   const confirmPasswordRef = useRef();
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   function checkFields() {
     const nameIsValid = isNameValid(nameRef.current.value);
@@ -72,6 +73,7 @@ function SignUp() {
       history.replace("/login");
     } catch (err) {
       console.log(err);
+      setFailed(true);
     } finally {
       setIsLoading(false);
     }
@@ -82,8 +84,18 @@ function SignUp() {
       {isLoading && <LoadingOverlay />}
       <h2>Faça seu cadastro</h2>
       <form onSubmit={submitHandler}>
+        <p className={`${styles["error-text"]} ${failed ? "" : styles.hidden}`}>
+          Não foi possível completar seu cadastro.
+        </p>
+
         <div className={styles["form-control"]}>
-          <p className={nameError ? "" : styles.hidden}>Digite um nome</p>
+          <p
+            className={`${styles["error-text"]} ${
+              nameError ? "" : styles.hidden
+            }`}
+          >
+            Digite um nome
+          </p>
           <input
             ref={nameRef}
             type="text"
@@ -94,7 +106,11 @@ function SignUp() {
           />
         </div>
         <div className={styles["form-control"]}>
-          <p className={emailError ? "" : styles.hidden}>
+          <p
+            className={`${styles["error-text"]} ${
+              emailError ? "" : styles.hidden
+            }`}
+          >
             Digite um email válido
           </p>
           <input
@@ -107,7 +123,11 @@ function SignUp() {
           />
         </div>
         <div className={styles["form-control"]}>
-          <p className={passwordError ? "" : styles.hidden}>
+          <p
+            className={`${styles["error-text"]} ${
+              passwordError ? "" : styles.hidden
+            }`}
+          >
             No mínimo 8 caracteres
           </p>
           <input
@@ -120,7 +140,11 @@ function SignUp() {
           />
         </div>
         <div className={styles["form-control"]}>
-          <p className={confirmPasswordError ? "" : styles.hidden}>
+          <p
+            className={`${styles["error-text"]} ${
+              confirmPasswordError ? "" : styles.hidden
+            }`}
+          >
             Suas senhas não batem
           </p>
           <input
@@ -134,7 +158,7 @@ function SignUp() {
         </div>
         <button type="submit">Cadastrar</button>
       </form>
-      <Link to="/login">Já possuo conta</Link>
+      <Link to="/">Já possuo uma conta</Link>
     </main>
   );
 }

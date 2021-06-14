@@ -16,9 +16,13 @@
   width: 100%;
   margin-top: 2rem;
   display: grid;
-  grid-template-rows: repeat(5, 1fr);
+  grid-template-rows: 1rem repeat(5, 1fr);
   justify-items: center;
   align-items: start;
+}
+
+.error-text {
+  color: var(--error-red);
 }
 
 .hidden {
@@ -27,7 +31,6 @@
 
 .main form .form-control p {
   margin-top: 5px;
-  color: #d4194b;
 }
 
 .main form .form-control {
@@ -66,6 +69,7 @@
 }
 
 .main form button {
+  cursor: pointer;
   width: 65%;
   height: 2.7rem;
   font-size: large;
@@ -89,4 +93,11 @@
   font-size: 1.2rem;
   text-decoration: none;
   color: var(--active-blue);
+}
+
+@media (min-width: 690px) {
+  .main {
+    width: 552px; /* 80% de 690 */
+    margin: 0 auto;
+  }
 }

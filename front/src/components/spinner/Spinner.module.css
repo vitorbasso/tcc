@@ -1,5 +1,5 @@
 .spinner {
-  margin: 70% auto;
+  margin: 30vh auto;
   border: 8px solid #afafaf; /* Light grey */
   border-top: 8px solid var(--active-blue);
   border-radius: 50%;
