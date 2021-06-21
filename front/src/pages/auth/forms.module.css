@@ -12,11 +12,18 @@
   color: var(--main-gray);
 }
 
+.main form.sign-up {
+  grid-template-rows: 1rem repeat(5, 1fr);
+}
+
+.main form.sign-in {
+  grid-template-rows: 1rem repeat(3, 1fr);
+}
+
 .main form {
   width: 100%;
   margin-top: 2rem;
   display: grid;
-  grid-template-rows: 1rem repeat(5, 1fr);
   justify-items: center;
   align-items: start;
 }
@@ -81,6 +88,10 @@
   align-self: center;
   background-color: var(--pastel-green);
   box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.main form button:hover {
+  background-color: var(--pastel-green-hover);
 }
 
 .main form button:active {

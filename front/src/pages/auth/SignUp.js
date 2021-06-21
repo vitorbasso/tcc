@@ -2,7 +2,7 @@ import { Link, useHistory } from "react-router-dom";
 import { useRef, useState } from "react";
 import { CLIENTS_URL } from "../../constants/paths";
 import { validateEmailInput } from "../../utils/inputUtils";
-import styles from "./SignUp.module.css";
+import styles from "./forms.module.css";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import useHttp from "../../hooks/useHttp";
 
@@ -75,8 +75,8 @@ function SignUp() {
   return (
     <main className={styles.main}>
       {registerIsLoading && <LoadingOverlay />}
-      <h2>Faça seu cadastro</h2>
-      <form onSubmit={submitHandler}>
+      <h2>Cadastro</h2>
+      <form onSubmit={submitHandler} className={styles["sign-up"]}>
         <p
           className={`${styles["error-text"]} ${
             registerError ? "" : styles.hidden

@@ -4,6 +4,7 @@ import { validateEmailInput } from "../../utils/inputUtils";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import useHttp from "../../hooks/useHttp";
 import { AUTH_URL } from "../../constants/paths";
+import styles from "./forms.module.css";
 import AuthContext from "../../context/auth-context";
 
 function SignIn() {
@@ -38,13 +39,21 @@ function SignIn() {
   }
 
   return (
-    <main>
+    <main className={styles.main}>
       {isLoading && <LoadingOverlay />}
       <h2>Login</h2>
-      <form onSubmit={submitHandler}>
-        <p>Dados de Login inválidos.</p>
-        <div>
-          <p>Informe um email válido.</p>
+      <form onSubmit={submitHandler} className={styles["sign-in"]}>
+        <p className={`${styles["error-text"]} ${error ? "" : styles.hidden}`}>
+          Dados de Login inválidos.
+        </p>
+        <div className={styles["form-control"]}>
+          <p
+            className={`${styles["error-text"]} ${
+              emailError ? "" : styles.hidden
+            }`}
+          >
+            Informe um email válido.
+          </p>
           <input
             ref={emailRef}
             type="email"
@@ -53,7 +62,8 @@ function SignIn() {
             required
           />
         </div>
-        <div>
+        <div className={styles["form-control"]}>
+          <p className={styles.hidden}>No mínimo 8 caracteres</p>
           <input
             ref={passwordRef}
             type="password"

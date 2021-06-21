@@ -9,7 +9,6 @@ function Home() {
   const { result, error, isLoading, sendRequest } = useHttp();
 
   useEffect(() => {
-    console.log("running useEffect");
     sendRequest({
       url: CLIENTS_URL,
     });
