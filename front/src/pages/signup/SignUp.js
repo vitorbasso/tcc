@@ -1,14 +1,13 @@
 import { Link, useHistory } from "react-router-dom";
 import { useRef, useState } from "react";
+import { CLIENTS_URL } from "../../constants/paths";
+import { validateEmailInput } from "../../utils/inputUtils";
 import styles from "./SignUp.module.css";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
+import useHttp from "../../hooks/useHttp";
 
 function isNameValid(name) {
   return name.trim() !== "";
-}
-
-function isEmailValid(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function isPasswordValid(password) {
@@ -22,6 +21,12 @@ function isConfirmPasswordValid(confirmPassword, password) {
 function SignUp() {
   const history = useHistory();
   const nameRef = useRef();
+  const {
+    result: registerSuccess,
+    error: registerError,
+    isLoading: registerIsLoading,
+    sendRequest: sendRegister,
+  } = useHttp();
   const [nameError, setNameError] = useState(false);
   const emailRef = useRef();
   const [emailError, setEmailError] = useState(false);
@@ -29,12 +34,10 @@ function SignUp() {
   const [passwordError, setPasswordError] = useState(false);
   const confirmPasswordRef = useRef();
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [failed, setFailed] = useState(false);
 
-  function checkFields() {
+  function areFieldsValid() {
     const nameIsValid = isNameValid(nameRef.current.value);
-    const emailIsValid = isEmailValid(emailRef.current.value);
+    const emailIsValid = validateEmailInput(emailRef.current.value);
     const passwordIsValid = isPasswordValid(passwordRef.current.value);
     const confirmPasswordIsValid = isConfirmPasswordValid(
       confirmPasswordRef.current.value,
@@ -49,42 +52,36 @@ function SignUp() {
     );
   }
 
-  async function submitHandler(event) {
+  function submitHandler(event) {
     event.preventDefault();
-    setIsLoading(true);
-    const formIsValid = checkFields();
-    if (!formIsValid) {
-      setIsLoading(false);
-      return;
-    }
-    try {
-      const response = await fetch("http://localhost:8080/v1/clients", {
-        method: "POST",
-        body: JSON.stringify({
-          name: nameRef.current.value,
-          email: emailRef.current.value,
-          password: passwordRef.current.value,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) throw new Error("Couldn't register");
-      history.replace("/login");
-    } catch (err) {
-      console.log(err);
-      setFailed(true);
-    } finally {
-      setIsLoading(false);
-    }
+    if (!areFieldsValid()) return;
+
+    sendRegister({
+      url: CLIENTS_URL,
+      method: "POST",
+      body: {
+        name: nameRef.current.value,
+        email: emailRef.current.value,
+        password: passwordRef.current.value,
+      },
+    });
+  }
+
+  if (!registerIsLoading && registerSuccess) {
+    history.replace("/");
+    return null;
   }
 
   return (
     <main className={styles.main}>
-      {isLoading && <LoadingOverlay />}
+      {registerIsLoading && <LoadingOverlay />}
       <h2>Faça seu cadastro</h2>
       <form onSubmit={submitHandler}>
-        <p className={`${styles["error-text"]} ${failed ? "" : styles.hidden}`}>
+        <p
+          className={`${styles["error-text"]} ${
+            registerError ? "" : styles.hidden
+          }`}
+        >
           Não foi possível completar seu cadastro.
         </p>
 
@@ -100,7 +97,6 @@ function SignUp() {
             ref={nameRef}
             type="text"
             name="name"
-            id="name"
             placeholder="Seu nome aqui"
             required
           />
@@ -117,7 +113,6 @@ function SignUp() {
             ref={emailRef}
             type="email"
             name="email"
-            id="email"
             placeholder="Digite seu email"
             required
           />
@@ -134,7 +129,6 @@ function SignUp() {
             ref={passwordRef}
             type="password"
             name="password"
-            id="password"
             placeholder="Digite sua senha"
             required
           />
@@ -151,7 +145,6 @@ function SignUp() {
             ref={confirmPasswordRef}
             type="password"
             name="confirm-password"
-            id="confirm-password"
             placeholder="Confirme sua senha"
             required
           />
