@@ -5,6 +5,7 @@ import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import useHttp from "../../hooks/useHttp";
 import { AUTH_URL } from "../../constants/paths";
 import styles from "./forms.module.css";
+import baseStyles from "../../css/base.module.css";
 import AuthContext from "../../context/auth-context";
 
 function SignIn() {
@@ -39,17 +40,21 @@ function SignIn() {
   }
 
   return (
-    <main className={styles.main}>
+    <main className={`${styles.main} ${baseStyles.container}`}>
       {isLoading && <LoadingOverlay />}
       <h2>Login</h2>
       <form onSubmit={submitHandler} className={styles["sign-in"]}>
-        <p className={`${styles["error-text"]} ${error ? "" : styles.hidden}`}>
+        <p
+          className={`${baseStyles["error-text"]} ${
+            error ? "" : baseStyles.hidden
+          }`}
+        >
           Dados de Login inválidos.
         </p>
-        <div className={styles["form-control"]}>
+        <div className={baseStyles["form-control"]}>
           <p
-            className={`${styles["error-text"]} ${
-              emailError ? "" : styles.hidden
+            className={`${baseStyles["error-text"]} ${
+              emailError ? "" : baseStyles.hidden
             }`}
           >
             Informe um email válido.
@@ -62,8 +67,8 @@ function SignIn() {
             required
           />
         </div>
-        <div className={styles["form-control"]}>
-          <p className={styles.hidden}>No mínimo 8 caracteres</p>
+        <div className={baseStyles["form-control"]}>
+          <p className={baseStyles.hidden}>No mínimo 8 caracteres</p>
           <input
             ref={passwordRef}
             type="password"
@@ -72,7 +77,9 @@ function SignIn() {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <button className={baseStyles.btn} type="submit">
+          Login
+        </button>
       </form>
       <Link to="/register">Criar uma conta</Link>
     </main>

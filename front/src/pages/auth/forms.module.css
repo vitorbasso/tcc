@@ -1,23 +1,7 @@
 .main {
-  margin: 0 auto;
-  padding: 10vh 0;
-  width: 80%;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.main h2 {
-  font-size: 2rem;
-  color: var(--main-gray);
-}
-
-.main form.sign-up {
-  grid-template-rows: 1rem repeat(5, 1fr);
-}
-
-.main form.sign-in {
-  grid-template-rows: 1rem repeat(3, 1fr);
 }
 
 .main form {
@@ -28,87 +12,32 @@
   align-items: start;
 }
 
-.error-text {
-  color: var(--error-red);
+.main form.sign-up {
+  grid-template-rows: 1rem repeat(5, 1fr);
 }
 
-.hidden {
-  visibility: hidden;
+.main form.sign-in {
+  grid-template-rows: 1rem repeat(3, 1fr);
 }
 
-.main form .form-control p {
+.main form div p {
   margin-top: 5px;
-}
-
-.main form .form-control {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  text-align: center;
-}
-
-.main form .form-control input {
-  margin: 10px 0;
-  height: 2.8rem;
-  width: 80%;
-  border: none;
-  /* border-bottom: 1px solid var(--main-gray); */
-  padding-left: 15px;
-  color: var(--main-gray);
-  background-color: #f0f0f0;
-  border-radius: 30px;
-  font-size: 1rem;
-  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.2);
-}
-
-.main form .form-control input:focus {
-  outline: none;
-  /* border-bottom: 2px solid var(--active-blue); */
-  font-size: 1.2rem;
-  color: var(--active-blue);
-}
-
-.main form .form-control input:focus::placeholder {
-  color: var(--active-blue);
-  font-size: 1.2rem;
-}
-
-.main form button {
-  cursor: pointer;
-  width: 65%;
-  height: 2.7rem;
-  font-size: large;
-  font-weight: normal;
-  border-radius: 30px;
-  color: #fff;
-  /* text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2); */
-  border: none;
-  align-self: center;
-  background-color: var(--pastel-green);
-  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
-}
-
-.main form button:hover {
-  background-color: var(--pastel-green-hover);
-}
-
-.main form button:active {
-  transform: translateY(2px);
-  box-shadow: none;
 }
 
 .main a {
   margin-top: -15px;
   font-size: 1.2rem;
-  text-decoration: none;
   color: var(--active-blue);
 }
 
-@media (min-width: 690px) {
-  .main {
-    width: 552px; /* 80% de 690 */
-    margin: 0 auto;
+@media (min-width: 1280px) {
+  .main form {
+    width: 60%;
+  }
+}
+
+@media (min-width: 768px) {
+  .main form {
+    width: 614.4px;
   }
 }

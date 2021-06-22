@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { CLIENTS_URL } from "../../constants/paths";
 import { validateEmailInput } from "../../utils/inputUtils";
 import styles from "./forms.module.css";
+import baseStyles from "../../css/base.module.css";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import useHttp from "../../hooks/useHttp";
 
@@ -73,22 +74,22 @@ function SignUp() {
   }
 
   return (
-    <main className={styles.main}>
+    <main className={`${styles.main} ${baseStyles.container}`}>
       {registerIsLoading && <LoadingOverlay />}
       <h2>Cadastro</h2>
       <form onSubmit={submitHandler} className={styles["sign-up"]}>
         <p
-          className={`${styles["error-text"]} ${
-            registerError ? "" : styles.hidden
+          className={`${baseStyles["error-text"]} ${
+            registerError ? "" : baseStyles.hidden
           }`}
         >
           Não foi possível completar seu cadastro.
         </p>
 
-        <div className={styles["form-control"]}>
+        <div className={baseStyles["form-control"]}>
           <p
-            className={`${styles["error-text"]} ${
-              nameError ? "" : styles.hidden
+            className={`${baseStyles["error-text"]} ${
+              nameError ? "" : baseStyles.hidden
             }`}
           >
             Digite um nome
@@ -101,10 +102,10 @@ function SignUp() {
             required
           />
         </div>
-        <div className={styles["form-control"]}>
+        <div className={baseStyles["form-control"]}>
           <p
-            className={`${styles["error-text"]} ${
-              emailError ? "" : styles.hidden
+            className={`${baseStyles["error-text"]} ${
+              emailError ? "" : baseStyles.hidden
             }`}
           >
             Digite um email válido
@@ -117,10 +118,10 @@ function SignUp() {
             required
           />
         </div>
-        <div className={styles["form-control"]}>
+        <div className={baseStyles["form-control"]}>
           <p
-            className={`${styles["error-text"]} ${
-              passwordError ? "" : styles.hidden
+            className={`${baseStyles["error-text"]} ${
+              passwordError ? "" : baseStyles.hidden
             }`}
           >
             No mínimo 8 caracteres
@@ -133,10 +134,10 @@ function SignUp() {
             required
           />
         </div>
-        <div className={styles["form-control"]}>
+        <div className={baseStyles["form-control"]}>
           <p
-            className={`${styles["error-text"]} ${
-              confirmPasswordError ? "" : styles.hidden
+            className={`${baseStyles["error-text"]} ${
+              confirmPasswordError ? "" : baseStyles.hidden
             }`}
           >
             Suas senhas não batem
@@ -149,7 +150,9 @@ function SignUp() {
             required
           />
         </div>
-        <button type="submit">Cadastrar</button>
+        <button className={baseStyles.btn} type="submit">
+          Cadastrar
+        </button>
       </form>
       <Link to="/">Já possuo uma conta</Link>
     </main>

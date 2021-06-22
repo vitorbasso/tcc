@@ -7,20 +7,20 @@ import AuthContext from "./context/auth-context";
 import { useContext } from "react";
 
 function App() {
-  const authCtx = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
   return (
     <Switch>
-      {!authCtx.isLoggedIn && (
+      {!isLoggedIn && (
         <Route path="/" exact>
           <SignIn />
         </Route>
       )}
-      {!authCtx.isLoggedIn && (
+      {!isLoggedIn && (
         <Route path="/register">
           <SignUp />
         </Route>
       )}
-      {authCtx.isLoggedIn && (
+      {isLoggedIn && (
         <Route path="/" exact>
           <Home />
         </Route>

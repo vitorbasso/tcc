@@ -2,7 +2,7 @@
 
 :root {
   --pastel-green: #78bfaf;
-  --pastel-green-hover: #70b3a4;
+  --pastel-green-dark: #70b3a4;
   /* --active-blue: #0879a6; */
   --active-blue: #1f53c2;
   --main-gray: #484848;
@@ -25,6 +25,10 @@ p {
   user-select: none;
 }
 
+h2 {
+  font-size: 2rem;
+}
+
 body {
   height: 100vh;
   /* background-color: #ebeae6; */
@@ -34,4 +38,8 @@ body {
   font-family: "Lato", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
 }

@@ -1,11 +1,11 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import { CLIENTS_URL } from "../../constants/paths";
-import AuthContext from "../../context/auth-context";
 import useHttp from "../../hooks/useHttp";
+import Header from "../../components/header/Header";
+import baseStyles from "../../css/base.module.css";
 
 function Home() {
-  const authCtx = useContext(AuthContext);
   const { result, error, isLoading, sendRequest } = useHttp();
 
   useEffect(() => {
@@ -15,16 +15,18 @@ function Home() {
   }, []);
 
   return (
-    <div>
+    <>
       {isLoading && <LoadingOverlay />}
-      <p>Home Page</p>
       {!isLoading && result && (
-        <p>
-          id: {result.id} - Email: {result.email} - Nome: {result.name}
-        </p>
+        <div className={baseStyles.container}>
+          <Header logout>
+            <h3>Bem Vindo,</h3>
+            <h2>{result.name?.split(" ")?.[0]}</h2>
+          </Header>
+          <main></main>
+        </div>
       )}
-      <button onClick={authCtx.onLogout}>logout</button>
-    </div>
+    </>
   );
 }
 
