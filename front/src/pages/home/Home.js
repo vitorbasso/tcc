@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { CLIENTS_URL } from "../../constants/paths";
+import { CLIENTS_URL, WALLETS_URL } from "../../constants/paths";
 import useHttp from "../../hooks/useHttp";
 import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
@@ -15,34 +15,41 @@ function getFirstName(result) {
   return result ? result.name?.split(" ")?.[0] : "-";
 }
 
+function getBalance(result) {
+  return result ? result.balance + result.balanceDaytrade : 0;
+}
+
 function Home() {
-  const { result, isLoading, sendRequest } = useHttp();
+  const { result: resultName, sendRequest: sendRequestName } = useHttp();
+  const { result: resultWallet, sendRequest: sendRequestWallet } = useHttp();
 
   useEffect(() => {
-    sendRequest({
+    sendRequestName({
       url: CLIENTS_URL,
     });
-  }, [sendRequest]);
+  }, [sendRequestName]);
 
-  const firstName = getFirstName(result);
-  const money = 888_888.88;
+  useEffect(() => {
+    sendRequestWallet({
+      url: `${WALLETS_URL}/1`,
+    });
+  }, [sendRequestWallet]);
+
+  const firstName = getFirstName(resultName);
+  const money = getBalance(resultWallet);
   const moneyClass = getMoneyClass(money);
   return (
-    <>
-      {!isLoading && result && (
-        <div className={`${baseStyles.container} ${styles.container}`}>
-          <Header logout>
-            <h3>Bem Vindo,</h3>
-            <h2>{firstName}</h2>
-          </Header>
-          <main>
-            <section>
-              <Money className={styles[moneyClass]} value={money} />
-            </section>
-          </main>
-        </div>
-      )}
-    </>
+    <div className={`${baseStyles.container} ${styles.container}`}>
+      <Header logout>
+        <h3>Bem Vindo,</h3>
+        <h2>{firstName}</h2>
+      </Header>
+      <main>
+        <section>
+          <Money className={styles[moneyClass]} value={money} />
+        </section>
+      </main>
+    </div>
   );
 }
 
