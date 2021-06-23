@@ -1,7 +1,7 @@
 import { Link, useHistory } from "react-router-dom";
 import { useRef, useState } from "react";
 import { CLIENTS_URL } from "../../constants/paths";
-import { validateEmailInput } from "../../utils/inputUtils";
+import { validateEmailInput } from "../../utils/validationUtils";
 import styles from "./forms.module.css";
 import baseStyles from "../../css/base.module.css";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";

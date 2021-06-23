@@ -1,6 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { validateEmailInput } from "../../utils/inputUtils";
+import { validateEmailInput } from "../../utils/validationUtils";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import useHttp from "../../hooks/useHttp";
 import { AUTH_URL } from "../../constants/paths";

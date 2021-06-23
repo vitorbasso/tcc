@@ -3,6 +3,7 @@
   justify-content: space-between;
   align-items: center;
   text-transform: capitalize;
+  margin-bottom: 1.5rem;
 }
 
 .header div {

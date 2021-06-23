@@ -1,0 +1,28 @@
+.money {
+  font-size: 13.5vw;
+}
+
+.money-7 {
+  font-size: 8.5vw;
+}
+
+.money-10 {
+  font-size: 6.5vw;
+}
+
+.money > *:first-child,
+.money > *:last-child {
+  font-size: 1.8rem;
+}
+
+@media (min-width: 1024px) {
+  .money {
+    font-size: 138.24px;
+  }
+  .money-7 {
+    font-size: 87.04px;
+  }
+  .money-10 {
+    font-size: 66.56px;
+  }
+}
