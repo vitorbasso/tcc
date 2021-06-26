@@ -3,11 +3,8 @@ package com.vitorbasso.gerenciadorinvestimentos.service.concrete
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.MonthlyWallet
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestException
-import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
-import com.vitorbasso.gerenciadorinvestimentos.exception.CustomManagerException
 import com.vitorbasso.gerenciadorinvestimentos.repository.IMonthlyWalletRepository
 import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -17,13 +14,6 @@ internal class MonthlyWalletService(
 ) {
 
     fun getMonthlyWallets(clientId: Long) = this.monthlyWalletRepository.findAllByClientId(clientId)
-
-    fun getMonthlyWallet(
-        monthlyWalletId: Long,
-        clientId: Long,
-        exception: CustomManagerException = CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
-    ) = this.monthlyWalletRepository.findByIdOrNull(monthlyWalletId)?.takeIf { it.client.id == clientId }
-        ?: throw exception
 
     fun getMonthlyWalletByMonth(
         month: LocalDate,
@@ -36,7 +26,5 @@ internal class MonthlyWalletService(
     fun save(monthlyWallet: MonthlyWallet, clientId: Long) = if (monthlyWallet.client.id == clientId)
         this.monthlyWalletRepository.save(monthlyWallet)
     else throw CustomBadRequestException(ManagerErrorCode.MANAGER_05)
-
-    fun deleteMonthlyWallet(monthlyWallet: MonthlyWallet) = this.monthlyWalletRepository.delete(monthlyWallet)
 
 }

@@ -24,7 +24,7 @@ data class Asset(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")
-    val wallet: Wallet = Wallet(),
+    val wallet: Wallet = Wallet(Client()),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_ticker", referencedColumnName = "ticker")

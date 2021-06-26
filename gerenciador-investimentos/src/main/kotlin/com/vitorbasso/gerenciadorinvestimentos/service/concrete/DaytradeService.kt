@@ -2,44 +2,40 @@ package com.vitorbasso.gerenciadorinvestimentos.service.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
-import com.vitorbasso.gerenciadorinvestimentos.util.Util
-import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
-import java.time.LocalDate
 
 @Service
 internal object DaytradeService {
 
-    fun calculateDaytradeContribution(
-        month: LocalDate,
-        transactions: List<Transaction>
-    ): DaytradeContribution {
-        if (!isDaytradeMonth(month, transactions))
-            return DaytradeContribution()
+//    fun calculateDaytradeContribution(
+//        month: LocalDate,
+//        transactions: List<Transaction>
+//    ): DaytradeContribution {
+//        if (!isDaytradeMonth(month, transactions))
+//            return DaytradeContribution()
+//
+//        val (buyTransactions, sellTransactions) = transactions.partition {
+//            it.type == TransactionType.BUY
+//        }
+//        val buyValue = buyTransactions.fold(BigDecimal.ZERO) { total, transaction ->
+//            total + Util.getAverageCost(
+//                transaction.value,
+//                transaction.quantity
+//            ).multiply(BigDecimal(transaction.daytradeQuantity))
+//        }
+//        val sellValue = sellTransactions.fold(BigDecimal.ZERO) { total, transaction ->
+//            total + Util.getAverageCost(
+//                transaction.value,
+//                transaction.quantity
+//            ).multiply(BigDecimal(transaction.daytradeQuantity))
+//        }
+//        return DaytradeContribution(
+//            sellValue.subtract(buyValue),
+//            sellValue
+//        )
+//    }
 
-        val (buyTransactions, sellTransactions) = transactions.partition {
-            it.type == TransactionType.BUY
-        }
-        val buyValue = buyTransactions.fold(BigDecimal.ZERO) { total, transaction ->
-            total + Util.getAverageCost(
-                transaction.value,
-                transaction.quantity
-            ).multiply(BigDecimal(transaction.daytradeQuantity))
-        }
-        val sellValue = sellTransactions.fold(BigDecimal.ZERO) { total, transaction ->
-            total + Util.getAverageCost(
-                transaction.value,
-                transaction.quantity
-            ).multiply(BigDecimal(transaction.daytradeQuantity))
-        }
-        return DaytradeContribution(
-            sellValue.subtract(buyValue),
-            sellValue
-        )
-    }
-
-    fun processDaytrade(sameDayTransactions: List<Transaction>): List<Transaction> {
+    suspend fun processDaytrade(sameDayTransactions: List<Transaction>): List<Transaction> {
 
         val processedTransactions = mutableListOf<Transaction>()
 
@@ -98,16 +94,16 @@ internal object DaytradeService {
         it.type == TransactionType.BUY
     }).let { Pair(it.first.toMutableList(), it.second.toMutableList()) }
 
-    private fun isDaytradeMonth(
-        month: LocalDate,
-        daytradeTransactions: List<Transaction>
-    ) = month.isEqual(
-        daytradeTransactions.firstOrNull()?.transactionDate?.atStartOfMonth() ?: month.withDayOfMonth(2)
-    )
-
-    data class DaytradeContribution(
-        val balanceContribution: BigDecimal = BigDecimal.ZERO,
-        val withdrawnContribution: BigDecimal = BigDecimal.ZERO
-    )
+//    private fun isDaytradeMonth(
+//        month: LocalDate,
+//        daytradeTransactions: List<Transaction>
+//    ) = month.isEqual(
+//        daytradeTransactions.firstOrNull()?.transactionDate?.atStartOfMonth() ?: month.withDayOfMonth(2)
+//    )
+//
+//    data class DaytradeContribution(
+//        val balanceContribution: BigDecimal = BigDecimal.ZERO,
+//        val withdrawnContribution: BigDecimal = BigDecimal.ZERO
+//    )
 
 }

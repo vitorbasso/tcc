@@ -24,8 +24,6 @@ create table if not exists `tax_deductible` (
 
 create table if not exists `wallet`(
 	`id` bigint auto_increment,
-	`name` varchar(255) not null,
-    `broker` varchar(255) not null,
     `balance_daytrade` decimal(20,2) default 0,
     `balance` decimal(20,2) default 0,
     `withdrawn` decimal(20,2) default 0,
@@ -40,8 +38,6 @@ create table if not exists `wallet`(
 
 create table if not exists `monthly_wallet`(
 	`id` bigint auto_increment,
-	`name` varchar(255) not null,
-    `broker` varchar(255) not null,
     `balance_daytrade` decimal(20,2) default 0,
     `balance` decimal(20,2) default 0,
     `withdrawn` decimal(20,2) default 0,
@@ -98,6 +94,6 @@ create table if not exists `transaction`(
 )engine=InnoDB;
 
 CREATE INDEX `transaction_date` ON `transaction` (`transaction_date`);
-ALTER TABLE `transaction` ADD UNIQUE `unique_transactino` (`transaction_date`, `asset_id`);
+ALTER TABLE `transaction` ADD UNIQUE `unique_transaction` (`transaction_date`, `asset_id`);
 ALTER TABLE `monthly_wallet` ADD UNIQUE `unique_monthly_wallet` (`wallet_month`, `wallet_id`);
 ALTER TABLE `tax_deductible` ADD UNIQUE `unique_tax` (`client_id`, `month`);

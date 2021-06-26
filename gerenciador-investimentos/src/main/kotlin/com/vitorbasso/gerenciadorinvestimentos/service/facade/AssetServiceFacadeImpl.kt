@@ -36,7 +36,7 @@ internal class AssetServiceFacadeImpl(
     @Transactional
     override fun deleteAsset(walletId: Long, ticker: String) {
         val asset = this.assetService.getAsset(
-            wallet = this.walletService.getWallet(walletId = walletId) as Wallet,
+            wallet = this.walletService.getWallet() as Wallet,
             stock = this.stockService.getStock(ticker)
         )
         (context.getBean("accountingService", AccountingService::class) as AccountingService).accountFor(

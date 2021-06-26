@@ -3,6 +3,8 @@ package com.vitorbasso.gerenciadorinvestimentos.controller
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.ClientRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.ClientUpdateRequest
 import com.vitorbasso.gerenciadorinvestimentos.service.IClientService
+import com.vitorbasso.gerenciadorinvestimentos.service.IMonthlyWalletService
+import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -19,7 +21,9 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/\${api-version}/clients")
 class ClientController(
-    val clientService: IClientService
+    val clientService: IClientService,
+    val walletService: IWalletService,
+    val monthlyWalletService: IMonthlyWalletService
 ) {
 
     @GetMapping
@@ -37,5 +41,11 @@ class ClientController(
     fun deleteClient() {
         this.clientService.deleteClient()
     }
+
+    @GetMapping("/wallet")
+    fun getWallet() = this.walletService.getWallet()
+
+    @GetMapping("/monthly-wallets")
+    fun getMonthlyWallets() = this.monthlyWalletService.getMonthlyWallets()
 
 }

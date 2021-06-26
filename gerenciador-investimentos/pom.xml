@@ -31,7 +31,7 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <kotlin.version>1.4.10</kotlin.version>
+        <kotlin.version>1.5.20</kotlin.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
         <mockk.version>1.10.4</mockk.version>
         <detekt-maven-plugin.version>1.15.0.1</detekt-maven-plugin.version>
@@ -47,6 +47,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -64,6 +65,11 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
         </dependency>
 
         <!-- security related dependencies -->

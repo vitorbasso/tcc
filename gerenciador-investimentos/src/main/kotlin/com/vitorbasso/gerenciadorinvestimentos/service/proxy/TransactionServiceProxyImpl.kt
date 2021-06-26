@@ -17,8 +17,8 @@ class TransactionServiceProxyImpl(
     private val transactionService: ITransactionService
 ) : ITransactionService {
 
-    override fun performTransaction(transactionRequest: TransactionRequest) =
-        this.transactionService.performTransaction(transactionRequest).getDto()
+    override fun performTransaction(transactionsRequest: List<TransactionRequest>) =
+        this.transactionService.performTransaction(transactionsRequest).map { it.getDto() }
 
     override fun deleteTransaction(transactionId: Long) = this.transactionService.deleteTransaction(transactionId)
 
