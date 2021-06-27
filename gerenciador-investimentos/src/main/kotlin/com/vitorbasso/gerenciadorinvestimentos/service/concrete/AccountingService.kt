@@ -13,7 +13,7 @@ internal class AccountingService {
     fun accountForAddedTransactions(
         newTransactions: List<Transaction>,
         existingTransactions: List<Transaction>
-    ): Map<Long, List<Transaction>> {
+    ): List<Transaction> {
 
         val newTransactionsByAsset = newTransactions.mapByAsset()
         val existingTransactionsByAsset = existingTransactions.mapByAsset()
@@ -32,8 +32,8 @@ internal class AccountingService {
                         .groupByDate()
                         .parallelMap { DaytradeService.processDaytrade(it) }.flatten()
 
-                asset to processedTransactionsForDaytrade
-            }.toMap()
+                processedTransactionsForDaytrade
+            }.flatten()
         }
     }
 

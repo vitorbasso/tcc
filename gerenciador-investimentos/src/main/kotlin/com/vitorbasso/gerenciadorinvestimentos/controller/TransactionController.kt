@@ -18,11 +18,15 @@ class TransactionController(
 ) {
 
     @PostMapping
-    fun saveTransactions(@RequestBody transactionsRequest: List<TransactionRequest>) =
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun saveTransactions(@RequestBody transactionsRequest: List<TransactionRequest>) {
         this.transactionService.performTransaction(transactionsRequest)
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteTransaction(@PathVariable id: Long) = this.transactionService.deleteTransaction(id)
+    fun deleteTransaction(@PathVariable id: Long) {
+        this.transactionService.deleteTransaction(id)
+    }
 
 }

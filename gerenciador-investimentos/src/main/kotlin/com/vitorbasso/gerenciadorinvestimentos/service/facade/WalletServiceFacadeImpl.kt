@@ -12,8 +12,8 @@ internal class WalletServiceFacadeImpl(
     private val walletService: WalletService
 ) : IWalletService {
 
-    override fun getWallet() =
-        this.walletService.getWallet(SecurityContextUtil.getClientDetails(), LocalDate.now().atStartOfMonth())
+    override fun getWallet(month: LocalDate) =
+        this.walletService.getWallet(SecurityContextUtil.getClientDetails(), month.atStartOfMonth())
 
     override fun getAllWallets() = this.walletService.getAllWallets(SecurityContextUtil.getClientDetails())
 

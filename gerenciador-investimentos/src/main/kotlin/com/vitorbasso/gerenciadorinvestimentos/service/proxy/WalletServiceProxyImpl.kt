@@ -11,6 +11,7 @@ import com.vitorbasso.gerenciadorinvestimentos.util.setScale
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 @Primary
@@ -19,7 +20,7 @@ class WalletServiceProxyImpl(
     private val walletService: IWalletService
 ) : IWalletService {
 
-    override fun getWallet() = this.walletService.getWallet().getDto()
+    override fun getWallet(month: LocalDate) = this.walletService.getWallet(month).getDto()
 
     override fun getAllWallets() = this.walletService.getAllWallets().map { it.getDto() }
 

@@ -16,10 +16,10 @@ internal class WalletService(
     fun getWallet(
         client: Client,
         month: LocalDate
-    ) = this.walletRepository.findByClientAndWalletMonth(client, checkDate(month)) ?: Wallet(
+    ) = this.walletRepository.findByClientAndWalletMonth(client, checkDate(month)) ?: (Wallet(
         walletMonth = month,
         client = client
-    ).let { this.walletRepository.save(it) }
+    ).let { this.walletRepository.save(it) })
 
     fun getAllWallets(client: Client) = this.walletRepository.findAllByClient(client)
 

@@ -1,7 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Stock
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.IStockService
@@ -21,17 +20,21 @@ internal class AssetServiceFacadeImpl(
     private val context: ApplicationContext
 ) : IAssetService {
 
-    override fun getAsset(wallet: Wallet, stock: Stock) =
-        this.assetService.getAssetNullable(wallet, stock) ?: Asset(
+    override fun getAsset(wallet: Wallet, ticker: String) =
+        this.assetService.getAssetNullable(wallet, ticker) ?: Asset(
             wallet = wallet,
-            stock = stock
+            stock = this.stockService.getStock(ticker)
         ).let { this.assetService.saveAsset(it) }
+
+    fun reproccessAsset(wallet: Wallet, ticker: String) {
+        this.assetService.getAsset(wallet, ticker)
+    }
 
     @Transactional
     override fun deleteAsset(walletId: Long, ticker: String) {
         val asset = this.assetService.getAsset(
             wallet = this.walletService.getWallet() as Wallet,
-            stock = this.stockService.getStock(ticker)
+            ticker = ticker
         )
 //        (context.getBean("accountingService", AccountingService::class) as AccountingService).accountFor(
 //            transaction = Transaction(asset = asset),
