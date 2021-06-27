@@ -34,6 +34,8 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
         ticker: String
     ): List<Transaction>
 
+    fun findAllByAssetWalletClientAndAssetStockTicker(client: Client, ticker: String): List<Transaction>
+
     fun existsByAssetAndTransactionDate(asset: Asset, transactionDate: LocalDateTime): Boolean
 
 }

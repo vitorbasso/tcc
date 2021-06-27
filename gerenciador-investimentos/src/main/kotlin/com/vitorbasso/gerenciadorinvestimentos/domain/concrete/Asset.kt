@@ -22,6 +22,8 @@ data class Asset(
     val amount: Int = 0,
     val balance: BigDecimal = BigDecimal.ZERO,
     val daytradeBalance: BigDecimal = BigDecimal.ZERO,
+    val withdrawn: BigDecimal = BigDecimal.ZERO,
+    val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")

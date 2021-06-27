@@ -56,6 +56,8 @@ create table if not exists `asset`(
     `amount` int not null default 0,
     `balance` decimal(20, 2) not null default 0,
     `daytrade_balance` decimal(20, 2) not null default 0,
+    `withdrawn` decimal(20,2) default 0,
+    `withdrawn_daytrade` decimal(20,2) default 0,
     `date_created` timestamp not null default NOW(),
     `date_updated` timestamp default NOW(),
     primary key (`id`),

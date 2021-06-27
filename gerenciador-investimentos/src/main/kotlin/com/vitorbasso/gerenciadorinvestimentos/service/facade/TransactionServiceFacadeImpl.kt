@@ -12,6 +12,7 @@ import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
+import com.vitorbasso.gerenciadorinvestimentos.service.concrete.mapByAsset
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import com.vitorbasso.gerenciadorinvestimentos.util.parallelMap
@@ -28,7 +29,7 @@ import java.time.LocalDateTime
 internal class TransactionServiceFacadeImpl(
     private val transactionService: TransactionService,
     private val stockService: IStockService,
-    private val assetService: IAssetService,
+    private val assetService: AssetServiceFacadeImpl,
     @Qualifier("walletServiceFacadeImpl")
     private val walletService: IWalletService,
     private val accountingService: AccountingService
@@ -66,7 +67,15 @@ internal class TransactionServiceFacadeImpl(
             staleTransactions
         )
 
-        this.transactionService.saveAll(newAndUpdatedTransactions)
+        val savedTransactions = this.transactionService.saveAll(newAndUpdatedTransactions.values.flatten())
+        val savedTransactionsIdSet = savedTransactions.map { it.id }.toSet()
+        val allTransactions =
+            savedTransactions.plus(staleTransactions.filterNot { savedTransactionsIdSet.contains(it.id) }).mapByAsset()
+        runBlocking(Dispatchers.IO) {
+            allTransactions.entries.parallelMap { (ticker, transactions) ->
+                assetService.reprocessAsset(client, ticker, transactions)
+            }
+        }
     }
 
     private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
