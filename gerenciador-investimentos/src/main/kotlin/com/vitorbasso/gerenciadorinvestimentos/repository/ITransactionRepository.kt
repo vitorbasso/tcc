@@ -1,6 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.repository
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Client
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -27,6 +28,11 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
     fun findAllFromTransactionBeforeTransactionDate(assetId: Long, transactionDate: LocalDateTime): List<Transaction>
 
     fun findAllByAssetOrderByTransactionDate(asset: Asset): List<Transaction>
+
+    fun findAllByAssetWalletClientAndAssetStockTickerOrderByTransactionDate(
+        client: Client,
+        ticker: String
+    ): List<Transaction>
 
     fun existsByAssetAndTransactionDate(asset: Asset, transactionDate: LocalDateTime): Boolean
 

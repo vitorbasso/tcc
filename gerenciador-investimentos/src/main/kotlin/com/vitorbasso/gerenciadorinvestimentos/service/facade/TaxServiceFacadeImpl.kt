@@ -4,7 +4,6 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.ITaxable
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.TaxDeductible
 import com.vitorbasso.gerenciadorinvestimentos.dto.request.TaxDeductibleRequest
 import com.vitorbasso.gerenciadorinvestimentos.service.IClientService
-import com.vitorbasso.gerenciadorinvestimentos.service.IMonthlyWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITaxService
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TaxService
@@ -19,8 +18,6 @@ internal class TaxServiceFacadeImpl(
     private val taxService: TaxService,
     @Qualifier("walletServiceFacadeImpl")
     private val walletService: IWalletService,
-    @Qualifier("monthlyWalletServiceFacadeImpl")
-    private val monthlyWalletService: IMonthlyWalletService,
     @Qualifier("clientServiceFacadeImpl")
     private val clientService: IClientService
 ) : ITaxService {
@@ -43,8 +40,7 @@ internal class TaxServiceFacadeImpl(
             ?: TaxDeductible(client = SecurityContextUtil.getClientDetails())
 
     private fun getTaxables(month: LocalDate) = (
-        (listOf(this.walletService.getWallet()) +
-            this.monthlyWalletService.getMonthlyWallets()
+        (listOf(this.walletService.getAllWallets())
         ) as List<ITaxable>).filter { it.walletMonth.isBefore(month.withDayOfMonth(2)) }
 
 }

@@ -21,6 +21,8 @@ class WalletServiceProxyImpl(
 
     override fun getWallet() = this.walletService.getWallet().getDto()
 
+    override fun getAllWallets() = this.walletService.getAllWallets().map { it.getDto() }
+
 }
 
 private fun IWallet.getDto() = WalletDto(
@@ -38,5 +40,5 @@ private fun IAsset.getDto() = AssetDto(
     stockSymbol = this.stock.ticker,
     averageCost = this.averageCost.setScale(),
     amount = this.amount,
-    lifetimeBalance = this.lifetimeBalance.setScale()
+    balance = this.balance
 )

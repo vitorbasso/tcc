@@ -1,6 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Client
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
@@ -30,6 +31,9 @@ internal class TransactionService(
             ?: findAllByAsset(asset = transaction.asset)
 
     fun findAllByAsset(asset: Asset) = this.transactionRepository.findAllByAssetOrderByTransactionDate(asset)
+
+    fun findAllByTicker(client: Client, ticker: String) =
+        this.transactionRepository.findAllByAssetWalletClientAndAssetStockTickerOrderByTransactionDate(client, ticker)
 
     fun deleteTransaction(transaction: Transaction) = this.transactionRepository.delete(transaction)
 

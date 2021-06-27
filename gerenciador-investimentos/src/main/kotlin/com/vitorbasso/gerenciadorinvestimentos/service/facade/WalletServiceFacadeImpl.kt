@@ -1,10 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
-import com.vitorbasso.gerenciadorinvestimentos.service.IAccountingServiceSubscriber
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
@@ -13,33 +9,12 @@ import java.time.LocalDate
 
 @Service
 internal class WalletServiceFacadeImpl(
-    private val walletService: WalletService,
-    private val monthlyWalletService: MonthlyWalletServiceFacadeImpl
-) : IWalletService, IAccountingServiceSubscriber {
+    private val walletService: WalletService
+) : IWalletService {
 
     override fun getWallet() =
-        this.walletService.getWallet(SecurityContextUtil.getClientDetails().id).validate()
+        this.walletService.getWallet(SecurityContextUtil.getClientDetails(), LocalDate.now().atStartOfMonth())
 
-    override fun processAccountantReport(
-        transaction: Transaction,
-        accountantReport: AccountingService.AccountantReport
-    ): AccountingService.AccountantReport {
-        transaction.asset.wallet.validate(transaction.transactionDate.atStartOfMonth()).let { walletValidated ->
-            accountantReport.walletsReport.forEach {
-                this.walletService.processWalletReport(
-                    wallet = walletValidated,
-                    walletReport = it.value,
-                    reportMonth = it.key,
-                    monthlyWalletService = monthlyWalletService
-                )
-            }
-        }
-        return accountantReport
-    }
-
-    private fun Wallet.validate(month: LocalDate? = null) =
-        this.takeIf { isValid(it) } ?: walletService.enforceWalletMonth(this, month ?: LocalDate.now().atStartOfMonth())
-
-    private fun isValid(wallet: Wallet) = wallet.walletMonth.atStartOfMonth() == LocalDate.now().atStartOfMonth()
+    override fun getAllWallets() = this.walletService.getAllWallets(SecurityContextUtil.getClientDetails())
 
 }

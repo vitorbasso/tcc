@@ -12,23 +12,24 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
-import javax.persistence.OneToOne
 
 @Entity
 data class Wallet(
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", referencedColumnName = "id")
-    val client: Client,
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
+
     override val balanceDaytrade: BigDecimal = BigDecimal.ZERO,
     override val balance: BigDecimal = BigDecimal.ZERO,
     override val withdrawn: BigDecimal = BigDecimal.ZERO,
     override val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
     override val walletMonth: LocalDate = LocalDate.now().atStartOfMonth(),
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", referencedColumnName = "id")
+    val client: Client = Client(),
 
     @OneToMany(mappedBy = "wallet")
     val asset: List<Asset> = listOf()

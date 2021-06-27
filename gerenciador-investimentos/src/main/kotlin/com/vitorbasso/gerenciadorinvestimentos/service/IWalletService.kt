@@ -6,4 +6,6 @@ interface IWalletService {
 
     fun getWallet(): IWallet
 
+    fun getAllWallets(): List<IWallet>
+
 }

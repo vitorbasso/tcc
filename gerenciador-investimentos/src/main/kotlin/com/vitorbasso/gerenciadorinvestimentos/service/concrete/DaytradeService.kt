@@ -7,34 +7,6 @@ import org.springframework.stereotype.Service
 @Service
 internal object DaytradeService {
 
-//    fun calculateDaytradeContribution(
-//        month: LocalDate,
-//        transactions: List<Transaction>
-//    ): DaytradeContribution {
-//        if (!isDaytradeMonth(month, transactions))
-//            return DaytradeContribution()
-//
-//        val (buyTransactions, sellTransactions) = transactions.partition {
-//            it.type == TransactionType.BUY
-//        }
-//        val buyValue = buyTransactions.fold(BigDecimal.ZERO) { total, transaction ->
-//            total + Util.getAverageCost(
-//                transaction.value,
-//                transaction.quantity
-//            ).multiply(BigDecimal(transaction.daytradeQuantity))
-//        }
-//        val sellValue = sellTransactions.fold(BigDecimal.ZERO) { total, transaction ->
-//            total + Util.getAverageCost(
-//                transaction.value,
-//                transaction.quantity
-//            ).multiply(BigDecimal(transaction.daytradeQuantity))
-//        }
-//        return DaytradeContribution(
-//            sellValue.subtract(buyValue),
-//            sellValue
-//        )
-//    }
-
     suspend fun processDaytrade(sameDayTransactions: List<Transaction>): List<Transaction> {
 
         val processedTransactions = mutableListOf<Transaction>()
@@ -93,17 +65,5 @@ internal object DaytradeService {
     }.partition {
         it.type == TransactionType.BUY
     }).let { Pair(it.first.toMutableList(), it.second.toMutableList()) }
-
-//    private fun isDaytradeMonth(
-//        month: LocalDate,
-//        daytradeTransactions: List<Transaction>
-//    ) = month.isEqual(
-//        daytradeTransactions.firstOrNull()?.transactionDate?.atStartOfMonth() ?: month.withDayOfMonth(2)
-//    )
-//
-//    data class DaytradeContribution(
-//        val balanceContribution: BigDecimal = BigDecimal.ZERO,
-//        val withdrawnContribution: BigDecimal = BigDecimal.ZERO
-//    )
 
 }

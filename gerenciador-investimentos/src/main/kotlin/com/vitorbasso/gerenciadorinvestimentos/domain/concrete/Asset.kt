@@ -20,11 +20,12 @@ data class Asset(
     val id: Long = -1,
     val averageCost: BigDecimal = BigDecimal.ZERO,
     val amount: Int = 0,
-    val lifetimeBalance: BigDecimal = BigDecimal.ZERO,
+    val balance: BigDecimal = BigDecimal.ZERO,
+    val daytradeBalance: BigDecimal = BigDecimal.ZERO,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")
-    val wallet: Wallet = Wallet(Client()),
+    val wallet: Wallet = Wallet(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_ticker", referencedColumnName = "ticker")

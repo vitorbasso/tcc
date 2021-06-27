@@ -11,9 +11,12 @@ import com.vitorbasso.gerenciadorinvestimentos.service.IAssetService
 import com.vitorbasso.gerenciadorinvestimentos.service.IStockService
 import com.vitorbasso.gerenciadorinvestimentos.service.ITransactionService
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
-import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingService2
+import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TransactionService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
+import com.vitorbasso.gerenciadorinvestimentos.util.parallelMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,12 +31,12 @@ internal class TransactionServiceFacadeImpl(
     private val assetService: IAssetService,
     @Qualifier("walletServiceFacadeImpl")
     private val walletService: IWalletService,
-    private val accountingService: AccountingService2
+    private val accountingService: AccountingService
 ) : ITransactionService {
 
     @Transactional
     override fun performTransaction(transactionsRequest: List<TransactionRequest>) =
-        processTransaction(transactionsRequest.map { it.getTransaction() })
+        processTransaction(transactionsRequest)
 
     @Transactional
     override fun deleteTransaction(transactionId: Long) {
@@ -48,16 +51,22 @@ internal class TransactionServiceFacadeImpl(
         this.transactionService.deleteTransaction(transactionToDelete)
     }
 
-    private fun processTransaction(transactions: List<Transaction>): List<Transaction> {
-        if(transactions.isEmpty()) throw CustomBadRequestException(ManagerErrorCode.MANAGER_12)
-        val staleTransactions = this.transactionService.findAllByAsset(transactions.first().asset)
-        val newTransactions = this.transactionService.saveAll(transactions)
+    private fun processTransaction(transactions: List<TransactionRequest>): List<Transaction> {
+        if (transactions.isEmpty()) throw CustomBadRequestException(ManagerErrorCode.MANAGER_12)
+        val newTransactionsTicker = transactions.map { it.ticker }.toSet()
+        val client = SecurityContextUtil.getClientDetails()
+        val staleTransactions = runBlocking(Dispatchers.IO) {
+            newTransactionsTicker.parallelMap { ticker ->
+                transactionService.findAllByTicker(client, ticker)
+            }.flatten()
+        }
+        val newTransactions = this.transactionService.saveAll(transactions.map { it.getTransaction() })
         val accountantReport = accountingService.accountForAddedTransactions(
             newTransactions,
             staleTransactions
         )
 
-        return this.transactionService.saveAll(accountantReport)
+        return this.transactionService.saveAll(accountantReport.values.flatten())
     }
 
     private fun checkDate(dateToCheck: LocalDateTime, asset: Asset) = dateToCheck.takeIf {

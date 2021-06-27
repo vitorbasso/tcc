@@ -1,5 +1,8 @@
 package com.vitorbasso.gerenciadorinvestimentos.util
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -22,3 +25,7 @@ fun LocalDateTime.atStartOfMonth(): LocalDate = this.toLocalDate().atStartOfMont
 fun LocalDate.atStartOfMonth(): LocalDate = this.withDayOfMonth(1)
 
 fun LocalDateTime.atStartOfDay(): LocalDateTime = this.withHour(0).withMinute(0).withSecond(0).withNano(0)
+
+suspend fun <A, B> Iterable<A>.parallelMap(f: suspend (A) -> B): List<B> = coroutineScope {
+    map { async { f(it) } }.awaitAll()
+}

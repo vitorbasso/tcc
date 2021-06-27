@@ -9,7 +9,7 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.OneToOne
+import javax.persistence.OneToMany
 
 @Entity
 data class Client(
@@ -22,12 +22,12 @@ data class Client(
 
     private val password: String = "",
 
-    val name: String = ""
+    val name: String = "",
+
+    @OneToMany(mappedBy = "client", cascade = [CascadeType.ALL])
+    val wallets: List<Wallet> = listOf()
 
 ) : BaseEntity(), IClient, UserDetails {
-
-    @OneToOne(mappedBy = "client", cascade = [CascadeType.ALL])
-    val wallet: Wallet = Wallet(this)
 
     override fun getUsername() = this.email
 
