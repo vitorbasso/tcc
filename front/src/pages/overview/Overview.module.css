@@ -1,0 +1,84 @@
+.section__pie-chart {
+  --pie-dimension: 65vw;
+  display: grid;
+  grid-template-rows: 3fr 0.8fr;
+  row-gap: 1rem;
+  justify-items: center;
+  align-content: center;
+  margin-bottom: 3rem;
+}
+
+.section__assets {
+  margin: 0 auto;
+}
+
+.pie-chart__pie-chart {
+  width: var(--pie-dimension);
+  height: var(--pie-dimension);
+  margin-bottom: 1rem;
+}
+
+.pie-chart__selected-legend {
+  width: var(--pie-dimension);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pie-chart__selected-info {
+  display: flex;
+  flex-direction: column;
+  width: var(--pie-dimension);
+  justify-content: space-around;
+}
+
+.pie-chart__selected-info div {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (min-width: 615px) {
+  .section__pie-chart {
+    --pie-dimension: calc(615px * 0.65);
+  }
+
+  .section__assets {
+    width: calc(615px * 0.8);
+  }
+}
+
+@media (min-width: 1280px) {
+  .section__pie-chart {
+    width: 800px;
+    margin: 5rem auto 0;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 5fr 0.5fr;
+  }
+  .pie-chart__selected-info {
+    justify-self: flex-start;
+    justify-content: center;
+    width: 250px;
+  }
+  .pie-chart__selected-legend {
+    width: 250px;
+    display: flex;
+  }
+  .pie-chart__selected-info > div {
+    margin-top: 1rem;
+  }
+
+  .asset-table {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .asset-table table {
+    width: 500px;
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+
+  .section__assets {
+    width: 100%;
+  }
+}

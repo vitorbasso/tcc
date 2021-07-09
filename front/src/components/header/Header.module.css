@@ -1,0 +1,20 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-transform: capitalize;
+  margin-bottom: 1.5rem;
+}
+
+.header div {
+  min-width: 28px;
+}
+
+.header i {
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.header i svg {
+  display: block;
+}

@@ -1,0 +1,26 @@
+name: "FRONT: Gerenciador de Investimentos PULL REQUEST"
+
+on:
+  pull_request:
+    branches: [develop, release, master]
+    paths: ['front/**']
+
+jobs:
+  pr-verification:
+    name: PR Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./front
+      - name: build
+        working-directory: ./front
+        run: npm run build

@@ -32,18 +32,12 @@ class ClientServiceProxyImpl(
 
 private fun IClient.getDto() = ClientDto(
     id = (this as Client).id,
-    firstName = this.firstName,
-    lastName = this.lastName,
-    email = this.email,
-    cpf = this.cpf,
-    avatarImage = this.avatarImage
+    name = this.name,
+    email = this.email
 )
 
 private fun IClient.getEntity() = Client(
-    cpf = (this as ClientRequest).cpf,
-    email = this.email,
-    password = this.password,
-    firstName = this.firstName,
-    lastName = this.lastName,
-    avatarImage = this.avatarImage
+    email = (this as ClientRequest).email,
+    name = this.name,
+    password = this.password
 )

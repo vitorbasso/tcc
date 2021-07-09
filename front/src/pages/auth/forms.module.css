@@ -1,0 +1,43 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.main form {
+  width: 100%;
+  margin-top: 2rem;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+}
+
+.main form.sign-up {
+  grid-template-rows: 1rem repeat(5, 1fr);
+}
+
+.main form.sign-in {
+  grid-template-rows: 1rem repeat(3, 1fr);
+}
+
+.main form div p {
+  margin-top: 5px;
+}
+
+.main a {
+  margin-top: -15px;
+  font-size: 1.2rem;
+  color: var(--active-blue);
+}
+
+@media (min-width: 1280px) {
+  .main form {
+    width: 60%;
+  }
+}
+
+@media (min-width: 768px) {
+  .main form {
+    width: 614.4px;
+  }
+}
