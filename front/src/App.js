@@ -5,6 +5,8 @@ import SignIn from "./pages/auth/SignIn";
 import Home from "./pages/home/Home";
 import AuthContext from "./context/auth-context";
 import { useContext } from "react";
+import Overview from "./pages/overview/Overview";
+import NotFound from "./pages/not-found/NotFound";
 
 function App() {
   const { isLoggedIn } = useContext(AuthContext);
@@ -25,8 +27,13 @@ function App() {
           <Home />
         </Route>
       )}
+      {isLoggedIn && (
+        <Route path="/overview" exact>
+          <Overview />
+        </Route>
+      )}
       <Route path="*">
-        <h2>Not Found</h2>
+        <NotFound />
       </Route>
     </Switch>
   );

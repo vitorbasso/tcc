@@ -1,0 +1,25 @@
+.top-tickets {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+p {
+  margin: 0;
+}
+
+.value-change {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: start;
+}
+
+.red {
+  color: #ea526f;
+}
+
+.green {
+  color: #57cc99;
+}

@@ -1,0 +1,10 @@
+.main p {
+  font-size: 1.3rem;
+  margin: 5rem auto 0;
+  text-align: center;
+}
+
+.main button {
+  margin: 5rem auto 0;
+  width: 100%;
+}

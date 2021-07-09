@@ -1,7 +1,7 @@
 .container {
   margin: 0 auto;
   width: 80%;
-  padding: 10vh 0;
+  padding: 10vh 0 0;
   color: var(--main-gray);
 }
 

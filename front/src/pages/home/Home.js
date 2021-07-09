@@ -5,6 +5,8 @@ import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
 import Money from "../../components/money/Money";
 import styles from "./Home.module.css";
+import AtAGlance from "../../components/atAGlance/AtAGlance";
+import Navigation from "../../components/navigation/Navigation";
 
 function getMoneyClass(money) {
   const moneyLength = ("" + money).split(".")[0].length;
@@ -32,6 +34,7 @@ function Home() {
   useEffect(() => {
     sendRequestWallet({
       url: `${WALLETS_URL}/1`,
+      method: "GET",
     });
   }, [sendRequestWallet]);
 
@@ -45,8 +48,14 @@ function Home() {
         <h2>{firstName}</h2>
       </Header>
       <main>
-        <section>
+        <section className={styles.section}>
           <Money className={styles[moneyClass]} value={money} />
+        </section>
+        <section>
+          <AtAGlance />
+        </section>
+        <section>
+          <Navigation />
         </section>
       </main>
     </div>

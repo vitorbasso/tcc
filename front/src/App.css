@@ -35,6 +35,8 @@ body {
   /* background-color: #e8e5d5; */
   /* background-color: #faf4d4; */
   background: linear-gradient(0deg, #faf4d4, #ebeae6);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   font-family: "Lato", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
