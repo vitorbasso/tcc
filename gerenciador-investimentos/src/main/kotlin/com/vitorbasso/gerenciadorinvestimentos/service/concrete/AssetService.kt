@@ -1,7 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Stock
+import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Client
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomEntityNotFoundException
@@ -14,10 +14,14 @@ internal class AssetService(
     private val assetRepository: IAssetRepository
 ) {
 
-    fun getAsset(wallet: Wallet, stock: Stock) = this.assetRepository.findByWalletAndStock(wallet, stock)
+    fun getAsset(wallet: Wallet, ticker: String) = this.assetRepository.findByWalletAndStockTicker(wallet, ticker)
         ?: throw CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
 
-    fun getAssetNullable(wallet: Wallet, stock: Stock) = this.assetRepository.findByWalletAndStock(wallet, stock)
+    fun getAssetNullable(wallet: Wallet, ticker: String) =
+        this.assetRepository.findByWalletAndStockTicker(wallet, ticker)
+
+    fun findAllByClientAndTicker(client: Client, ticker: String) =
+        this.assetRepository.findAllByWalletClientAndStockTicker(client, ticker)
 
     fun deleteAsset(asset: Asset) = this.assetRepository.delete(asset)
 

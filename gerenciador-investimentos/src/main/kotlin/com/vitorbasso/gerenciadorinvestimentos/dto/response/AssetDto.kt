@@ -8,5 +8,5 @@ data class AssetDto(
     val stockSymbol: String,
     val averageCost: BigDecimal,
     val amount: Int,
-    val lifetimeBalance: BigDecimal
+    val balance: BigDecimal
 ) : IAsset

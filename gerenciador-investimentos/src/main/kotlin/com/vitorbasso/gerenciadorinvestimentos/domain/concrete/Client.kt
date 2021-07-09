@@ -25,7 +25,7 @@ data class Client(
     val name: String = "",
 
     @OneToMany(mappedBy = "client", cascade = [CascadeType.ALL])
-    val wallet: List<Wallet> = listOf()
+    val wallets: List<Wallet> = listOf()
 
 ) : BaseEntity(), IClient, UserDetails {
 

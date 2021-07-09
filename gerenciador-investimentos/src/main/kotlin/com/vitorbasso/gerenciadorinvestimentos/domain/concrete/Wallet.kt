@@ -20,8 +20,7 @@ data class Wallet(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-    val name: String = "",
-    val broker: String = "",
+
     override val balanceDaytrade: BigDecimal = BigDecimal.ZERO,
     override val balance: BigDecimal = BigDecimal.ZERO,
     override val withdrawn: BigDecimal = BigDecimal.ZERO,

@@ -28,10 +28,6 @@ data class Transaction(
 
     val transactionDate: LocalDateTime = LocalDateTime.now(),
 
-    val checkingValue: BigDecimal = BigDecimal.ZERO,
-
-    val checkingQuantity: Int = 0,
-
     val daytradeQuantity: Int = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)

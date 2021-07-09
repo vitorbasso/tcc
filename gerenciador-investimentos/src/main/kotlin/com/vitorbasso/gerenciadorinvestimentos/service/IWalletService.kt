@@ -1,18 +1,13 @@
 package com.vitorbasso.gerenciadorinvestimentos.service
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.IWallet
-import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletUpdateRequest
+import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
+import java.time.LocalDate
 
 interface IWalletService {
 
-    fun getWalletCollection(): List<IWallet>
+    fun getWallet(month: LocalDate = LocalDate.now().atStartOfMonth()): IWallet
 
-    fun getWallet(walletId: Long): IWallet
-
-    fun saveWallet(walletToSave: IWallet): IWallet
-
-    fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest): IWallet
-
-    fun deleteWallet(walletId: Long)
+    fun getAllWallets(): List<IWallet>
 
 }
