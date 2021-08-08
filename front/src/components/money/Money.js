@@ -7,11 +7,13 @@ function Money(props) {
   const value = valueParts.slice(2, -2).map((item) => item.value);
   const cents = valueParts.slice(-2).map((item) => item.value);
   return (
-    <span className={`${styles["money-font"]} ${props.className}`}>
-      <span>{currency}</span>
-      <span>{value}</span>
-      <span>{cents}</span>
-    </span>
+    <div className={`${styles.money} ${props.className}`}>
+      <span>
+        <span>{currency}</span>
+        <span>{value}</span>
+        <span>{cents}</span>
+      </span>
+    </div>
   );
 }
 

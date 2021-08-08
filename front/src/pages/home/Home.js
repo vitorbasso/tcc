@@ -7,11 +7,7 @@ import Money from "../../components/money/Money";
 import styles from "./Home.module.css";
 import AtAGlance from "../../components/atAGlance/AtAGlance";
 import Navigation from "../../components/navigation/Navigation";
-
-function getMoneyClass(money) {
-  const moneyLength = ("" + money).split(".")[0].length;
-  return moneyLength < 7 ? "money" : moneyLength < 10 ? "money-7" : "money-10";
-}
+import { getMoneyClass } from "../../utils/cssUtils";
 
 function getFirstName(result) {
   return result ? result.name?.split(" ")?.[0] : "-";
@@ -49,7 +45,7 @@ function Home() {
       </Header>
       <main>
         <section className={styles.section}>
-          <Money className={styles[moneyClass]} value={money} />
+          <Money className={baseStyles[moneyClass]} value={money} />
         </section>
         <section>
           <AtAGlance />

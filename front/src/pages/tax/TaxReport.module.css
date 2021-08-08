@@ -1,0 +1,51 @@
+.money {
+  text-align: start;
+}
+
+.inline-money {
+  display: inline;
+  font-size: 1.2rem;
+}
+
+.glance {
+  margin: 1rem 0;
+  text-transform: capitalize;
+}
+
+.glance h3 {
+  margin-bottom: 1em;
+}
+
+.overview {
+  margin-bottom: 4rem;
+  font-weight: bold;
+}
+
+.overview ul {
+  margin: 5em 0 2rem;
+  list-style-type: none;
+}
+
+.overview ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.6rem 0;
+}
+
+.overview p {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: normal;
+}
+
+.overview > div {
+  font-size: 1.5rem;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 10rem;
+}
