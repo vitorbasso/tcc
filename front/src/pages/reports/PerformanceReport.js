@@ -65,7 +65,7 @@ function PerformanceReport(props) {
   const moneyClass = getMoneyClass(money);
   const [arrow, css] = getVariationStyle(variation);
   const ibovDiff = variation - ibov;
-  const [_, ibovCss] = getVariationStyle(ibovDiff);
+  const [, ibovCss] = getVariationStyle(ibovDiff);
   return (
     <div className={baseStyles.container}>
       <Header backButton>
