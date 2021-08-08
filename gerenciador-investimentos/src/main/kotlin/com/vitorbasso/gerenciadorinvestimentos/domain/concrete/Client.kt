@@ -2,6 +2,7 @@ package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
 import com.vitorbasso.gerenciadorinvestimentos.domain.IClient
+import org.hibernate.Hibernate
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.CascadeType
@@ -25,7 +26,7 @@ data class Client(
     val name: String = "",
 
     @OneToMany(mappedBy = "client", cascade = [CascadeType.ALL])
-    val wallet: List<Wallet> = listOf()
+    val wallets: List<Wallet> = listOf()
 
 ) : BaseEntity(), IClient, UserDetails {
 
@@ -42,4 +43,20 @@ data class Client(
     override fun isAccountNonExpired() = true
 
     override fun isAccountNonLocked() = true
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Client
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = 1756406093
+
+    @Override
+    override fun toString(): String {
+        return this::class.simpleName + "(id = $id , dateCreated = $dateCreated , dateUpdated = $dateUpdated ," +
+            " email = $email , name = $name )"
+    }
 }

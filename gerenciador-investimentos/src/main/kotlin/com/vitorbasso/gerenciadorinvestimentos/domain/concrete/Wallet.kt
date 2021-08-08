@@ -4,6 +4,7 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
 import com.vitorbasso.gerenciadorinvestimentos.domain.ITaxable
 import com.vitorbasso.gerenciadorinvestimentos.domain.IWallet
 import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
+import org.hibernate.Hibernate
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.Entity
@@ -35,4 +36,21 @@ data class Wallet(
     @OneToMany(mappedBy = "wallet")
     val asset: List<Asset> = listOf()
 
-) : BaseEntity(), IWallet, ITaxable
+) : BaseEntity(), IWallet, ITaxable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Wallet
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = 1440352806
+
+    @Override
+    override fun toString(): String {
+        return this::class.simpleName + "(id = $id , dateCreated = $dateCreated , dateUpdated = $dateUpdated , " +
+            "name = $name , broker = $broker , balanceDaytrade = $balanceDaytrade , balance = $balance , " +
+            "withdrawn = $withdrawn , withdrawnDaytrade = $withdrawnDaytrade , walletMonth = $walletMonth )"
+    }
+}

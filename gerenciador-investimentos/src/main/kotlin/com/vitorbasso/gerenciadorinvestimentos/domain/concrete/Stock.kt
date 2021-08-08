@@ -1,5 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
+import org.hibernate.Hibernate
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.math.BigDecimal
@@ -21,4 +22,21 @@ data class Stock(
     @field:UpdateTimestamp
     @Column(nullable = false)
     val dateUpdated: LocalDateTime = LocalDateTime.now()
-) : Serializable
+) : Serializable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Stock
+
+        return ticker == other.ticker
+    }
+
+    override fun hashCode(): Int = 1136165790
+
+    @Override
+    override fun toString(): String {
+        return this::class.simpleName + "(ticker = $ticker , currentValue = $currentValue , " +
+            "openingValue = $openingValue , closingValue = $closingValue , highestValue = $highestValue , " +
+            "lowestValue = $lowestValue , variation = $variation , dateUpdated = $dateUpdated )"
+    }
+}

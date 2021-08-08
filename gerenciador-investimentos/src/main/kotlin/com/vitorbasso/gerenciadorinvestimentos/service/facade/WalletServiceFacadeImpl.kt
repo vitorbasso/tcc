@@ -23,8 +23,13 @@ internal class WalletServiceFacadeImpl(
     private val clientService: ClientService
 ) : IWalletService, IAccountingServiceSubscriber {
 
-    override fun getWalletCollection() =
-        this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet.map { it.validate() }
+    override fun getWalletCollection(): List<IWallet> {
+        val wallets =
+            this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallets.map { it.validate() }
+        return wallets.ifEmpty {
+            listOf(saveWallet(Wallet(name = DEFAULT_WALLET_NAME)))
+        }
+    }
 
     override fun getWallet(walletId: Long) =
         this.walletService.getWallet(walletId, SecurityContextUtil.getClientDetails().id).validate()
@@ -74,5 +79,9 @@ internal class WalletServiceFacadeImpl(
     private fun Wallet.validate() = this.takeIf { isValid(it) } ?: walletService.enforceWalletMonth(this)
 
     private fun isValid(wallet: Wallet) = wallet.walletMonth.atStartOfMonth() == LocalDate.now().atStartOfMonth()
+
+    companion object {
+        private const val DEFAULT_WALLET_NAME = "DEFAULT"
+    }
 
 }
