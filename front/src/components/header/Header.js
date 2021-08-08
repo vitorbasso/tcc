@@ -8,7 +8,8 @@ function Header(props) {
   const authCtx = useContext(AuthContext);
   const history = useHistory();
   function handleGoBackClick() {
-    history.push("/");
+    if (props.caller) history.push(props.caller);
+    else history.push("/");
   }
   return (
     <header className={`${styles.header} ${props.className}`}>

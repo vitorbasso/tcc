@@ -2,6 +2,11 @@
   padding-bottom: 5rem;
 }
 
+.no-style-link {
+  color: var(--main-gray);
+  font-weight: normal;
+}
+
 .table {
   width: 100%;
   display: flex;
@@ -27,6 +32,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  font-weight: normal;
 }
 
 .table-body tr td:first-child {

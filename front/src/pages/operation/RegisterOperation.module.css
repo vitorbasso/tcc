@@ -1,0 +1,52 @@
+.form {
+  width: 100%;
+  margin-top: 2rem;
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+}
+
+.form-type span {
+  align-self: flex-start;
+  margin-left: 10%;
+}
+
+.form-type div {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  min-width: 7rem;
+  min-height: 1.5rem;
+  cursor: pointer;
+  color: #fff;
+  font-weight: normal;
+  font-size: small;
+  text-transform: capitalize;
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  background-color: var(--pastel-green);
+}
+
+.btn:hover {
+  background-color: var(--pastel-green-dark);
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.form-type button.btn.selected {
+  background-color: var(--pastel-green-dark);
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.flex-end {
+  align-self: flex-end;
+  margin-right: 10%;
+}

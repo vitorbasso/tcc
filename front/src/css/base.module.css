@@ -13,6 +13,23 @@
   visibility: hidden;
 }
 
+.money {
+  font-size: 13.5vw;
+}
+
+.money-7 {
+  font-size: 8.5vw;
+}
+
+.money-10 {
+  font-size: 6.5vw;
+}
+
+.money span > *:first-child,
+.money span > *:last-child {
+  font-size: 1.8rem;
+}
+
 .form-control {
   width: 100%;
   display: flex;

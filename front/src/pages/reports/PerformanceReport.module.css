@@ -1,0 +1,83 @@
+.nav ul {
+  list-style: none;
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.nav ul li {
+  margin: 0 3px;
+}
+
+.nav ul li button {
+  border: none;
+  border-radius: 10px;
+  min-width: 3rem;
+  cursor: pointer;
+  color: #fff;
+  font-weight: normal;
+  font-size: small;
+  text-transform: capitalize;
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  background-color: var(--pastel-green);
+}
+
+.nav ul li button:hover {
+  background-color: var(--pastel-green-dark);
+}
+
+.nav ul li button:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.nav ul li button.selected {
+  background-color: var(--pastel-green-dark);
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.overall {
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.section__assets {
+  margin: 0 auto;
+}
+
+.money {
+  height: 5rem;
+}
+
+.ibov {
+  text-align: center;
+}
+
+.ibov span:first-child {
+  font-weight: bold;
+}
+
+.variation {
+  display: flex;
+  justify-content: center;
+}
+
+.variation span {
+  margin: 0.6rem;
+}
+
+.variation span:first-child {
+  margin-right: 0;
+}
+
+.red {
+  color: #ea526f;
+}
+
+.green {
+  color: #57cc99;
+}
