@@ -66,7 +66,7 @@ internal class TransactionServiceFacadeImpl(
     } ?: throw CustomWrongDateException()
 
     private fun TransactionRequest.getTransaction() = assetService.getAsset(
-        wallet = walletService.getWallet(this.walletId) as Wallet,
+        wallet = walletService.getWallet() as Wallet,
         stock = stockService.getStock(this.ticker)
     ).let {
         Transaction(

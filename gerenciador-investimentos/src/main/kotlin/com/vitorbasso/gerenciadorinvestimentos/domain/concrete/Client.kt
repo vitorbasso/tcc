@@ -7,10 +7,12 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.CascadeType
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.OneToMany
+import javax.persistence.JoinColumn
+import javax.persistence.OneToOne
 
 @Entity
 data class Client(
@@ -25,10 +27,11 @@ data class Client(
 
     val name: String = "",
 
-    @OneToMany(mappedBy = "client", cascade = [CascadeType.ALL])
-    val wallets: List<Wallet> = listOf()
+    ) : BaseEntity(), IClient, UserDetails {
 
-) : BaseEntity(), IClient, UserDetails {
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "wallet_id", referencedColumnName = "id")
+    val wallet: Wallet = Wallet(client = this)
 
     override fun getUsername() = this.email
 

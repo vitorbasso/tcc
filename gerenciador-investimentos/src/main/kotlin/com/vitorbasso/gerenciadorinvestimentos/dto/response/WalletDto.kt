@@ -6,8 +6,6 @@ import java.time.LocalDate
 
 data class WalletDto(
     val id: Long,
-    val name: String,
-    val broker: String,
     val balanceDaytrade: BigDecimal,
     val balance: BigDecimal,
     val withdrawn: BigDecimal,

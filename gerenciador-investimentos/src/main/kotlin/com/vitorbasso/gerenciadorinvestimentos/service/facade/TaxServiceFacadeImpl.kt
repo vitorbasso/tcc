@@ -43,8 +43,7 @@ internal class TaxServiceFacadeImpl(
             ?: TaxDeductible(client = SecurityContextUtil.getClientDetails())
 
     private fun getTaxables(month: LocalDate) = (
-        (this.walletService.getWalletCollection() +
-            this.monthlyWalletService.getMonthlyWallets()
-        ) as List<ITaxable>).filter { it.walletMonth.isBefore(month.withDayOfMonth(2)) }
+        (this.monthlyWalletService.getMonthlyWallets().plus(this.walletService.getWallet())
+            ) as List<ITaxable>).filter { it.walletMonth.isBefore(month.withDayOfMonth(2)) }
 
 }
