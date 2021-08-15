@@ -1,13 +1,27 @@
 use `gerenciador_investimento`;
 
+create table if not exists `wallet`(
+	`id` bigint auto_increment,
+    `balance_daytrade` decimal(20,2) default 0,
+    `balance` decimal(20,2) default 0,
+    `withdrawn` decimal(20,2) default 0,
+    `withdrawn_daytrade` decimal(20,2) default 0,
+    `wallet_month` date not null,
+    `date_created` timestamp not null default NOW(),
+    `date_updated` timestamp default NOW(),
+    primary key (`id`)
+)engine=InnoDB;
+
 create table if not exists `client`(
 	`id` bigint auto_increment,
 	`email` varchar(255) not null unique,
     `password` varchar(255) not null,
 	`name` varchar(255) not null,
+    `wallet_id` bigint not null,
     `date_created` timestamp not null,
     `date_updated` timestamp default NOW(),
-    primary key (`id`)
+    primary key (`id`),
+    foreign key (`wallet_id`) references `wallet` (`id`)
 )engine=InnoDB;
 
 create table if not exists `tax_deductible` (
@@ -22,26 +36,8 @@ create table if not exists `tax_deductible` (
     foreign key (`client_id`) references `client` (`id`)
 )engine=InnoDB;
 
-create table if not exists `wallet`(
-	`id` bigint auto_increment,
-	`name` varchar(255) not null,
-    `broker` varchar(255) not null,
-    `balance_daytrade` decimal(20,2) default 0,
-    `balance` decimal(20,2) default 0,
-    `withdrawn` decimal(20,2) default 0,
-    `withdrawn_daytrade` decimal(20,2) default 0,
-    `wallet_month` date not null,
-    `client_id` bigint not null,
-    `date_created` timestamp not null default NOW(),
-    `date_updated` timestamp default NOW(),
-    primary key (`id`),
-    foreign key (`client_id`) references `client` (`id`)
-)engine=InnoDB;
-
 create table if not exists `monthly_wallet`(
 	`id` bigint auto_increment,
-	`name` varchar(255) not null,
-    `broker` varchar(255) not null,
     `balance_daytrade` decimal(20,2) default 0,
     `balance` decimal(20,2) default 0,
     `withdrawn` decimal(20,2) default 0,
