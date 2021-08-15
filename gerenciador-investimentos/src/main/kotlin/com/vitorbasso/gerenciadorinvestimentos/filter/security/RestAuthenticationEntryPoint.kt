@@ -25,7 +25,7 @@ class RestAuthenticationEntryPoint(
         exception: AuthenticationException?
     ) {
 
-        val responseDto = ApiErrorDto(ManagerErrorCode.MANAGER_09) {
+        val responseDto = ApiErrorDto(ManagerErrorCode.MANAGER_08) {
             this.messageSource.getMessage(it, null, LocaleContextHolder.getLocale())
         }
 

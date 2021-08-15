@@ -25,7 +25,7 @@ internal class TaxService(
         deductible: TaxDeductible,
         deductibleRequest: TaxDeductibleRequest
     ): TaxInfo {
-        if (!validateDeduction(tax, deductibleRequest)) throw CustomBadRequestException(ManagerErrorCode.MANAGER_12)
+        if (!validateDeduction(tax, deductibleRequest)) throw CustomBadRequestException(ManagerErrorCode.MANAGER_11)
         val deducted = deductible.deducted.add(deductibleRequest.deducted)
         val daytradeDeducted = deductible.daytradeDeducted.add(deductibleRequest.daytradeDeducted)
         this.taxRepository.save(

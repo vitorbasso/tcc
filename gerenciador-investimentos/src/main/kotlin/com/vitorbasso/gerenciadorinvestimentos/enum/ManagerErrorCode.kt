@@ -7,11 +7,10 @@ enum class ManagerErrorCode(val cause: String) {
     MANAGER_03("error.entity.not-found"),
     MANAGER_04("error.entity.duplicate"),
     MANAGER_05("error.bad-request"),
-    MANAGER_06("error.client.wallet.update"),
-    MANAGER_07("error.client.wallet.delete"),
-    MANAGER_08("error.authentication.bad-credentials"),
-    MANAGER_09("error.forbidden"),
-    MANAGER_10("error.transaction.bad.date"),
-    MANAGER_11("error.client.monthly-wallet.delete"),
-    MANAGER_12("error.tax.bad-value")
+    MANAGER_06("error.client.wallet.delete"),
+    MANAGER_07("error.authentication.bad-credentials"),
+    MANAGER_08("error.forbidden"),
+    MANAGER_09("error.transaction.bad.date"),
+    MANAGER_10("error.client.monthly-wallet.delete"),
+    MANAGER_11("error.tax.bad-value")
 }

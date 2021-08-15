@@ -31,7 +31,7 @@ internal class MonthlyWalletServiceFacadeImpl(
         this.monthlyWalletService.getMonthlyWallet(
             monthlyWalletId = monthlyWalletId,
             clientId = SecurityContextUtil.getClientDetails().id,
-            exception = CustomBadRequestException(ManagerErrorCode.MANAGER_11)
+            exception = CustomBadRequestException(ManagerErrorCode.MANAGER_10)
         )
     )
 

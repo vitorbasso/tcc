@@ -20,8 +20,6 @@ data class MonthlyWallet(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-    val name: String = "",
-    val broker: String = "",
     override val balanceDaytrade: BigDecimal = BigDecimal.ZERO,
     override val balance: BigDecimal = BigDecimal.ZERO,
     override val withdrawn: BigDecimal = BigDecimal.ZERO,
@@ -47,7 +45,7 @@ data class MonthlyWallet(
     @Override
     override fun toString(): String {
         return this::class.simpleName + "(id = $id , dateCreated = $dateCreated , dateUpdated = $dateUpdated , " +
-            "name = $name , broker = $broker , balanceDaytrade = $balanceDaytrade , balance = $balance , " +
+            "balanceDaytrade = $balanceDaytrade , balance = $balance , " +
             "withdrawn = $withdrawn , withdrawnDaytrade = $withdrawnDaytrade , walletId = $walletId , " +
             "walletMonth = $walletMonth )"
     }

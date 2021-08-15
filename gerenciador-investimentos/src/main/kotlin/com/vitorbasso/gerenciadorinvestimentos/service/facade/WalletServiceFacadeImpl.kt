@@ -1,6 +1,5 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
-import com.vitorbasso.gerenciadorinvestimentos.domain.IWallet
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
@@ -12,7 +11,6 @@ import com.vitorbasso.gerenciadorinvestimentos.service.concrete.ClientService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.WalletService
 import com.vitorbasso.gerenciadorinvestimentos.util.SecurityContextUtil
 import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
-import liquibase.pro.packaged.it
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -30,7 +28,7 @@ internal class WalletServiceFacadeImpl(
         this.walletService.deleteWallet(
             this.walletService.getWallet(
                 clientId = SecurityContextUtil.getClientDetails().id,
-                exception = CustomBadRequestException(ManagerErrorCode.MANAGER_07)
+                exception = CustomBadRequestException(ManagerErrorCode.MANAGER_06)
             ).validate()
         )
     }

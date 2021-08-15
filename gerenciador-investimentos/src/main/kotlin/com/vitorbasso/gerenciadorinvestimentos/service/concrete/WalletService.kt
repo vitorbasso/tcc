@@ -80,8 +80,6 @@ internal class WalletService(
     ) = monthlyWalletService.getMonthlyWalletByMonth(walletMonth.atStartOfMonth())
         ?: MonthlyWallet(
             balanceDaytrade = BigDecimal.ZERO,
-            balance = BigDecimal.ZERO,
-            walletMonth = walletMonth.atStartOfMonth(),
             walletId = wallet.id,
             client = wallet.client
         )
@@ -89,8 +87,6 @@ internal class WalletService(
 
 private fun Wallet.toMonthlyWallet() = MonthlyWallet(
     balanceDaytrade = this.balanceDaytrade,
-    balance = this.balance,
-    walletId = this.id,
     walletMonth = this.walletMonth,
     client = this.client
 )
