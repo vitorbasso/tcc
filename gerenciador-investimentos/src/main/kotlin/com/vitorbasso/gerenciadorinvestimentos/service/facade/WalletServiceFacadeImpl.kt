@@ -17,8 +17,7 @@ import java.time.LocalDate
 @Service
 internal class WalletServiceFacadeImpl(
     private val walletService: WalletService,
-    private val monthlyWalletService: MonthlyWalletServiceFacadeImpl,
-    private val clientService: ClientService
+    private val monthlyWalletService: MonthlyWalletServiceFacadeImpl
 ) : IWalletService, IAccountingServiceSubscriber {
 
     override fun getWallet() =

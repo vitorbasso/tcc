@@ -79,7 +79,7 @@ internal class WalletService(
         walletMonth: LocalDate
     ) = monthlyWalletService.getMonthlyWalletByMonth(walletMonth.atStartOfMonth())
         ?: MonthlyWallet(
-            balanceDaytrade = BigDecimal.ZERO,
+            walletMonth = walletMonth.atStartOfMonth(),
             walletId = wallet.id,
             client = wallet.client
         )
