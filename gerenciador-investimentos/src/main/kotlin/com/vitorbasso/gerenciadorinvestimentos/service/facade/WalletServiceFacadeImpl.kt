@@ -1,9 +1,7 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.facade
 
-import com.vitorbasso.gerenciadorinvestimentos.domain.IWallet
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Transaction
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
-import com.vitorbasso.gerenciadorinvestimentos.dto.request.WalletUpdateRequest
 import com.vitorbasso.gerenciadorinvestimentos.enum.ManagerErrorCode
 import com.vitorbasso.gerenciadorinvestimentos.exception.CustomBadRequestException
 import com.vitorbasso.gerenciadorinvestimentos.service.IAccountingServiceSubscriber
@@ -19,37 +17,17 @@ import java.time.LocalDate
 @Service
 internal class WalletServiceFacadeImpl(
     private val walletService: WalletService,
-    private val monthlyWalletService: MonthlyWalletServiceFacadeImpl,
-    private val clientService: ClientService
+    private val monthlyWalletService: MonthlyWalletServiceFacadeImpl
 ) : IWalletService, IAccountingServiceSubscriber {
 
-    override fun getWalletCollection() =
-        this.clientService.getClient(SecurityContextUtil.getClientDetails().id).wallet.map { it.validate() }
-
-    override fun getWallet(walletId: Long) =
-        this.walletService.getWallet(walletId, SecurityContextUtil.getClientDetails().id).validate()
-
-    override fun saveWallet(walletToSave: IWallet) = this.walletService.saveWallet(
-        SecurityContextUtil.getClientDetails(),
-        walletToSave as Wallet
-    )
-
-    override fun updateWallet(walletId: Long, walletUpdateRequest: WalletUpdateRequest) =
-        this.walletService.updateWallet(
-            this.walletService.getWallet(
-                walletId = walletId,
-                clientId = SecurityContextUtil.getClientDetails().id,
-                exception = CustomBadRequestException(ManagerErrorCode.MANAGER_06)
-            ).validate(),
-            walletUpdateRequest
-        )
+    override fun getWallet() =
+        this.walletService.getWallet(SecurityContextUtil.getClientDetails().id).validate()
 
     override fun deleteWallet(walletId: Long) {
         this.walletService.deleteWallet(
             this.walletService.getWallet(
-                walletId = walletId,
                 clientId = SecurityContextUtil.getClientDetails().id,
-                exception = CustomBadRequestException(ManagerErrorCode.MANAGER_07)
+                exception = CustomBadRequestException(ManagerErrorCode.MANAGER_06)
             ).validate()
         )
     }

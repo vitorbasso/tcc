@@ -25,7 +25,7 @@ internal class TaxService(
         deductible: TaxDeductible,
         deductibleRequest: TaxDeductibleRequest
     ): TaxInfo {
-        if (!validateDeduction(tax, deductibleRequest)) throw CustomBadRequestException(ManagerErrorCode.MANAGER_12)
+        if (!validateDeduction(tax, deductibleRequest)) throw CustomBadRequestException(ManagerErrorCode.MANAGER_11)
         val deducted = deductible.deducted.add(deductibleRequest.deducted)
         val daytradeDeducted = deductible.daytradeDeducted.add(deductibleRequest.daytradeDeducted)
         this.taxRepository.save(
@@ -40,14 +40,16 @@ internal class TaxService(
                 withdrawn = tax.withdrawn,
                 tax = PERCENT_15,
                 irrf = IRRF,
-                deducted = deducted
+                deducted = deducted,
+                type = OperationType.NORMAL
             ).takeIf { tax.withdrawn.compareTo(MAX_WITHDRAWN) >= 0 } ?: BigDecimal.ZERO,
             daytradeTax = getTaxDue(
                 balance = tax.daytradeBalance,
                 withdrawn = tax.daytradeWithdrawn,
                 tax = PERCENT_20,
                 irrf = DAYTRADE_IRRF,
-                deducted = daytradeDeducted
+                deducted = daytradeDeducted,
+                type = OperationType.DAYTRADE
             ),
             availableToDeduct = tax.availableToDeduct.subtract(deductibleRequest.deducted),
             daytradeAvailableToDeduct = tax.daytradeAvailableToDeduct.subtract(deductibleRequest.daytradeDeducted),
@@ -94,14 +96,16 @@ internal class TaxService(
                 withdrawn = tax.withdrawn,
                 tax = PERCENT_15,
                 irrf = IRRF,
-                deducted = deducted.deducted
+                deducted = deducted.deducted,
+                type = OperationType.NORMAL
             ).takeIf { tax.withdrawn.compareTo(MAX_WITHDRAWN) >= 0 } ?: BigDecimal.ZERO,
             daytradeTax = getTaxDue(
                 balance = tax.daytradeBalance,
                 withdrawn = tax.daytradeWithdrawn,
                 tax = PERCENT_20,
                 irrf = DAYTRADE_IRRF,
-                deducted = deducted.daytradeDeducted
+                deducted = deducted.daytradeDeducted,
+                type = OperationType.DAYTRADE
             ),
             availableToDeduct = tax.availableToDeduct.subtract(deducted.deducted),
             daytradeAvailableToDeduct = tax.daytradeAvailableToDeduct.subtract(deducted.daytradeDeducted),
@@ -115,9 +119,15 @@ internal class TaxService(
         withdrawn: BigDecimal,
         tax: BigDecimal,
         irrf: BigDecimal,
-        deducted: BigDecimal = BigDecimal.ZERO
+        deducted: BigDecimal = BigDecimal.ZERO,
+        type: OperationType
     ) = (balance.subtract(deducted).multiply(tax)
-        .subtract(withdrawn.multiply(irrf))).takeIf { isPositive(it) } ?: BigDecimal.ZERO
+        .subtract(
+            when (type) {
+                OperationType.NORMAL -> withdrawn
+                OperationType.DAYTRADE -> balance
+            }.multiply(irrf)
+        )).takeIf { isPositive(it) } ?: BigDecimal.ZERO
 
     private fun validateDeduction(tax: TaxInfo, deduction: TaxDeductibleRequest) =
         tax.availableToDeduct.compareTo(deduction.deducted) >= 0 &&
@@ -142,6 +152,10 @@ internal class TaxService(
         val withdrawn: BigDecimal = BigDecimal.ZERO,
         val daytradeWithdrawn: BigDecimal = BigDecimal.ZERO
     ) : ITax
+
+    private enum class OperationType {
+        DAYTRADE, NORMAL
+    }
 
     companion object {
         private val MAX_WITHDRAWN = BigDecimal("20000")

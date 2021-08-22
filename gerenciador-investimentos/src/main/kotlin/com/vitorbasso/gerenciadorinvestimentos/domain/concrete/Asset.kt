@@ -2,6 +2,7 @@ package com.vitorbasso.gerenciadorinvestimentos.domain.concrete
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.BaseEntity
 import com.vitorbasso.gerenciadorinvestimentos.domain.IAsset
+import org.hibernate.Hibernate
 import java.math.BigDecimal
 import javax.persistence.CascadeType
 import javax.persistence.Entity
@@ -33,4 +34,20 @@ data class Asset(
     @OneToMany(mappedBy = "asset", cascade = [CascadeType.ALL])
     val transactions: List<Transaction> = listOf()
 
-) : BaseEntity(), IAsset
+) : BaseEntity(), IAsset {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Asset
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = 469637925
+
+    @Override
+    override fun toString(): String {
+        return this::class.simpleName + "(id = $id , dateCreated = $dateCreated , dateUpdated = $dateUpdated , " +
+            "averageCost = $averageCost , amount = $amount , lifetimeBalance = $lifetimeBalance )"
+    }
+}

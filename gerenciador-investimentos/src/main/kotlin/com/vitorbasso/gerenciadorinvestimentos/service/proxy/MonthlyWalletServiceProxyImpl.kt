@@ -29,10 +29,8 @@ internal class MonthlyWalletServiceProxyImpl(
 
 private fun IMonthlyWallet.getDto() = MonthlyWalletDto(
     id = (this as MonthlyWallet).id,
-    name = this.name,
-    broker = this.broker,
-    balanceDaytrade = this.balanceDaytrade.setScale(),
-    balance = this.balance.setScale(),
+    balance = this.balance,
+    balanceDaytrade = this.balanceDaytrade,
     withdrawn = this.withdrawn.setScale(),
     withdrawnDaytrade = this.withdrawnDaytrade.setScale(),
     walletId = this.walletId,
@@ -41,7 +39,5 @@ private fun IMonthlyWallet.getDto() = MonthlyWalletDto(
 
 private fun IMonthlyWallet.getSmallDto() = MonthlyWalletSmallDto(
     id = (this as MonthlyWallet).id,
-    name = this.name,
-    broker = this.broker,
     month = this.walletMonth
 )

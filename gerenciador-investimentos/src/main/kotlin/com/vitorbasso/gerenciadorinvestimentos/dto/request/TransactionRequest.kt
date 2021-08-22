@@ -15,7 +15,5 @@ data class TransactionRequest(
     val type: TransactionType,
     @field:NotBlank(message = "error.request.body.fields.transaction.ticker")
     val ticker: String,
-    @field:NotBlank(message = "error.request.body.fields.transaction.walletId")
-    val walletId: Long,
     val date: LocalDateTime = LocalDateTime.now()
 )
