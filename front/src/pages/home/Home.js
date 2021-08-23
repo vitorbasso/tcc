@@ -14,7 +14,12 @@ function getFirstName(result) {
 }
 
 function getBalance(result) {
-  return result ? result.balance + result.balanceDaytrade : 0;
+  return result
+    ? result.stockAssets.reduce((total, asset) => {
+        return (total +=
+          asset.amount > 0 ? asset.averageCost * asset.amount : 0);
+      }, 0)
+    : 0;
 }
 
 function Home() {

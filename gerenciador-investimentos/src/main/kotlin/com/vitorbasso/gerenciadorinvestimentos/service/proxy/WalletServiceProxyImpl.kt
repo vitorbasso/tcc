@@ -34,7 +34,7 @@ private fun IWallet.getDto() = WalletDto(
     withdrawn = this.withdrawn.setScale(),
     withdrawnDaytrade = this.withdrawnDaytrade.setScale(),
     walletMonth = this.walletMonth,
-    stockAsset = this.asset.map { it.getDto() }
+    stockAssets = this.asset.map { it.getDto() }
 )
 
 private fun IAsset.getDto() = AssetDto(

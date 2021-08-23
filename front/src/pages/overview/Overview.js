@@ -7,12 +7,22 @@ import { numberFormatter } from "../../utils/numberUtils";
 import Money from "../../components/money/Money";
 import AssetTable from "../../components/asset/AssetTable";
 import { MOCK_ASSETS } from "../../constants/mocks";
+import useHttp from "../../hooks/useHttp";
+import { useEffect } from "react";
+import { WALLETS_URL } from "../../constants/paths";
 
 function Overview(props) {
-  const walletTotalValue = MOCK_ASSETS.reduce(
-    (total, asset) => (total += asset.value),
-    0
-  );
+  const { result, sendRequest } = useHttp();
+
+  useEffect(() => {
+    sendRequest({
+      url: WALLETS_URL,
+    });
+  }, [sendRequest]);
+  let assets = [];
+  if (result) {
+    assets = result.stockAssets;
+  }
   return (
     <div className={baseStyles.container}>
       <Header backButton>
@@ -36,8 +46,7 @@ function Overview(props) {
         </section>
         <section className={styles["section__assets"]}>
           <AssetTable
-            walletTotalValue={walletTotalValue}
-            assets={MOCK_ASSETS}
+            assets={assets}
             className={styles["asset-table"]}
             caller={"/overview"}
           />

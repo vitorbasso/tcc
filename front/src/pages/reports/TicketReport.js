@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { useLocation, useParams } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
+import { STOCKS_URL, WALLETS_URL } from "../../constants/paths";
 import baseStyles from "../../css/base.module.css";
+import useHttp from "../../hooks/useHttp";
 import { getMoneyClass } from "../../utils/cssUtils";
 import { moneyFormatter, percentFormatter } from "../../utils/numberUtils";
 import styles from "./TicketReport.module.css";
@@ -26,10 +28,36 @@ function getVariationStyle(variation) {
 }
 
 function TicketReport(props) {
+  const { result, sendRequest } = useHttp();
   const [variation, setVariation] = useState(0.0242);
   const location = useLocation();
   const { id } = useParams();
-  const money = 50_000;
+
+  useEffect(() => {
+    sendRequest({
+      url: WALLETS_URL,
+    });
+  }, [sendRequest]);
+
+  let averageValue = 0;
+  let amount = 0;
+  let money = 0;
+  let percentOfWallet = 0;
+  if (result) {
+    const asset = result.stockAssets.find((asset) => asset.stockSymbol === id);
+    if (asset) {
+      money = asset.averageCost * asset.amount;
+      amount = asset.amount;
+      averageValue = asset.averageCost;
+      percentOfWallet =
+        money /
+        result.stockAssets.reduce((total, asset) => {
+          return (total +=
+            asset.amount > 0 ? asset.averageCost * asset.amount : 0);
+        }, 0);
+    }
+  }
+
   const moneyClass = getMoneyClass(money);
 
   function filter(filterBy) {
@@ -94,16 +122,18 @@ function TicketReport(props) {
         <section className={styles.overview}>
           <span>{id}</span>
           <span>
-            {Intl.NumberFormat("pt-BR", { style: "percent" }).format(0.5)}
+            {Intl.NumberFormat("pt-BR", { style: "percent" }).format(
+              percentOfWallet
+            )}
           </span>
         </section>
         <Money value={money} className={`${baseStyles[moneyClass]}`} />
         <section className={styles.info}>
           <div>
-            <p>Qnt {Intl.NumberFormat("pt-BR").format(2_000)}</p>
+            <p>Qnt {Intl.NumberFormat("pt-BR").format(amount)}</p>
             <p>
               <span>Preço médio </span>
-              <span>{moneyFormatter.format(25)}</span>
+              <span>{moneyFormatter.format(averageValue)}</span>
             </p>
           </div>
           <div className={`${styles.variation} ${css}`}>
