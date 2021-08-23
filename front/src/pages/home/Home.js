@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { CLIENTS_URL, WALLETS_URL } from "../../constants/paths";
+import { CLIENTS_URL, TAX_URL, WALLETS_URL } from "../../constants/paths";
 import useHttp from "../../hooks/useHttp";
 import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
@@ -20,6 +20,7 @@ function getBalance(result) {
 function Home() {
   const { result: resultName, sendRequest: sendRequestName } = useHttp();
   const { result: resultWallet, sendRequest: sendRequestWallet } = useHttp();
+  const { result: resultTax, sendRequest: sendRequestTax } = useHttp();
 
   useEffect(() => {
     sendRequestName({
@@ -29,10 +30,15 @@ function Home() {
 
   useEffect(() => {
     sendRequestWallet({
-      url: `${WALLETS_URL}/1`,
-      method: "GET",
+      url: WALLETS_URL,
     });
   }, [sendRequestWallet]);
+
+  useEffect(() => {
+    sendRequestTax({
+      url: TAX_URL,
+    });
+  }, [sendRequestTax]);
 
   const firstName = getFirstName(resultName);
   const money = getBalance(resultWallet);
@@ -48,7 +54,7 @@ function Home() {
           <Money className={baseStyles[moneyClass]} value={money} />
         </section>
         <section>
-          <AtAGlance />
+          <AtAGlance wallet={resultWallet} tax={resultTax} />
         </section>
         <section>
           <Navigation />

@@ -94,6 +94,5 @@ create table if not exists `transaction`(
 )engine=InnoDB;
 
 CREATE INDEX `transaction_date` ON `transaction` (`transaction_date`);
-ALTER TABLE `transaction` ADD UNIQUE `unique_transactino` (`transaction_date`, `asset_id`);
 ALTER TABLE `monthly_wallet` ADD UNIQUE `unique_monthly_wallet` (`wallet_month`, `wallet_id`);
 ALTER TABLE `tax_deductible` ADD UNIQUE `unique_tax` (`client_id`, `month`);

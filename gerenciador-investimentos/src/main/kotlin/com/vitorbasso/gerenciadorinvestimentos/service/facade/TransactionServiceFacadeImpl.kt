@@ -61,8 +61,7 @@ internal class TransactionServiceFacadeImpl(
 
     private fun checkDate(dateToCheck: LocalDateTime, asset: Asset) = dateToCheck.takeIf {
         !it.toLocalDate().isAfter(LocalDate.now()) &&
-            (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY) &&
-            this.transactionService.validateTransaction(dateToCheck, asset)
+            (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY)
     } ?: throw CustomWrongDateException()
 
     private fun TransactionRequest.getTransaction() = assetService.getAsset(

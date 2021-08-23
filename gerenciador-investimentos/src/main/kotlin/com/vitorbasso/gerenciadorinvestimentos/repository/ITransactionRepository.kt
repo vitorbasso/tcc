@@ -28,6 +28,4 @@ interface ITransactionRepository : JpaRepository<Transaction, Long> {
 
     fun findAllByAssetOrderByTransactionDate(asset: Asset): List<Transaction>
 
-    fun existsByAssetAndTransactionDate(asset: Asset, transactionDate: LocalDateTime): Boolean
-
 }

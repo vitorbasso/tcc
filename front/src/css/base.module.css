@@ -9,6 +9,10 @@
   color: var(--error-red);
 }
 
+.success-text {
+  color: var(--pastel-green);
+}
+
 .hidden {
   visibility: hidden;
 }
