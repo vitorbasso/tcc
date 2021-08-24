@@ -6,22 +6,18 @@ import styles from "./Overview.module.css";
 import { numberFormatter } from "../../utils/numberUtils";
 import Money from "../../components/money/Money";
 import AssetTable from "../../components/asset/AssetTable";
-import { MOCK_ASSETS } from "../../constants/mocks";
-import useHttp from "../../hooks/useHttp";
-import { useEffect } from "react";
-import { WALLETS_URL } from "../../constants/paths";
+import { useContext, useEffect } from "react";
+import WalletContext from "../../context/wallet-context";
 
 function Overview(props) {
-  const { result, sendRequest } = useHttp();
+  const { wallet, fetchWallet } = useContext(WalletContext);
 
   useEffect(() => {
-    sendRequest({
-      url: WALLETS_URL,
-    });
-  }, [sendRequest]);
+    fetchWallet();
+  }, [fetchWallet]);
   let assets = [];
-  if (result) {
-    assets = result.stockAssets;
+  if (wallet) {
+    assets = wallet.stockAssets;
   }
   return (
     <div className={baseStyles.container}>
@@ -35,12 +31,12 @@ function Overview(props) {
             <PieSelected className={styles["pie-chart__selected-legend"]} />
             <div>
               <p>{numberFormatter.format(2_000)}</p>
-              <p>
+              <div>
                 <Money value={25} />
-              </p>
-              <p>
+              </div>
+              <div>
                 <Money value={50_000} />
-              </p>
+              </div>
             </div>
           </div>
         </section>

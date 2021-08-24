@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
 import baseStyles from "../../css/base.module.css";
@@ -8,7 +8,8 @@ import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { moneyFormatter, percentFormatter } from "../../utils/numberUtils";
 import AssetTable from "../../components/asset/AssetTable";
 import useHttp from "../../hooks/useHttp";
-import { STOCKS_URL, WALLETS_URL } from "../../constants/paths";
+import { STOCKS_URL } from "../../constants/paths";
+import WalletContext from "../../context/wallet-context";
 
 const DAY = "day";
 const WEEK = "week";
@@ -28,21 +29,17 @@ function getVariationStyle(variation) {
 }
 
 function PerformanceReport(props) {
-  const { result: resultWallet, sendRequest: sendRequestWallet } = useHttp();
+  const { wallet, fetchWallet } = useContext(WalletContext);
   const { result: resultStock, sendRequest: sendRequestStock } = useHttp();
-  const [money, setMoney] = useState(534_549.85);
-  const [variation2, setVariation] = useState(0.036);
   const [ibov, setIbov] = useState(0.0163);
   useEffect(() => {
-    sendRequestWallet({
-      url: WALLETS_URL,
-    });
-  }, [sendRequestWallet]);
+    fetchWallet();
+  }, [fetchWallet]);
   let assets = [];
   let assetNames = "";
   let paidForAssets = 0;
-  if (resultWallet) {
-    assets = resultWallet.stockAssets;
+  if (wallet) {
+    assets = wallet.stockAssets;
     assetNames = assets
       .filter((asset) => asset.amount > 0)
       .map((asset) => asset.stockSymbol)
@@ -71,32 +68,31 @@ function PerformanceReport(props) {
   }
   const variation =
     walletWorth !== 0 ? (walletWorth - paidForAssets) / walletWorth : 0;
-  console.log(variation);
   function filter(filterBy) {
     const lastSelected = document.querySelector(`.${styles.selected}`);
     lastSelected.classList.remove(styles.selected);
     switch (filterBy) {
       case DAY:
-        setMoney(15_246.46);
-        setVariation(-0.004);
+        // setMoney(15_246.46);
+        // setVariation(-0.004);
         setIbov(0.0001);
         updateNavSelected(DAY);
         break;
       case WEEK:
-        setMoney(55_530.5);
-        setVariation(0.005);
+        // setMoney(55_530.5);
+        // setVariation(0.005);
         setIbov(0.0005);
         updateNavSelected(WEEK);
         break;
       case MONTH:
-        setMoney(534_549.85);
-        setVariation(0.036);
+        // setMoney(534_549.85);
+        // setVariation(0.036);
         setIbov(0.0163);
         updateNavSelected(MONTH);
         break;
       case YEAR:
-        setMoney(13_358_387.58);
-        setVariation(0.1756);
+        // setMoney(13_358_387.58);
+        // setVariation(0.1756);
         setIbov(0.0634);
         updateNavSelected(YEAR);
         break;

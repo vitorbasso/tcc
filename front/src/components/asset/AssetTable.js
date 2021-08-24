@@ -11,9 +11,10 @@ function AssetTable(props) {
     <div className={`${props.className} ${styles.container}`}>
       {props.assets.map((asset) => {
         const value = asset.averageCost * asset.amount;
-        if (asset.amount !== 0)
+        if (asset.amount !== 0) {
           return (
             <Link
+              key={asset.id}
               className={styles["no-style-link"]}
               to={{
                 pathname: `performance/${asset.stockSymbol}`,
@@ -22,7 +23,7 @@ function AssetTable(props) {
                 },
               }}
             >
-              <table key={asset.id} className={`${styles.table}`}>
+              <table className={`${styles.table}`}>
                 <thead className={styles["table-head"]}>
                   <tr>
                     <th>Ação</th>
@@ -51,6 +52,9 @@ function AssetTable(props) {
               </table>
             </Link>
           );
+        } else {
+          return {};
+        }
       })}
     </div>
   );

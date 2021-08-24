@@ -1,7 +1,5 @@
 import { BsCheck, BsExclamationCircle } from "react-icons/bs";
 import styles from "./Notification.module.css";
-import baseStyles from "../../css/base.module.css";
-import { useEffect, useState } from "react";
 
 export const SUCCESS_NOTIFICATION = "success";
 export const ERROR_NOTIFICATION = "error";

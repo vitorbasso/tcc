@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
-import { TAX_URL, WALLETS_URL } from "../../constants/paths";
+import { TAX_URL } from "../../constants/paths";
+import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
 import useHttp from "../../hooks/useHttp";
 import { getMoneyClass } from "../../utils/cssUtils";
@@ -9,25 +10,23 @@ import styles from "./TaxReport.module.css";
 
 function TaxReport() {
   const { result: resultTax, sendRequest: sendRequestTax } = useHttp();
-  const { result: resultWallet, sendRequest: sendRequestWallet } = useHttp();
+  const { wallet, fetchWallet } = useContext(WalletContext);
 
   useEffect(() => {
     sendRequestTax({
       url: TAX_URL,
     });
-    sendRequestWallet({
-      url: WALLETS_URL,
-    });
-  }, [sendRequestTax, sendRequestWallet]);
+    fetchWallet();
+  }, [sendRequestTax, fetchWallet]);
 
   let money = 0;
   let balance = 0;
   let deductable = 0;
   let withdrawn = 0;
   let base = 0;
-  if (resultWallet) {
-    balance = resultWallet.balance + resultWallet.balanceDaytrade;
-    withdrawn = resultWallet.withdrawn + resultWallet.withdrawnDaytrade;
+  if (wallet) {
+    balance = wallet.balance + wallet.balanceDaytrade;
+    withdrawn = wallet.withdrawn + wallet.withdrawnDaytrade;
   }
   if (resultTax) {
     money = resultTax.normalTax + resultTax.daytradeTax;

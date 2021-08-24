@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { CLIENTS_URL, TAX_URL, WALLETS_URL } from "../../constants/paths";
+import { useContext, useEffect } from "react";
+import { CLIENTS_URL, TAX_URL } from "../../constants/paths";
 import useHttp from "../../hooks/useHttp";
 import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
@@ -8,6 +8,7 @@ import styles from "./Home.module.css";
 import AtAGlance from "../../components/atAGlance/AtAGlance";
 import Navigation from "../../components/navigation/Navigation";
 import { getMoneyClass } from "../../utils/cssUtils";
+import WalletContext from "../../context/wallet-context";
 
 function getFirstName(result) {
   return result ? result.name?.split(" ")?.[0] : "-";
@@ -23,10 +24,9 @@ function getBalance(result) {
 }
 
 function Home() {
+  const { wallet, fetchWallet } = useContext(WalletContext);
   const { result: resultName, sendRequest: sendRequestName } = useHttp();
-  const { result: resultWallet, sendRequest: sendRequestWallet } = useHttp();
   const { result: resultTax, sendRequest: sendRequestTax } = useHttp();
-
   useEffect(() => {
     sendRequestName({
       url: CLIENTS_URL,
@@ -34,10 +34,8 @@ function Home() {
   }, [sendRequestName]);
 
   useEffect(() => {
-    sendRequestWallet({
-      url: WALLETS_URL,
-    });
-  }, [sendRequestWallet]);
+    fetchWallet();
+  }, [fetchWallet]);
 
   useEffect(() => {
     sendRequestTax({
@@ -46,7 +44,7 @@ function Home() {
   }, [sendRequestTax]);
 
   const firstName = getFirstName(resultName);
-  const money = getBalance(resultWallet);
+  const money = getBalance(wallet);
   const moneyClass = getMoneyClass(money);
   return (
     <div className={`${baseStyles.container} ${styles.container}`}>
@@ -59,7 +57,7 @@ function Home() {
           <Money className={baseStyles[moneyClass]} value={money} />
         </section>
         <section>
-          <AtAGlance wallet={resultWallet} tax={resultTax} />
+          <AtAGlance wallet={wallet} tax={resultTax} />
         </section>
         <section>
           <Navigation />

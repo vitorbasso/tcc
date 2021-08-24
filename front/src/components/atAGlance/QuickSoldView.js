@@ -5,13 +5,13 @@ function QuickSoldView(props) {
   return (
     <div>
       <p>Vendas:</p>
-      <p>
+      <div>
         <Money value={props.sold} className={styles["money-size"]} />
-      </p>
+      </div>
       <p>IR:</p>
-      <p>
+      <div>
         <Money value={props.tax} className={styles["money-size"]} />
-      </p>
+      </div>
     </div>
   );
 }

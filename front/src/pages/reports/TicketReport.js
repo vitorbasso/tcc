@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { useLocation, useParams } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
-import { STOCKS_URL, WALLETS_URL } from "../../constants/paths";
+import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
-import useHttp from "../../hooks/useHttp";
 import { getMoneyClass } from "../../utils/cssUtils";
 import { moneyFormatter, percentFormatter } from "../../utils/numberUtils";
 import styles from "./TicketReport.module.css";
@@ -28,30 +27,28 @@ function getVariationStyle(variation) {
 }
 
 function TicketReport(props) {
-  const { result, sendRequest } = useHttp();
+  const { wallet, fetchWallet } = useContext(WalletContext);
   const [variation, setVariation] = useState(0.0242);
   const location = useLocation();
   const { id } = useParams();
 
   useEffect(() => {
-    sendRequest({
-      url: WALLETS_URL,
-    });
-  }, [sendRequest]);
+    fetchWallet();
+  }, [fetchWallet]);
 
   let averageValue = 0;
   let amount = 0;
   let money = 0;
   let percentOfWallet = 0;
-  if (result) {
-    const asset = result.stockAssets.find((asset) => asset.stockSymbol === id);
+  if (wallet) {
+    const asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);
     if (asset) {
       money = asset.averageCost * asset.amount;
       amount = asset.amount;
       averageValue = asset.averageCost;
       percentOfWallet =
         money /
-        result.stockAssets.reduce((total, asset) => {
+        wallet.stockAssets.reduce((total, asset) => {
           return (total +=
             asset.amount > 0 ? asset.averageCost * asset.amount : 0);
         }, 0);

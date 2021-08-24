@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
 import styles from "./RegisterOperation.module.css";
@@ -9,6 +9,7 @@ import Notification, {
 import useHttp from "../../hooks/useHttp";
 import { TRANSACTION_URL } from "../../constants/paths";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
+import WalletContext from "../../context/wallet-context";
 
 const BUY = "BUY";
 const SELL = "SELL";
@@ -25,11 +26,9 @@ function RegisterOperation(props) {
     useState(SUCCESS_NOTIFICATION);
   const [notificationMessage, setNotificationMessage] = useState("SUCESSO");
   const [resetNotification, setResetNotification] = useState(false);
+  const { fetchWallet } = useContext(WalletContext);
   function onCloseNotification() {
     setShowNotification(false);
-  }
-  function onResetNotification() {
-    setResetNotification(false);
   }
   function onSubmitHandler(event) {
     event.preventDefault();
@@ -52,6 +51,7 @@ function RegisterOperation(props) {
       if (result) {
         setNotificationType(SUCCESS_NOTIFICATION);
         setNotificationMessage("SUCESSO");
+        fetchWallet(true);
       } else if (error) {
         setNotificationType(ERROR_NOTIFICATION);
         setNotificationMessage("ERRO");
@@ -64,7 +64,7 @@ function RegisterOperation(props) {
       clearTimeout(timeout);
       setResetNotification(true);
     };
-  }, [isLoading, result, error]);
+  }, [isLoading, result, error, fetchWallet]);
 
   function onTypeClick(event) {
     event.preventDefault();
