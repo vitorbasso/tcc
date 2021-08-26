@@ -37,6 +37,7 @@ function SignIn() {
       return;
     }
     authCtx.onLogin(jwt);
+    return [];
   }
 
   return (
