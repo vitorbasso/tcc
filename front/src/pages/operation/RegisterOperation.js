@@ -10,11 +10,12 @@ import useHttp from "../../hooks/useHttp";
 import { TRANSACTION_URL } from "../../constants/paths";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import WalletContext from "../../context/wallet-context";
+import taxContext from "../../context/tax-context";
 
 const BUY = "BUY";
 const SELL = "SELL";
 
-function RegisterOperation(props) {
+function RegisterOperation() {
   const { result, error, isLoading, sendRequest } = useHttp();
   const [type, setType] = useState(BUY);
   const [showNotification, setShowNotification] = useState(false);
@@ -27,6 +28,7 @@ function RegisterOperation(props) {
   const [notificationMessage, setNotificationMessage] = useState("SUCESSO");
   const [resetNotification, setResetNotification] = useState(false);
   const { fetchWallet } = useContext(WalletContext);
+  const { fetchTax } = useContext(taxContext);
   function onCloseNotification() {
     setShowNotification(false);
   }
@@ -52,6 +54,7 @@ function RegisterOperation(props) {
         setNotificationType(SUCCESS_NOTIFICATION);
         setNotificationMessage("SUCESSO");
         fetchWallet(true);
+        fetchTax(true);
       } else if (error) {
         setNotificationType(ERROR_NOTIFICATION);
         setNotificationMessage("ERRO");
@@ -64,7 +67,7 @@ function RegisterOperation(props) {
       clearTimeout(timeout);
       setResetNotification(true);
     };
-  }, [isLoading, result, error, fetchWallet]);
+  }, [isLoading, result, error, fetchWallet, fetchTax]);
 
   function onTypeClick(event) {
     event.preventDefault();

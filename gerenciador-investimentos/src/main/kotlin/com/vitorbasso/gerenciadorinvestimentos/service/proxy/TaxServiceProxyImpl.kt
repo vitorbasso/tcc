@@ -34,5 +34,6 @@ private fun ITax.toDto() = TaxDto(
     daytradeDeducted = this.daytradeDeducted.setScale(),
     baseForCalculation = this.balance.setScale(),
     daytradeBaseForCalculation = this.daytradeBalance.setScale(),
-    withdrawn = this.withdrawn.setScale()
+    withdrawn = this.withdrawn.setScale(),
+    daytradeWithdrawn = this.daytradeWithdrawn.setScale()
 )

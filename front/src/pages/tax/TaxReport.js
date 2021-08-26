@@ -1,43 +1,56 @@
 import { useContext, useEffect } from "react";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
-import { TAX_URL } from "../../constants/paths";
+import taxContext from "../../context/tax-context";
 import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
-import useHttp from "../../hooks/useHttp";
 import { getMoneyClass } from "../../utils/cssUtils";
 import styles from "./TaxReport.module.css";
 
 function TaxReport() {
-  const { result: resultTax, sendRequest: sendRequestTax } = useHttp();
+  const { tax, fetchTax } = useContext(taxContext);
   const { wallet, fetchWallet } = useContext(WalletContext);
 
   useEffect(() => {
-    sendRequestTax({
-      url: TAX_URL,
-    });
+    fetchTax();
     fetchWallet();
-  }, [sendRequestTax, fetchWallet]);
+  }, [fetchTax, fetchWallet]);
 
-  let money = 0;
+  let normalTax = 0;
+  let daytradeTax = 0;
   let balance = 0;
+  let daytradeBalance = 0;
   let deductable = 0;
+  let daytradeDeductable = 0;
   let withdrawn = 0;
+  let daytradeWithdrawn = 0;
   let base = 0;
+  let daytradeBase = 0;
   if (wallet) {
-    balance = wallet.balance + wallet.balanceDaytrade;
-    withdrawn = wallet.withdrawn + wallet.withdrawnDaytrade;
+    balance = wallet.balance;
+    daytradeBalance = wallet.balanceDaytrade;
+    withdrawn = wallet.withdrawn;
+    daytradeWithdrawn = wallet.withdrawnDaytrade;
   }
-  if (resultTax) {
-    money = resultTax.normalTax + resultTax.daytradeTax;
-    deductable =
-      resultTax.availableToDeduct + resultTax.daytradeAvailableToDeduct;
-    base = resultTax.baseForCalculation + resultTax.daytradeBaseForCalculation;
+  if (tax) {
+    normalTax = tax.normalTax;
+    daytradeTax = tax.daytradeTax;
+    deductable = tax.availableToDeduct;
+    daytradeDeductable = tax.daytradeAvailableToDeduct;
+    base = tax.baseForCalculation;
+    daytradeBase = tax.daytradeBaseForCalculation;
   } else {
-    money = 0;
+    normalTax = 0;
+    daytradeTax = 0;
   }
 
-  const moneyClass = getMoneyClass(money);
+  const totalTax = normalTax + daytradeTax;
+  const totalBalance = balance + daytradeBalance;
+  const totalDeductable = deductable + daytradeDeductable;
+  const totalWithdrawn = withdrawn + daytradeWithdrawn;
+  const totalBase = base + daytradeBase;
+
+  const moneyClass = getMoneyClass(totalTax);
   return (
     <div className={baseStyles.container}>
       <Header backButton>
@@ -50,7 +63,7 @@ function TaxReport() {
           </h3>
           <Money
             className={`${styles.money} ${baseStyles[moneyClass]}`}
-            value={money}
+            value={totalTax}
           />
         </section>
         <section className={styles.overview}>
@@ -58,13 +71,19 @@ function TaxReport() {
             <li>
               <span>Lucro:</span>
               <span>
-                <Money className={styles["inline-money"]} value={balance} />
+                <Money
+                  className={styles["inline-money"]}
+                  value={totalBalance}
+                />
               </span>
             </li>
             <li>
               <span>Vendas:</span>
               <span>
-                <Money className={styles["inline-money"]} value={withdrawn} />
+                <Money
+                  className={styles["inline-money"]}
+                  value={totalWithdrawn}
+                />
               </span>
             </li>
             <li>
@@ -74,12 +93,15 @@ function TaxReport() {
                 acumulado:
               </span>
               <span>
-                <Money className={styles["inline-money"]} value={deductable} />
+                <Money
+                  className={styles["inline-money"]}
+                  value={totalDeductable}
+                />
               </span>
             </li>
           </ul>
           <p>Valor base cálculo</p>
-          <Money value={base} />
+          <Money value={totalBase} />
         </section>
         <section className={styles.action}>
           <button type="button" className={baseStyles.btn}>

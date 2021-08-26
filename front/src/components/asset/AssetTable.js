@@ -53,7 +53,7 @@ function AssetTable(props) {
             </Link>
           );
         } else {
-          return {};
+          return [];
         }
       })}
     </div>

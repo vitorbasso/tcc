@@ -30,7 +30,7 @@ function TicketReport(props) {
   const { wallet, fetchWallet } = useContext(WalletContext);
   const [variation, setVariation] = useState(0.0242);
   const location = useLocation();
-  const { id } = useParams();
+  const id = useParams().id.toUpperCase();
 
   useEffect(() => {
     fetchWallet();
@@ -84,7 +84,7 @@ function TicketReport(props) {
   const [arrow, css] = getVariationStyle(variation);
   return (
     <div className={baseStyles.container}>
-      <Header backButton caller={location.state.caller || "/"}>
+      <Header backButton caller={location.state?.caller || "/"}>
         <h2>Ticker</h2>
       </Header>
       <main>
