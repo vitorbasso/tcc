@@ -6,11 +6,10 @@ import WalletContext from "../../context/wallet-context";
 
 function QuickSoldView() {
   const { tax, fetchTax } = useContext(taxContext);
-  const { wallet, fetchWallet } = useContext(WalletContext);
+  const { wallet } = useContext(WalletContext);
   useEffect(() => {
     fetchTax();
-    fetchWallet();
-  }, [fetchTax, fetchWallet]);
+  }, [fetchTax]);
   let totalTax = 0;
   if (tax) {
     totalTax = tax.normalTax + tax.daytradeTax;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { WALLETS_URL } from "../constants/paths";
 import useHttp from "../hooks/useHttp";
 
@@ -24,6 +24,7 @@ export const DEFAULT_WALLET = {
   wallet: INITIAL_WALLET,
   error: null,
   isLoading: null,
+  invalidateCache: () => {},
   fetchWallet: () => {},
 };
 
@@ -31,27 +32,34 @@ const FIVE_MINUTES = 5 * 60000;
 
 export function WalletContextProvider(props) {
   const [wallet, setWallet] = useState(INITIAL_WALLET);
-  const [lastSuccess, setLastSuccess] = useState(0);
+  const [lastSuccess, setLastSuccess] = useState(0.0);
+  const [lastUpdated, setLastUpdated] = useState(0.0);
+  const [isCacheValid, setIsCacheValid] = useState(false);
   const { result, error, isLoading, sendRequest } = useHttp();
 
-  async function getWalletHandler(force) {
-    if (
-      (!isLoading &&
-        new Date(lastSuccess + FIVE_MINUTES) < new Date().getTime()) ||
-      force
-    ) {
+  const getWalletHandler = useCallback(async () => {
+    const last = lastSuccess + FIVE_MINUTES;
+    const now = new Date().getTime();
+
+    if ((!isLoading && last < now) || !isCacheValid) {
+      setLastSuccess(now);
+      setIsCacheValid(true);
       sendRequest({
         url: WALLETS_URL,
       });
     }
-  }
+  }, [lastSuccess, isLoading, isCacheValid, sendRequest]);
+
+  const invalidateCache = useCallback(() => {
+    setIsCacheValid(false);
+  }, [setIsCacheValid]);
 
   useEffect(() => {
-    if (!isLoading && result) {
+    if (lastUpdated !== lastSuccess && !isLoading && result) {
       setWallet(result);
-      setLastSuccess(new Date().getTime());
+      setLastUpdated(lastSuccess);
     }
-  }, [result, isLoading]);
+  }, [lastUpdated, lastSuccess, result, isLoading]);
 
   return (
     <WalletContext.Provider
@@ -59,6 +67,7 @@ export function WalletContextProvider(props) {
         wallet,
         error,
         isLoading,
+        invalidateCache,
         fetchWallet: getWalletHandler,
       }}
     >

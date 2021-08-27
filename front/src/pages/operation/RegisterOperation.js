@@ -27,8 +27,8 @@ function RegisterOperation() {
     useState(SUCCESS_NOTIFICATION);
   const [notificationMessage, setNotificationMessage] = useState("SUCESSO");
   const [resetNotification, setResetNotification] = useState(false);
-  const { fetchWallet } = useContext(WalletContext);
-  const { fetchTax } = useContext(taxContext);
+  const { invalidateCache: invalidateWalletCache } = useContext(WalletContext);
+  const { invalidateCache: invalidateTaxCache } = useContext(taxContext);
   function onCloseNotification() {
     setShowNotification(false);
   }
@@ -53,8 +53,8 @@ function RegisterOperation() {
       if (result) {
         setNotificationType(SUCCESS_NOTIFICATION);
         setNotificationMessage("SUCESSO");
-        fetchWallet(true);
-        fetchTax(true);
+        invalidateTaxCache();
+        invalidateWalletCache();
       } else if (error) {
         setNotificationType(ERROR_NOTIFICATION);
         setNotificationMessage("ERRO");
@@ -67,7 +67,7 @@ function RegisterOperation() {
       clearTimeout(timeout);
       setResetNotification(true);
     };
-  }, [isLoading, result, error, fetchWallet, fetchTax]);
+  }, [isLoading, result, error, invalidateTaxCache, invalidateWalletCache]);
 
   function onTypeClick(event) {
     event.preventDefault();

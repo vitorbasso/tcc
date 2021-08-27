@@ -48,7 +48,6 @@ function TaxReport() {
   const totalBalance = balance + daytradeBalance;
   const totalDeductable = deductable + daytradeDeductable;
   const totalWithdrawn = withdrawn + daytradeWithdrawn;
-  const totalBase = base + daytradeBase;
 
   const moneyClass = getMoneyClass(totalTax);
   return (
@@ -77,12 +76,42 @@ function TaxReport() {
                 />
               </span>
             </li>
+            <li className={styles["sub-list"]}>
+              <span>- Normal:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={balance} />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Daytrade:</span>
+              <span>
+                <Money
+                  className={styles["inline-money"]}
+                  value={daytradeBalance}
+                />
+              </span>
+            </li>
             <li>
               <span>Vendas:</span>
               <span>
                 <Money
                   className={styles["inline-money"]}
                   value={totalWithdrawn}
+                />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Normal:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={withdrawn} />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Daytrade:</span>
+              <span>
+                <Money
+                  className={styles["inline-money"]}
+                  value={daytradeWithdrawn}
                 />
               </span>
             </li>
@@ -99,9 +128,26 @@ function TaxReport() {
                 />
               </span>
             </li>
+            <li className={styles["sub-list"]}>
+              <span>- Normal:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={deductable} />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Daytrade:</span>
+              <span>
+                <Money
+                  className={styles["inline-money"]}
+                  value={daytradeDeductable}
+                />
+              </span>
+            </li>
           </ul>
           <p>Valor base cálculo</p>
-          <Money value={totalBase} />
+          <Money value={base} />
+          <p>Valor base cálculo Daytrade</p>
+          <Money value={daytradeBase} />
         </section>
         <section className={styles.action}>
           <button type="button" className={baseStyles.btn}>

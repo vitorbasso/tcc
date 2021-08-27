@@ -69,8 +69,10 @@ function SignUp() {
   }
 
   if (!registerIsLoading && registerSuccess) {
-    history.replace("/");
-    return null;
+    setTimeout(() => {
+      history.replace("/");
+    }, 10);
+    return [];
   }
 
   return (

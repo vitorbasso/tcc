@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { TAX_URL } from "../constants/paths";
 import useHttp from "../hooks/useHttp";
 
@@ -19,6 +19,7 @@ export const DEFAULT_TAX = {
   tax: INITIAL_TAX,
   error: null,
   isLoading: null,
+  invalidateCache: () => {},
   fetchTax: () => {},
 };
 
@@ -26,27 +27,40 @@ const FIVE_MINUTES = 5 * 60000;
 
 export function TaxContextProvider(props) {
   const [tax, setTax] = useState(INITIAL_TAX);
-  const [lastSuccess, setLastSuccess] = useState(0);
+  const [lastSuccess, setLastSuccess] = useState(0.0);
+  const [lastUpdated, setLastUpdated] = useState(0.0);
+  const [isCacheValid, setIsCacheValid] = useState(false);
   const { result, error, isLoading, sendRequest } = useHttp();
 
-  async function getTaxHandler(force) {
-    if (
-      (!isLoading &&
-        new Date(lastSuccess + FIVE_MINUTES) < new Date().getTime()) ||
-      force
-    ) {
+  const getTaxHandler = useCallback(async () => {
+    const last = lastSuccess + FIVE_MINUTES;
+    const now = new Date().getTime();
+    if ((!isLoading && last < now) || !isCacheValid) {
+      setLastSuccess(now);
+      setIsCacheValid(true);
       sendRequest({
         url: TAX_URL,
       });
     }
-  }
+  }, [isLoading, lastSuccess, isCacheValid, sendRequest]);
+
+  const invalidateCache = useCallback(() => {
+    setIsCacheValid(false);
+  }, [setIsCacheValid]);
+
+  const resetContext = useCallback(() => {
+    setTax(INITIAL_TAX);
+    setLastSuccess(0.0);
+    setLastUpdated(0.0);
+    setIsCacheValid(false);
+  }, []);
 
   useEffect(() => {
-    if (!isLoading && result) {
+    if (lastUpdated !== lastSuccess && !isLoading && result) {
       setTax(result);
-      setLastSuccess(new Date().getTime());
+      setLastUpdated(lastSuccess);
     }
-  }, [result, isLoading]);
+  }, [lastUpdated, lastSuccess, result, isLoading]);
 
   return (
     <taxContext.Provider
@@ -55,6 +69,8 @@ export function TaxContextProvider(props) {
         error,
         isLoading,
         fetchTax: getTaxHandler,
+        invalidateCache,
+        resetContext,
       }}
     >
       {props.children}

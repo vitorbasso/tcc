@@ -24,7 +24,7 @@ function getBalance(result) {
 }
 
 function Home() {
-  const { wallet, fetchWallet } = useContext(WalletContext);
+  const { wallet, isLoading, fetchWallet } = useContext(WalletContext);
   const { result: resultName, sendRequest: sendRequestName } = useHttp();
   useEffect(() => {
     sendRequestName({
@@ -33,8 +33,8 @@ function Home() {
   }, [sendRequestName]);
 
   useEffect(() => {
-    fetchWallet();
-  }, [fetchWallet]);
+    if (!isLoading) fetchWallet();
+  }, [isLoading, fetchWallet]);
 
   const firstName = getFirstName(resultName);
   const money = getBalance(wallet);

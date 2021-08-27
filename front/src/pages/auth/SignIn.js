@@ -36,7 +36,9 @@ function SignIn() {
       console.error("did not get token");
       return;
     }
-    authCtx.onLogin(jwt);
+    setTimeout(() => {
+      authCtx.onLogin(jwt);
+    }, 10);
     return [];
   }
 
