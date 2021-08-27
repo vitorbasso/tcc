@@ -22,11 +22,12 @@ export function AuthContextProvider(props) {
     setToken(token);
     setIsLoggedIn(true);
   }
-  function logoutHandler() {
+  function logoutHandler(cleanup) {
     if (!isLoggedIn) return;
     localStorage.removeItem("token");
     setToken("");
     setIsLoggedIn(false);
+    if (typeof cleanup === "function") cleanup();
   }
   return (
     <AuthContext.Provider

@@ -20,6 +20,7 @@ export const DEFAULT_TAX = {
   error: null,
   isLoading: null,
   invalidateCache: () => {},
+  resetContext: () => {},
   fetchTax: () => {},
 };
 

@@ -25,6 +25,7 @@ export const DEFAULT_WALLET = {
   error: null,
   isLoading: null,
   invalidateCache: () => {},
+  resetContext: () => {},
   fetchWallet: () => {},
 };
 
@@ -54,6 +55,13 @@ export function WalletContextProvider(props) {
     setIsCacheValid(false);
   }, [setIsCacheValid]);
 
+  const resetContext = useCallback(() => {
+    setWallet(INITIAL_WALLET);
+    setLastSuccess(0.0);
+    setLastUpdated(0.0);
+    setIsCacheValid(false);
+  }, []);
+
   useEffect(() => {
     if (lastUpdated !== lastSuccess && !isLoading && result) {
       setWallet(result);
@@ -67,8 +75,9 @@ export function WalletContextProvider(props) {
         wallet,
         error,
         isLoading,
-        invalidateCache,
         fetchWallet: getWalletHandler,
+        invalidateCache,
+        resetContext,
       }}
     >
       {props.children}
