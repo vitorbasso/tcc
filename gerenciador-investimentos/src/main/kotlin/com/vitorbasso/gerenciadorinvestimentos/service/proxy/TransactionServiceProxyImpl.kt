@@ -26,10 +26,8 @@ class TransactionServiceProxyImpl(
 
 private fun ITransaction.getDto() = TransactionDto(
     id = (this as Transaction).id,
-    type = this.type.name,
+    type = this.type,
     quantity = this.quantity,
     value = this.value.setScale(),
-    ticker = this.asset.stock.ticker,
     transactionDate = this.transactionDate,
-    daytradeQuantity = this.daytradeQuantity
 )

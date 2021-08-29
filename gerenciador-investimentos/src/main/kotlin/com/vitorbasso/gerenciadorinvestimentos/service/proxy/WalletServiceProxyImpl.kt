@@ -4,7 +4,7 @@ import com.vitorbasso.gerenciadorinvestimentos.domain.IAsset
 import com.vitorbasso.gerenciadorinvestimentos.domain.IWallet
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
 import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
-import com.vitorbasso.gerenciadorinvestimentos.dto.response.AssetDto
+import com.vitorbasso.gerenciadorinvestimentos.dto.response.AssetWithoutTransactionsDto
 import com.vitorbasso.gerenciadorinvestimentos.dto.response.WalletDto
 import com.vitorbasso.gerenciadorinvestimentos.service.IWalletService
 import com.vitorbasso.gerenciadorinvestimentos.util.setScale
@@ -37,7 +37,7 @@ private fun IWallet.getDto() = WalletDto(
     stockAssets = this.asset.map { it.getDto() }
 )
 
-private fun IAsset.getDto() = AssetDto(
+private fun IAsset.getDto() = AssetWithoutTransactionsDto(
     id = (this as Asset).id,
     stockSymbol = this.stock.ticker,
     averageCost = this.averageCost.setScale(),

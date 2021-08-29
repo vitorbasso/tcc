@@ -1,12 +1,10 @@
 package com.vitorbasso.gerenciadorinvestimentos.service
 
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Asset
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Stock
-import com.vitorbasso.gerenciadorinvestimentos.domain.concrete.Wallet
+import com.vitorbasso.gerenciadorinvestimentos.domain.IAsset
 
 interface IAssetService {
 
-    fun getAsset(wallet: Wallet, stock: Stock): Asset
+    fun getAsset(ticker: String): IAsset
 
-    fun deleteAsset(walletId: Long, ticker: String)
+    fun deleteAsset(ticker: String)
 }
