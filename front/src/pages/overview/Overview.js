@@ -28,7 +28,10 @@ function Overview(props) {
         <section className={styles["section__pie-chart"]}>
           <PieChart className={styles["pie-chart__pie-chart"]} />
           <div className={styles["pie-chart__selected-info"]}>
-            <PieSelected className={styles["pie-chart__selected-legend"]} />
+            <PieSelected
+              caller="/overview"
+              className={styles["pie-chart__selected-legend"]}
+            />
             <div>
               <p>{numberFormatter.format(2_000)}</p>
               <div>
