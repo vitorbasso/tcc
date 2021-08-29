@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 data class TransactionDto(
     val id: Long,
     val type: TransactionType,
-    val quantity: Int,
+    val quantity: Long,
     val value: BigDecimal,
     val transactionDate: LocalDateTime,
 ) : ITransaction

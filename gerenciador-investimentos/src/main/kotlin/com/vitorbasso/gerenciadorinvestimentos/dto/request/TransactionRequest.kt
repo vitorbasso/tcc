@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank
 
 data class TransactionRequest(
     @field:Min(value = 0, message = "error.request.body.fields.transaction.quantity")
-    val quantity: Int,
+    val quantity: Long,
     @field:Min(value = 0, message = "error.request.body.fields.transaction.value")
     val value: BigDecimal,
     @field:NotBlank(message = "error.request.body.fields.transaction.type")

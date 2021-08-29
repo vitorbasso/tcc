@@ -23,7 +23,7 @@ data class Transaction(
 
     val type: TransactionType = TransactionType.BUY,
 
-    val quantity: Int = 0,
+    val quantity: Long = 0,
 
     val value: BigDecimal = BigDecimal.ZERO,
 
@@ -31,9 +31,9 @@ data class Transaction(
 
     val checkingValue: BigDecimal = BigDecimal.ZERO,
 
-    val checkingQuantity: Int = 0,
+    val checkingQuantity: Long = 0,
 
-    val daytradeQuantity: Int = 0,
+    val daytradeQuantity: Long = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", referencedColumnName = "id")

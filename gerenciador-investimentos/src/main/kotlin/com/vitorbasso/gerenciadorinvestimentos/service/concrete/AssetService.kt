@@ -21,7 +21,7 @@ internal class AssetService(
 
     fun deleteAsset(asset: Asset) = this.assetRepository.delete(asset)
 
-    fun saveAsset(asset: Asset) = if (asset.amount == 0)
+    fun saveAsset(asset: Asset) = if (asset.amount == 0L)
         this.assetRepository.save(asset.copy(averageCost = BigDecimal(0)))
     else this.assetRepository.save(asset)
 

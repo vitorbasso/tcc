@@ -7,6 +7,6 @@ data class AssetWithoutTransactionsDto(
     val id: Long,
     val stockSymbol: String,
     val averageCost: BigDecimal,
-    val amount: Int,
+    val amount: Long,
     val lifetimeBalance: BigDecimal
 ) : IAsset
