@@ -5,9 +5,9 @@ import baseStyles from "../../css/base.module.css";
 import styles from "./Overview.module.css";
 import { numberFormatter } from "../../utils/numberUtils";
 import Money from "../../components/money/Money";
-import AssetTable from "../../components/asset/AssetTable";
 import { useContext, useEffect } from "react";
 import WalletContext from "../../context/wallet-context";
+import AssetTable from "../../components/table/assets/AssetTable";
 
 function Overview() {
   const { wallet, fetchWallet } = useContext(WalletContext);

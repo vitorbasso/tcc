@@ -6,10 +6,10 @@ import { getMoneyClass } from "../../utils/cssUtils";
 import styles from "./PerformanceReport.module.css";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { moneyFormatter, percentFormatter } from "../../utils/numberUtils";
-import AssetTable from "../../components/asset/AssetTable";
 import useHttp from "../../hooks/useHttp";
 import { STOCKS_URL } from "../../constants/paths";
 import WalletContext from "../../context/wallet-context";
+import AssetTable from "../../components/table/assets/AssetTable";
 
 const DAY = "day";
 const WEEK = "week";
@@ -74,26 +74,18 @@ function PerformanceReport(props) {
     lastSelected.classList.remove(styles.selected);
     switch (filterBy) {
       case DAY:
-        // setMoney(15_246.46);
-        // setVariation(-0.004);
         setIbov(0.0001);
         updateNavSelected(DAY);
         break;
       case WEEK:
-        // setMoney(55_530.5);
-        // setVariation(0.005);
         setIbov(0.0005);
         updateNavSelected(WEEK);
         break;
       case MONTH:
-        // setMoney(534_549.85);
-        // setVariation(0.036);
         setIbov(0.0163);
         updateNavSelected(MONTH);
         break;
       case YEAR:
-        // setMoney(13_358_387.58);
-        // setVariation(0.1756);
         setIbov(0.0634);
         updateNavSelected(YEAR);
         break;

@@ -1,0 +1,5 @@
+.selected {
+  background-color: var(--pastel-green-dark);
+  transform: translateY(2px);
+  box-shadow: none;
+}

@@ -1,6 +1,7 @@
 import styles from "./AssetTable.module.css";
-import { numberFormatter, percentFormatter } from "../../utils/numberUtils";
-import Money from "../money/Money";
+import baseStyles from "../../../css/base.module.css";
+import { numberFormatter, percentFormatter } from "../../../utils/numberUtils";
+import Money from "../../money/Money";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
@@ -80,8 +81,8 @@ function AssetTable(props) {
     Object.assign(percentFormatter.resolvedOptions(), { signDisplay: "never" })
   );
   return (
-    <div className={`${props.className} ${styles.container}`}>
-      <label className={styles["hide-zero"]} htmlFor="hide-zero">
+    <div className={`${props.className} ${baseStyles.table}`}>
+      <label htmlFor="hide-zero">
         <input
           id="hide-zero"
           type="checkbox"
@@ -89,12 +90,8 @@ function AssetTable(props) {
         />
         Esconder ações com quantidade zero
       </label>
-      <div className={styles["sorting-buttons"]} onClick={handleSorting}>
-        <button
-          className={`${styles.btn} ${styles.selected}`}
-          data-sort={PERCENT}
-          type="button"
-        >
+      <div onClick={handleSorting}>
+        <button className={styles.selected} data-sort={PERCENT} type="button">
           %{" "}
           {sortBy === PERCENT ? (
             <BsArrowDown />
@@ -104,7 +101,7 @@ function AssetTable(props) {
             ""
           )}
         </button>
-        <button className={styles.btn} data-sort={NAME} type="button">
+        <button data-sort={NAME} type="button">
           Nome{" "}
           {sortBy === NAME ? (
             <BsArrowUp />
@@ -114,7 +111,7 @@ function AssetTable(props) {
             ""
           )}
         </button>
-        <button className={styles.btn} data-sort={AVERAGE_VALUE} type="button">
+        <button data-sort={AVERAGE_VALUE} type="button">
           Avg{" "}
           {sortBy === AVERAGE_VALUE ? (
             <BsArrowDown />
@@ -130,7 +127,6 @@ function AssetTable(props) {
         return (
           <Link
             key={asset.id}
-            className={styles["no-style-link"]}
             to={{
               pathname: `performance/${asset.stockSymbol}`,
               state: {
@@ -138,8 +134,8 @@ function AssetTable(props) {
               },
             }}
           >
-            <table className={`${styles.table}`}>
-              <thead className={styles["table-head"]}>
+            <table>
+              <thead>
                 <tr>
                   <th>Ação</th>
                   <th>Qnt</th>
@@ -148,7 +144,7 @@ function AssetTable(props) {
                   <th>%</th>
                 </tr>
               </thead>
-              <tbody className={styles["table-body"]}>
+              <tbody>
                 <tr>
                   <td>{asset.stockSymbol}</td>
                   <td>{numberFormatter.format(asset.amount)}</td>

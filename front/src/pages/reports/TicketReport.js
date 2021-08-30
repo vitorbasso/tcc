@@ -3,6 +3,7 @@ import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { useLocation, useParams } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
+import TickerTable from "../../components/table/ticker/TickerTable";
 import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
 import { getMoneyClass } from "../../utils/cssUtils";
@@ -26,7 +27,7 @@ function getVariationStyle(variation) {
     : [null, ""];
 }
 
-function TicketReport(props) {
+function TicketReport() {
   const { wallet, fetchWallet } = useContext(WalletContext);
   const [variation, setVariation] = useState(0.0242);
   const location = useLocation();
@@ -138,6 +139,9 @@ function TicketReport(props) {
             <span>{percentFormatter.format(variation)}</span>
             <span>({moneyFormatter.format(variation * money)})</span>
           </div>
+        </section>
+        <section>
+          <TickerTable assets={wallet.stockAssets} />
         </section>
       </main>
     </div>

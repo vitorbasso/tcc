@@ -99,6 +99,105 @@
   box-shadow: none;
 }
 
+.table {
+  padding-bottom: 5rem;
+}
+
+.table a {
+  color: var(--main-gray);
+  font-weight: normal;
+}
+
+.table table {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--secondary-gray);
+  border-radius: 5px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.table thead tr {
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  border-right: 1px solid var(--secondary-gray);
+  padding-right: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.table thead tr th {
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-weight: normal;
+}
+
+.table tbody tr td:first-child {
+  text-transform: uppercase;
+  font-size: 1.2rem;
+}
+
+.table tbody tr {
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+}
+
+.table tbody tr td {
+  height: 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.hide-zero {
+  font-size: 0.8rem;
+}
+
+.table input {
+  margin-bottom: 1rem;
+  margin-right: 0.5rem;
+}
+
+.table > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  margin-bottom: 1rem;
+}
+
+.table > div button {
+  border: none;
+  border-radius: 10px;
+  width: 90%;
+  min-height: 1.5rem;
+  cursor: pointer;
+  color: #fff;
+  font-weight: normal;
+  font-size: small;
+  text-transform: capitalize;
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  background-color: var(--pastel-green);
+}
+
+.table > div button:hover {
+  background-color: var(--pastel-green-dark);
+}
+
+.table > div button:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.table > div button.selected {
+  background-color: var(--pastel-green-dark);
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
 @media (min-width: 1280px) {
   .container {
     width: 1024px; /* 80% de 690 */
