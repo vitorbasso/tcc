@@ -1,12 +1,12 @@
 import styles from "./QuickSoldView.module.css";
 import Money from "../money/Money";
 import { useContext, useEffect } from "react";
-import taxContext from "../../context/tax-context";
+import TaxContext from "../../context/tax-context";
 import WalletContext from "../../context/wallet-context";
 import { Link } from "react-router-dom";
 
 function QuickSoldView() {
-  const { tax, fetchTax } = useContext(taxContext);
+  const { tax, fetchTax } = useContext(TaxContext);
   const { wallet } = useContext(WalletContext);
   useEffect(() => {
     fetchTax();

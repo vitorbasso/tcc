@@ -1,14 +1,14 @@
 import { useContext, useEffect } from "react";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
-import taxContext from "../../context/tax-context";
+import TaxContext from "../../context/tax-context";
 import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
 import { getMoneyClass } from "../../utils/cssUtils";
 import styles from "./TaxReport.module.css";
 
 function TaxReport() {
-  const { tax, fetchTax } = useContext(taxContext);
+  const { tax, fetchTax } = useContext(TaxContext);
   const { wallet, fetchWallet } = useContext(WalletContext);
 
   useEffect(() => {
@@ -26,11 +26,15 @@ function TaxReport() {
   let daytradeWithdrawn = 0;
   let base = 0;
   let daytradeBase = 0;
+  let irrf = 0;
+  let daytradeIrrf = 0;
   if (wallet) {
-    balance = wallet.balance;
-    daytradeBalance = wallet.balanceDaytrade;
+    balance = wallet.balance > 0 ? wallet.balance : 0;
+    daytradeBalance = wallet.balanceDaytrade > 0 ? wallet.balanceDaytrade : 0;
     withdrawn = wallet.withdrawn;
     daytradeWithdrawn = wallet.withdrawnDaytrade;
+    irrf = withdrawn * 0.00005 > 1 && balance > 0 ? withdrawn * 0.00005 : 0;
+    daytradeIrrf = daytradeBalance * 0.01;
   }
   if (tax) {
     normalTax = tax.normalTax;
@@ -46,6 +50,7 @@ function TaxReport() {
 
   const totalTax = normalTax + daytradeTax;
   const totalBalance = balance + daytradeBalance;
+  const totalIrrf = irrf + daytradeIrrf;
   const totalDeductable = deductable + daytradeDeductable;
   const totalWithdrawn = withdrawn + daytradeWithdrawn;
 
@@ -143,11 +148,53 @@ function TaxReport() {
                 />
               </span>
             </li>
+            <li>
+              <span>IRRF:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={totalIrrf} />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Normal:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={irrf} />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Daytrade:</span>
+              <span>
+                <Money
+                  className={styles["inline-money"]}
+                  value={daytradeIrrf}
+                />
+              </span>
+            </li>
+            <li>
+              <span>Imposto:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={totalTax} />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Normal:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={normalTax} />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Daytrade:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={daytradeTax} />
+              </span>
+            </li>
           </ul>
           <p>Valor base cálculo</p>
-          <Money value={base} />
+          <Money value={base} className={base < 0 && styles.loss} />
           <p>Valor base cálculo Daytrade</p>
-          <Money value={daytradeBase} />
+          <Money
+            value={daytradeBase}
+            className={daytradeBase < 0 && styles.loss}
+          />
         </section>
         <section className={styles.action}>
           <button type="button" className={baseStyles.btn}>

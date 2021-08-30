@@ -1,9 +1,12 @@
 import styles from "./AssetTable.module.css";
 import baseStyles from "../../../css/base.module.css";
-import { numberFormatter, percentFormatter } from "../../../utils/numberUtils";
+import {
+  numberFormatter,
+  percentFormatterWithoutSign,
+} from "../../../utils/formatterUtils";
 import Money from "../../money/Money";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 
 function sortByPercentage(first, second, weight = 1) {
@@ -37,7 +40,10 @@ const AVERAGE_VALUE_INVERSE = "-averageValue";
 
 function AssetTable(props) {
   const [sortBy, setSortBy] = useState(PERCENT);
-  const [assetsToDisplay, setAssetsToDisplay] = useState(props.assets);
+  const [assetsToDisplay, setAssetsToDisplay] = useState([]);
+  useEffect(() => {
+    setAssetsToDisplay(props.assets);
+  }, [props.assets]);
   const assets = assetsToDisplay.sort((first, second) => {
     switch (sortBy) {
       case NAME:
@@ -76,10 +82,6 @@ function AssetTable(props) {
     else setSortBy(`-${btn.dataset.sort}`);
   }
 
-  const percentFormatterWithoutSign = Intl.NumberFormat(
-    "pt-BR",
-    Object.assign(percentFormatter.resolvedOptions(), { signDisplay: "never" })
-  );
   return (
     <div className={`${props.className} ${baseStyles.table}`}>
       <label htmlFor="hide-zero">

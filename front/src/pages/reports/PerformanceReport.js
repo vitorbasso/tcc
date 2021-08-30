@@ -5,7 +5,7 @@ import baseStyles from "../../css/base.module.css";
 import { getMoneyClass } from "../../utils/cssUtils";
 import styles from "./PerformanceReport.module.css";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
-import { moneyFormatter, percentFormatter } from "../../utils/numberUtils";
+import { moneyFormatter, percentFormatter } from "../../utils/formatterUtils";
 import useHttp from "../../hooks/useHttp";
 import { STOCKS_URL } from "../../constants/paths";
 import WalletContext from "../../context/wallet-context";

@@ -1,6 +1,6 @@
 import styles from "./TopTickets.module.css";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
-import { percentFormatter } from "../../utils/numberUtils";
+import { percentFormatter } from "../../utils/formatterUtils";
 import { useContext } from "react";
 import WalletContext from "../../context/wallet-context";
 import { Link } from "react-router-dom";

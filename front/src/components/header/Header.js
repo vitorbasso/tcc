@@ -3,13 +3,13 @@ import { useContext } from "react";
 import AuthContext from "../../context/auth-context";
 import { CgLogOut, CgArrowLeft } from "react-icons/cg";
 import { useHistory } from "react-router-dom";
-import taxContext from "../../context/tax-context";
+import TaxContext from "../../context/tax-context";
 import WalletContext from "../../context/wallet-context";
 
 function Header(props) {
   const authCtx = useContext(AuthContext);
   const history = useHistory();
-  const { resetContext: resetTaxContext } = useContext(taxContext);
+  const { resetContext: resetTaxContext } = useContext(TaxContext);
   const { resetContext: resetWalletContext } = useContext(WalletContext);
   function handleGoBackClick() {
     if (props.caller) history.push(props.caller);

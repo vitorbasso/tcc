@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import WalletContext from "../../context/wallet-context";
-import { percentFormatter } from "../../utils/numberUtils";
+import { percentFormatterWithoutSign } from "../../utils/formatterUtils";
 import styles from "./PieSelected.module.css";
 
 function PieSelected(props) {
@@ -25,13 +25,7 @@ function PieSelected(props) {
     (asset) => asset.id === assetValues?.[0]?.id
   );
   const link = topTicker ? `performance/${topTicker.stockSymbol}` : "";
-  const formatterOptions = Object.assign(percentFormatter.resolvedOptions(), {
-    signDisplay: "never",
-  });
-  const percentFormatterWithoutSign = Intl.NumberFormat(
-    "pt-BR",
-    formatterOptions
-  );
+
   const percentOfWallet = percentFormatterWithoutSign.format(
     topTicker && walletTotalValue !== 0
       ? (topTicker.amount * topTicker.averageCost) / walletTotalValue

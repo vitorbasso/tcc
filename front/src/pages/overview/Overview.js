@@ -3,7 +3,7 @@ import PieSelected from "../../components/piechart/PieSelected";
 import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
 import styles from "./Overview.module.css";
-import { numberFormatter } from "../../utils/numberUtils";
+import { numberFormatter } from "../../utils/formatterUtils";
 import Money from "../../components/money/Money";
 import { useContext, useEffect } from "react";
 import WalletContext from "../../context/wallet-context";
@@ -19,6 +19,10 @@ function Overview() {
   if (wallet) {
     assets = wallet.stockAssets;
   }
+  const assetAmount = assets[0]?.amount;
+  const assetAverageCost = assets[0]?.averageCost;
+  const assetTotalValue = assetAmount * assetAverageCost;
+
   return (
     <div className={baseStyles.container}>
       <Header backButton>
@@ -33,12 +37,12 @@ function Overview() {
               className={styles["pie-chart__selected-legend"]}
             />
             <div>
-              <p>{numberFormatter.format(2_000)}</p>
+              <p>{numberFormatter.format(assetAmount)}</p>
               <div>
-                <Money value={25} />
+                <Money value={assetAverageCost} />
               </div>
               <div>
-                <Money value={50_000} />
+                <Money value={assetTotalValue} />
               </div>
             </div>
           </div>

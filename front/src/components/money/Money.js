@@ -1,4 +1,4 @@
-import { moneyFormatter } from "../../utils/numberUtils";
+import { moneyFormatter } from "../../utils/formatterUtils";
 import styles from "./Money.module.css";
 
 function Money(props) {

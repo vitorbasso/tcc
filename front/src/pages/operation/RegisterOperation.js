@@ -10,7 +10,7 @@ import useHttp from "../../hooks/useHttp";
 import { TRANSACTION_URL } from "../../constants/paths";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import WalletContext from "../../context/wallet-context";
-import taxContext from "../../context/tax-context";
+import TaxContext from "../../context/tax-context";
 
 const BUY = "BUY";
 const SELL = "SELL";
@@ -28,7 +28,7 @@ function RegisterOperation() {
   const [notificationMessage, setNotificationMessage] = useState("SUCESSO");
   const [resetNotification, setResetNotification] = useState(false);
   const { invalidateCache: invalidateWalletCache } = useContext(WalletContext);
-  const { invalidateCache: invalidateTaxCache } = useContext(taxContext);
+  const { invalidateCache: invalidateTaxCache } = useContext(TaxContext);
   function onCloseNotification() {
     setShowNotification(false);
   }

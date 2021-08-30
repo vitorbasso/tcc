@@ -2,6 +2,10 @@
   text-align: start;
 }
 
+.loss {
+  color: var(--error-red);
+}
+
 .inline-money {
   display: inline;
   font-size: 1.2rem;

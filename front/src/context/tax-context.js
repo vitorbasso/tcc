@@ -64,7 +64,7 @@ export function TaxContextProvider(props) {
   }, [lastUpdated, lastSuccess, result, isLoading]);
 
   return (
-    <taxContext.Provider
+    <TaxContext.Provider
       value={{
         tax,
         error,
@@ -75,10 +75,10 @@ export function TaxContextProvider(props) {
       }}
     >
       {props.children}
-    </taxContext.Provider>
+    </TaxContext.Provider>
   );
 }
 
-const taxContext = React.createContext(DEFAULT_TAX);
+const TaxContext = React.createContext(DEFAULT_TAX);
 
-export default taxContext;
+export default TaxContext;
