@@ -7,6 +7,7 @@ import styles from "./PieSelected.module.css";
 function PieSelected(props) {
   const { wallet } = useContext(WalletContext);
   const assetValues = wallet.stockAssets
+    .filter((asset) => asset.amount !== 0)
     .map((asset) => ({
       id: asset.id,
       value: asset.amount * asset.averageCost,
@@ -23,7 +24,7 @@ function PieSelected(props) {
   const topTicker = wallet.stockAssets.find(
     (asset) => asset.id === assetValues?.[0]?.id
   );
-  const link = topTicker ? `performance/${topTicker.stockSymbol}` : "#";
+  const link = topTicker ? `performance/${topTicker.stockSymbol}` : "";
   const formatterOptions = Object.assign(percentFormatter.resolvedOptions(), {
     signDisplay: "never",
   });
@@ -32,7 +33,7 @@ function PieSelected(props) {
     formatterOptions
   );
   const percentOfWallet = percentFormatterWithoutSign.format(
-    topTicker
+    topTicker && walletTotalValue !== 0
       ? (topTicker.amount * topTicker.averageCost) / walletTotalValue
       : 0
   );
@@ -50,7 +51,7 @@ function PieSelected(props) {
       <div>
         <div className={bar}></div>
       </div>
-      <p className={styles.percent}>{percentOfWallet}</p>
+      <p>{percentOfWallet}</p>
       {topTicker && <p>{topTicker.stockSymbol}</p>}
     </Link>
   );

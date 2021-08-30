@@ -3,6 +3,7 @@ import Money from "../money/Money";
 import { useContext, useEffect } from "react";
 import taxContext from "../../context/tax-context";
 import WalletContext from "../../context/wallet-context";
+import { Link } from "react-router-dom";
 
 function QuickSoldView() {
   const { tax, fetchTax } = useContext(taxContext);
@@ -20,7 +21,7 @@ function QuickSoldView() {
   }
 
   return (
-    <div>
+    <Link to={`/tax`} className={styles.link}>
       <p>Lucro:</p>
       <div>
         <Money value={totalBalance} className={styles["money-size"]} />
@@ -29,7 +30,7 @@ function QuickSoldView() {
       <div>
         <Money value={totalTax} className={styles["money-size"]} />
       </div>
-    </div>
+    </Link>
   );
 }
 

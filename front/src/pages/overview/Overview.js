@@ -9,7 +9,7 @@ import AssetTable from "../../components/asset/AssetTable";
 import { useContext, useEffect } from "react";
 import WalletContext from "../../context/wallet-context";
 
-function Overview(props) {
+function Overview() {
   const { wallet, fetchWallet } = useContext(WalletContext);
 
   useEffect(() => {
