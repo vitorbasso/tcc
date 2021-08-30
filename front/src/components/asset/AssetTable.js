@@ -5,15 +5,9 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 
-function calculateAssetValue(asset) {
-  return asset.amount > 0
-    ? asset.amount * asset.averageCost
-    : -1 * asset.amount * asset.averageCost;
-}
-
 function sortByPercentage(first, second, weight = 1) {
-  const firstValue = calculateAssetValue(first);
-  const secondValue = calculateAssetValue(second);
+  const firstValue = first.amount * first.averageCost;
+  const secondValue = second.amount * second.averageCost;
   const value =
     firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
   return value * weight;
@@ -60,16 +54,13 @@ function AssetTable(props) {
     }
   });
   const totalValue = props.assets
-    .filter((asset) => asset.amount !== 0)
+    .filter((asset) => asset.amount > 0)
     .reduce((total, asset) => {
-      return (total +=
-        asset.amount > 0
-          ? asset.averageCost * asset.amount
-          : asset.averageCost * (-1 * asset.amount));
+      return (total += asset.averageCost * asset.amount);
     }, 0);
   function toggleZeroQuantityTransactions(event) {
     if (event.currentTarget.checked)
-      setAssetsToDisplay(props.assets.filter((asset) => asset.amount !== 0));
+      setAssetsToDisplay(props.assets.filter((asset) => asset.amount > 0));
     else setAssetsToDisplay(props.assets);
   }
 

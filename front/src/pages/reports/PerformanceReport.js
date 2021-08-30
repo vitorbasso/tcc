@@ -41,7 +41,7 @@ function PerformanceReport(props) {
   if (wallet) {
     assets = wallet.stockAssets;
     assetNames = assets
-      .filter((asset) => asset.amount > 0)
+      .filter((asset) => asset.amount !== 0)
       .map((asset) => asset.stockSymbol)
       .join();
     paidForAssets = assets
@@ -49,9 +49,10 @@ function PerformanceReport(props) {
       .reduce((total, asset) => total + asset.amount * asset.averageCost, 0);
   }
   useEffect(() => {
-    sendRequestStock({
-      url: `${STOCKS_URL}?symbols=${assetNames}`,
-    });
+    if (assetNames !== "")
+      sendRequestStock({
+        url: `${STOCKS_URL}?symbols=${assetNames}`,
+      });
   }, [assetNames, sendRequestStock]);
   let walletWorth = 0;
   if (resultStock) {

@@ -7,7 +7,7 @@ import styles from "./PieSelected.module.css";
 function PieSelected(props) {
   const { wallet } = useContext(WalletContext);
   const assetValues = wallet.stockAssets
-    .filter((asset) => asset.amount !== 0)
+    .filter((asset) => asset.amount > 0)
     .map((asset) => ({
       id: asset.id,
       value: asset.amount * asset.averageCost,
