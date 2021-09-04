@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { useLocation, useParams } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
+import TickerTable from "../../components/table/ticker/TickerTable";
+import { ASSET_URL } from "../../constants/paths";
+import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
+import useHttp from "../../hooks/useHttp";
 import { getMoneyClass } from "../../utils/cssUtils";
-import { moneyFormatter, percentFormatter } from "../../utils/numberUtils";
+import {
+  moneyFormatter,
+  percentFormatter,
+  percentFormatterWithoutSign,
+} from "../../utils/formatterUtils";
 import styles from "./TicketReport.module.css";
 
 const DAY = "day";
@@ -25,11 +33,54 @@ function getVariationStyle(variation) {
     : [null, ""];
 }
 
-function TicketReport(props) {
+function TicketReport() {
+  const { wallet, fetchWallet } = useContext(WalletContext);
   const [variation, setVariation] = useState(0.0242);
   const location = useLocation();
-  const { id } = useParams();
-  const money = 50_000;
+  const [sentRequest, setSentRequest] = useState(false);
+  const { result, error, isLoading, sendRequest } = useHttp();
+  const id = useParams().id.toUpperCase();
+
+  useEffect(() => {
+    fetchWallet();
+    if (
+      !sentRequest ||
+      (result && result.stockSymbol.toLowerCase() !== id.toLowerCase())
+    ) {
+      setSentRequest(true);
+      sendRequest({
+        url: `${ASSET_URL}/${id}`,
+      });
+    }
+  }, [fetchWallet, sendRequest, id, result, sentRequest]);
+
+  if (!isLoading && error && !result) setSentRequest(false);
+
+  let averageValue = 0;
+  let amount = 0;
+  let money = 0;
+  let percentOfWallet = 0;
+  let lifetimeBalance = 0;
+  if (wallet) {
+    const asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);
+    if (asset) {
+      money = asset.averageCost * asset.amount;
+      amount = asset.amount;
+      averageValue = asset.averageCost;
+      percentOfWallet =
+        money /
+        wallet.stockAssets.reduce((total, asset) => {
+          return (total +=
+            asset.amount > 0 ? asset.averageCost * asset.amount : 0);
+        }, 0);
+      lifetimeBalance = asset.lifetimeBalance;
+    }
+  }
+  let transactions = [];
+  if (result) {
+    transactions = result.transactions;
+  }
+
   const moneyClass = getMoneyClass(money);
 
   function filter(filterBy) {
@@ -57,9 +108,10 @@ function TicketReport(props) {
     }
   }
   const [arrow, css] = getVariationStyle(variation);
+
   return (
     <div className={baseStyles.container}>
-      <Header backButton caller={location.state.caller || "/"}>
+      <Header backButton caller={location.state?.caller || "/"}>
         <h2>Ticker</h2>
       </Header>
       <main>
@@ -93,24 +145,28 @@ function TicketReport(props) {
         </nav>
         <section className={styles.overview}>
           <span>{id}</span>
-          <span>
-            {Intl.NumberFormat("pt-BR", { style: "percent" }).format(0.5)}
-          </span>
+          <span>{percentFormatterWithoutSign.format(percentOfWallet)}</span>
         </section>
         <Money value={money} className={`${baseStyles[moneyClass]}`} />
         <section className={styles.info}>
           <div>
-            <p>Qnt {Intl.NumberFormat("pt-BR").format(2_000)}</p>
+            <p>Qnt {Intl.NumberFormat("pt-BR").format(amount)}</p>
             <p>
               <span>Preço médio </span>
-              <span>{moneyFormatter.format(25)}</span>
+              <span>{moneyFormatter.format(averageValue)}</span>
             </p>
+          </div>
+          <div>
+            <p>Balanço Total {moneyFormatter.format(lifetimeBalance)}</p>
           </div>
           <div className={`${styles.variation} ${css}`}>
             <span>{arrow}</span>
             <span>{percentFormatter.format(variation)}</span>
             <span>({moneyFormatter.format(variation * money)})</span>
           </div>
+        </section>
+        <section>
+          <TickerTable transactions={transactions} />
         </section>
       </main>
     </div>

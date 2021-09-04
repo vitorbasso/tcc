@@ -3,11 +3,10 @@ package com.vitorbasso.gerenciadorinvestimentos.dto.response
 import com.vitorbasso.gerenciadorinvestimentos.domain.IAsset
 import java.math.BigDecimal
 
-data class AssetDto(
+data class AssetWithoutTransactionsDto(
     val id: Long,
     val stockSymbol: String,
     val averageCost: BigDecimal,
     val amount: Long,
-    val lifetimeBalance: BigDecimal,
-    val transactions: List<TransactionDto>
+    val lifetimeBalance: BigDecimal
 ) : IAsset

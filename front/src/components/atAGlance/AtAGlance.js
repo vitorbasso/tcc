@@ -1,4 +1,3 @@
-import React from "react";
 import PieChart from "../piechart/PieChart";
 import styles from "./AtAGlance.module.css";
 import TopTickets from "./TopTickets";

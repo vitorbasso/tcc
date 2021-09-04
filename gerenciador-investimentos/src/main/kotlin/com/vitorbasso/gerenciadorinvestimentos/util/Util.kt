@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Component
 object Util {
 
-    fun getAverageCost(value: BigDecimal = BigDecimal.ZERO, quantity: Int = 1): BigDecimal =
+    fun getAverageCost(value: BigDecimal = BigDecimal.ZERO, quantity: Long = 1): BigDecimal =
         value.divide(BigDecimal(quantity).takeIf { it.compareTo(BigDecimal.ZERO) != 0 }
             ?: BigDecimal.ONE, 20, RoundingMode.HALF_EVEN)
 

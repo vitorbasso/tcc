@@ -20,7 +20,7 @@ data class Asset(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
     val averageCost: BigDecimal = BigDecimal.ZERO,
-    val amount: Int = 0,
+    val amount: Long = 0,
     val lifetimeBalance: BigDecimal = BigDecimal.ZERO,
 
     @ManyToOne(fetch = FetchType.LAZY)

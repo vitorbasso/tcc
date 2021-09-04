@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
 import baseStyles from "../../css/base.module.css";
 import { getMoneyClass } from "../../utils/cssUtils";
 import styles from "./PerformanceReport.module.css";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
-import { moneyFormatter, percentFormatter } from "../../utils/numberUtils";
-import AssetTable from "../../components/asset/AssetTable";
-import { MOCK_ASSETS } from "../../constants/mocks";
+import { moneyFormatter, percentFormatter } from "../../utils/formatterUtils";
+import useHttp from "../../hooks/useHttp";
+import { STOCKS_URL } from "../../constants/paths";
+import WalletContext from "../../context/wallet-context";
+import AssetTable from "../../components/table/assets/AssetTable";
 
 const DAY = "day";
 const WEEK = "week";
@@ -27,34 +29,63 @@ function getVariationStyle(variation) {
 }
 
 function PerformanceReport(props) {
-  const [money, setMoney] = useState(534_549.85);
-  const [variation, setVariation] = useState(0.036);
+  const { wallet, fetchWallet } = useContext(WalletContext);
+  const { result: resultStock, sendRequest: sendRequestStock } = useHttp();
   const [ibov, setIbov] = useState(0.0163);
+  useEffect(() => {
+    fetchWallet();
+  }, [fetchWallet]);
+  let assets = [];
+  let assetNames = "";
+  let paidForAssets = 0;
+  if (wallet) {
+    assets = wallet.stockAssets;
+    assetNames = assets
+      .filter((asset) => asset.amount !== 0)
+      .map((asset) => asset.stockSymbol)
+      .join();
+    paidForAssets = assets
+      .filter((asset) => asset.amount > 0)
+      .reduce((total, asset) => total + asset.amount * asset.averageCost, 0);
+  }
+  useEffect(() => {
+    if (assetNames !== "")
+      sendRequestStock({
+        url: `${STOCKS_URL}?symbols=${assetNames}`,
+      });
+  }, [assetNames, sendRequestStock]);
+  let walletWorth = 0;
+  if (resultStock) {
+    walletWorth = resultStock.reduce((total, asset) => {
+      return (
+        total +
+        asset.currentValue *
+          (assets.find(
+            (ass) =>
+              ass.stockSymbol.toUpperCase() === asset.ticker.toUpperCase()
+          )?.amount ?? 0)
+      );
+    }, 0);
+  }
+  const variation =
+    walletWorth !== 0 ? (walletWorth - paidForAssets) / walletWorth : 0;
   function filter(filterBy) {
     const lastSelected = document.querySelector(`.${styles.selected}`);
     lastSelected.classList.remove(styles.selected);
     switch (filterBy) {
       case DAY:
-        setMoney(15_246.46);
-        setVariation(-0.004);
         setIbov(0.0001);
         updateNavSelected(DAY);
         break;
       case WEEK:
-        setMoney(55_530.5);
-        setVariation(0.005);
         setIbov(0.0005);
         updateNavSelected(WEEK);
         break;
       case MONTH:
-        setMoney(534_549.85);
-        setVariation(0.036);
         setIbov(0.0163);
         updateNavSelected(MONTH);
         break;
       case YEAR:
-        setMoney(13_358_387.58);
-        setVariation(0.1756);
         setIbov(0.0634);
         updateNavSelected(YEAR);
         break;
@@ -62,7 +93,7 @@ function PerformanceReport(props) {
         console.error(`cannot filter by ${filterBy} `);
     }
   }
-  const moneyClass = getMoneyClass(money);
+  const moneyClass = getMoneyClass(walletWorth);
   const [arrow, css] = getVariationStyle(variation);
   const ibovDiff = variation - ibov;
   const [, ibovCss] = getVariationStyle(ibovDiff);
@@ -102,14 +133,14 @@ function PerformanceReport(props) {
         </nav>
         <section className={styles.overall}>
           <Money
-            value={money}
+            value={walletWorth}
             className={`${styles.money} ${baseStyles[moneyClass]}`}
           />
           <p className={`${styles.variation} ${css}`}>
             <span>
               {arrow} {percentFormatter.format(variation)}
             </span>
-            <span>({moneyFormatter.format(money * variation)})</span>
+            <span>({moneyFormatter.format(walletWorth * variation)})</span>
           </p>
           <p className={styles.ibov}>
             <span>IBOV </span>
@@ -118,8 +149,7 @@ function PerformanceReport(props) {
         </section>
         <section className={styles["section__assets"]}>
           <AssetTable
-            walletTotalValue={money}
-            assets={MOCK_ASSETS}
+            assets={assets}
             className={styles["asset-table"]}
             caller={"/performance"}
           />

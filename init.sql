@@ -68,7 +68,7 @@ create table if not exists `asset`(
     `wallet_id` bigint not null,
     `stock_ticker` varchar(6) not null,
     `average_cost` decimal(13,2) not null default 0,
-    `amount` int not null default 0,
+    `amount` bigint not null default 0,
     `lifetime_balance` decimal(20, 2) not null default 0,
     `date_created` timestamp not null default NOW(),
     `date_updated` timestamp default NOW(),
@@ -80,12 +80,12 @@ create table if not exists `asset`(
 create table if not exists `transaction`(
 	`id` bigint auto_increment,
 	`type` int not null,
-    `quantity` int default 0,
+    `quantity` bigint default 0,
     `value` decimal(13,2) default 0,
     `transaction_date` timestamp not null default NOW(),
     `checking_value` decimal(13,2) default 0,
-    `checking_quantity` int default 0,
-    `daytrade_quantity` int not null default 0,
+    `checking_quantity` bigint default 0,
+    `daytrade_quantity` bigint not null default 0,
     `asset_id` bigint not null,
     `date_created` timestamp not null default NOW(),
     `date_updated` timestamp default NOW(),
@@ -94,6 +94,5 @@ create table if not exists `transaction`(
 )engine=InnoDB;
 
 CREATE INDEX `transaction_date` ON `transaction` (`transaction_date`);
-ALTER TABLE `transaction` ADD UNIQUE `unique_transactino` (`transaction_date`, `asset_id`);
 ALTER TABLE `monthly_wallet` ADD UNIQUE `unique_monthly_wallet` (`wallet_month`, `wallet_id`);
 ALTER TABLE `tax_deductible` ADD UNIQUE `unique_tax` (`client_id`, `month`);

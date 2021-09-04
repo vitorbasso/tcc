@@ -1,18 +1,36 @@
 import styles from "./QuickSoldView.module.css";
 import Money from "../money/Money";
+import { useContext, useEffect } from "react";
+import TaxContext from "../../context/tax-context";
+import WalletContext from "../../context/wallet-context";
+import { Link } from "react-router-dom";
 
 function QuickSoldView() {
+  const { tax, fetchTax } = useContext(TaxContext);
+  const { wallet } = useContext(WalletContext);
+  useEffect(() => {
+    fetchTax();
+  }, [fetchTax]);
+  let totalTax = 0;
+  if (tax) {
+    totalTax = tax.normalTax + tax.daytradeTax;
+  }
+  let totalBalance = 0;
+  if (wallet) {
+    totalBalance = wallet.balance + wallet.balanceDaytrade;
+  }
+
   return (
-    <div>
-      <p>Vendas:</p>
-      <p>
-        <Money value={15_000} className={styles["money-size"]} />
-      </p>
+    <Link to={`/tax`} className={styles.link}>
+      <p>Lucro:</p>
+      <div>
+        <Money value={totalBalance} className={styles["money-size"]} />
+      </div>
       <p>IR:</p>
-      <p>
-        <Money value={0} className={styles["money-size"]} />
-      </p>
-    </div>
+      <div>
+        <Money value={totalTax} className={styles["money-size"]} />
+      </div>
+    </Link>
   );
 }
 

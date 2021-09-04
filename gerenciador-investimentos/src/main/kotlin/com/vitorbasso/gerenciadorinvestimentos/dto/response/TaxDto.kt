@@ -7,6 +7,7 @@ data class TaxDto(
     val normalTax: BigDecimal = BigDecimal.ZERO,
     val baseForCalculation: BigDecimal = BigDecimal.ZERO,
     val withdrawn: BigDecimal = BigDecimal.ZERO,
+    val daytradeWithdrawn: BigDecimal = BigDecimal.ZERO,
     val daytradeTax: BigDecimal = BigDecimal.ZERO,
     val daytradeBaseForCalculation: BigDecimal = BigDecimal.ZERO,
     val availableToDeduct: BigDecimal = BigDecimal.ZERO,

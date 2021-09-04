@@ -4,6 +4,7 @@ import com.vitorbasso.gerenciadorinvestimentos.dto.request.TaxDeductibleRequest
 import com.vitorbasso.gerenciadorinvestimentos.service.ITaxService
 import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 
 @RestController
+@CrossOrigin
 @RequestMapping("/\${api-version}/taxes")
 class TaxController(
     private val taxService: ITaxService

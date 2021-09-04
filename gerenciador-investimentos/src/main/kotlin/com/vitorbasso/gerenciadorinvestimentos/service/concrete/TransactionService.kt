@@ -34,7 +34,4 @@ internal class TransactionService(
 
     fun deleteTransaction(transaction: Transaction) = this.transactionRepository.delete(transaction)
 
-    fun validateTransaction(transactionDate: LocalDateTime, asset: Asset) =
-        !this.transactionRepository.existsByAssetAndTransactionDate(asset, transactionDate)
-
 }

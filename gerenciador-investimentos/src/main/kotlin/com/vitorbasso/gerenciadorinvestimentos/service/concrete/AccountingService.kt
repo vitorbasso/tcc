@@ -175,7 +175,7 @@ internal class AccountingService(
             TransactionType.BUY -> processBuyTransactionContribution(transaction, accountantNotes)
             TransactionType.SELL -> processSellTransactionContribution(transaction, accountantNotes)
         }
-        if (accountantNotes.quantityCount == 0) {
+        if (accountantNotes.quantityCount == 0L) {
             accountantNotes.valueForAverage = BigDecimal.ZERO
             accountantNotes.quantityForAverage = 0
         }
@@ -299,9 +299,9 @@ internal class AccountingService(
     )
 
     private data class AccountantNotes(
-        var quantityForAverage: Int = 0,
+        var quantityForAverage: Long = 0,
         var valueForAverage: BigDecimal = BigDecimal.ZERO,
-        var quantityCount: Int = 0,
+        var quantityCount: Long = 0,
         var balanceContribution: BigDecimal = BigDecimal.ZERO,
         var withdrawnContribution: BigDecimal = BigDecimal.ZERO
     )

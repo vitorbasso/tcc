@@ -3,16 +3,26 @@ import PieSelected from "../../components/piechart/PieSelected";
 import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
 import styles from "./Overview.module.css";
-import { numberFormatter } from "../../utils/numberUtils";
+import { numberFormatter } from "../../utils/formatterUtils";
 import Money from "../../components/money/Money";
-import AssetTable from "../../components/asset/AssetTable";
-import { MOCK_ASSETS } from "../../constants/mocks";
+import { useContext, useEffect } from "react";
+import WalletContext from "../../context/wallet-context";
+import AssetTable from "../../components/table/assets/AssetTable";
 
-function Overview(props) {
-  const walletTotalValue = MOCK_ASSETS.reduce(
-    (total, asset) => (total += asset.value),
-    0
-  );
+function Overview() {
+  const { wallet, fetchWallet } = useContext(WalletContext);
+
+  useEffect(() => {
+    fetchWallet();
+  }, [fetchWallet]);
+  let assets = [];
+  if (wallet) {
+    assets = wallet.stockAssets;
+  }
+  const assetAmount = assets[0]?.amount;
+  const assetAverageCost = assets[0]?.averageCost;
+  const assetTotalValue = assetAmount * assetAverageCost;
+
   return (
     <div className={baseStyles.container}>
       <Header backButton>
@@ -22,22 +32,24 @@ function Overview(props) {
         <section className={styles["section__pie-chart"]}>
           <PieChart className={styles["pie-chart__pie-chart"]} />
           <div className={styles["pie-chart__selected-info"]}>
-            <PieSelected className={styles["pie-chart__selected-legend"]} />
+            <PieSelected
+              caller="/overview"
+              className={styles["pie-chart__selected-legend"]}
+            />
             <div>
-              <p>{numberFormatter.format(2_000)}</p>
-              <p>
-                <Money value={25} />
-              </p>
-              <p>
-                <Money value={50_000} />
-              </p>
+              <p>{numberFormatter.format(assetAmount)}</p>
+              <div>
+                <Money value={assetAverageCost} />
+              </div>
+              <div>
+                <Money value={assetTotalValue} />
+              </div>
             </div>
           </div>
         </section>
         <section className={styles["section__assets"]}>
           <AssetTable
-            walletTotalValue={walletTotalValue}
-            assets={MOCK_ASSETS}
+            assets={assets}
             className={styles["asset-table"]}
             caller={"/overview"}
           />
