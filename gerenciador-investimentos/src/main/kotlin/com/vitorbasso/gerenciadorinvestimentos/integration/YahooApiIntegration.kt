@@ -29,9 +29,16 @@ class YahooApiIntegration(
         it.copy(symbol = cleanSymbol(it.symbol))
     }
 
+    fun getHistoricalData(symbols: List<String>) = this.yahooApi.getHistoricalData(
+        financeKey,
+        symbols.joinToString(separator = ",", transform = ::getProcessedSymbol)
+    ).map { (key, value) ->
+        Spark.from(cleanSymbol(key), value)
+    }
+
     private fun getProcessedSymbol(rawSymbol: String) = "${cleanSymbol(rawSymbol)}$SYMBOL_SUFFIX"
 
-    private fun cleanSymbol(processedSymbol: String) = processedSymbol.substringBeforeLast(SYMBOL_SUFFIX)
+    private fun cleanSymbol(processedSymbol: String) = processedSymbol.substringBeforeLast(SYMBOL_SUFFIX).toUpperCase()
 
     companion object {
         const val SYMBOL_SUFFIX = ".SA" //yahoo api necessary for symbols from b3

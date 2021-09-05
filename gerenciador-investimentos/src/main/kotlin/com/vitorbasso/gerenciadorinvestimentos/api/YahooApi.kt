@@ -2,6 +2,7 @@ package com.vitorbasso.gerenciadorinvestimentos.api
 
 import com.vitorbasso.gerenciadorinvestimentos.dto.api.response.AutoCompleteDto
 import com.vitorbasso.gerenciadorinvestimentos.dto.api.response.QuoteDto
+import com.vitorbasso.gerenciadorinvestimentos.dto.api.response.SparkDto
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestHeader
@@ -29,5 +30,15 @@ interface YahooApi {
         @RequestParam region: String = "BR",
         @RequestHeader("x -rapidapi-host") host: String = "apidojo-yahoo-finance-v1.p.rapidapi.com"
     ): QuoteDto
+
+    @GetMapping("market/get-spark")
+    fun getHistoricalData(
+        @RequestHeader("x-rapidapi-key") apiKey: String,
+        @RequestParam symbols: String,
+        @RequestParam region: String = "BR",
+        @RequestParam interval: String = "1d",
+        @RequestParam range: String = "1y",
+        @RequestHeader("x -rapidapi-host") host: String = "apidojo-yahoo-finance-v1.p.rapidapi.com"
+    ) : Map<String, SparkDto>
 
 }
