@@ -54,11 +54,10 @@ create table if not exists `monthly_wallet`(
 create table if not exists `stock` (
 	`ticker` varchar(25),
     `current_value` decimal(20, 2) default null,
-    `closing_value` decimal(20, 2) default null,
-    `opening_value` decimal(20, 2) default null,
-    `highest_value` decimal(20, 2) default null,
-    `lowest_value` decimal(20, 2) default null,
-    `variation` decimal(20, 4) default null,
+    `last_close` decimal(20,2) default null,
+    `last_week_close` decimal(20,2) default null,
+    `last_month_close` decimal(20,2) default null,
+    `last_year_close` decimal(20,2) default null,
     `date_updated` timestamp default NOW(),
     primary key (`ticker`)
 )engine=InnoDB;
