@@ -31,7 +31,7 @@ class YahooApiIntegration(
 
     fun getHistoricalData(symbols: List<String>) = this.yahooApi.getHistoricalData(
         financeKey,
-        symbols.joinToString(separator = ",", transform = ::getProcessedSymbol)
+        symbols.joinToString(separator = ",", transform = ::getProcessedSymbol).replace(whitespaceRegex, "")
     ).map { (key, value) ->
         Spark.from(cleanSymbol(key), value)
     }
@@ -42,6 +42,7 @@ class YahooApiIntegration(
 
     companion object {
         const val SYMBOL_SUFFIX = ".SA" //yahoo api necessary for symbols from b3
+        private val whitespaceRegex = "\\s".toRegex()
     }
 
 }

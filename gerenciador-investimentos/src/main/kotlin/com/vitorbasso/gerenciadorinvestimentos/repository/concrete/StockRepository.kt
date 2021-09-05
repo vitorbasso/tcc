@@ -12,6 +12,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Repository
 import java.math.BigDecimal
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 
 @Repository
@@ -28,7 +29,7 @@ class StockRepository(
     override fun findByTicker(ticker: String) = findByTickerBatch(listOf(ticker)).firstOrNull()
 
     override fun findByTickerBatch(tickers: List<String>): List<Stock> {
-        val nonBlankTickers = tickers.filter { it.isNotBlank() }
+        val nonBlankTickers = tickers.filter { it.isNotBlank() }.map { it.replace(whitespaceRegex, "") }
         val localStocks = this.stockJpaRepository.findAllById(nonBlankTickers)
         val localValidStocks = localStocks.filter { !isStockInvalid(it) }
 
@@ -38,7 +39,7 @@ class StockRepository(
         }
         val sparksTickers = quotesTickers.filter { ticker ->
             val stock = localStocks.find { it.ticker == ticker }
-            stock != null && notUpdatedToday(stock)
+            stock == null || notUpdatedToday(stock)
         }
         return if (quotesTickers.isEmpty()) localValidStocks
         else {
@@ -89,8 +90,21 @@ class StockRepository(
         )
     }
 
-    private fun isStockInvalid(stock: Stock?) =
-        stock == null || stock.dateUpdated.plusMinutes(STOCK_TTL).isBefore(LocalDateTime.now())
+    private fun isStockInvalid(stock: Stock?): Boolean {
+        val now = LocalDateTime.now()
+        val daysPastSaturday = now.dayOfWeek.value.toLong() % 8 - 6
+        val lastSaturday = now.minusDays(daysPastSaturday).atStartOfDay()
+        return stock == null
+            || (
+            (((now.dayOfWeek !in weekend) && (!now.minusDays(1).atStartOfDay()
+                .isEqual(stock.dateUpdated.atStartOfDay()) || (now.hour !in 9..18 && stock.dateUpdated.hour in 9..18)))
+                || lastSaturday.isAfter(
+                stock.dateUpdated
+            ))
+                && stock.dateUpdated.plusMinutes(STOCK_TTL).isBefore(now)
+            )
+    }
+
 
     private fun notUpdatedToday(stock: Stock) =
         stock.dateUpdated.atStartOfDay().isBefore(
@@ -99,6 +113,10 @@ class StockRepository(
 
     companion object {
         const val STOCK_TTL: Long = 5 // in minutes
+        private val whitespaceRegex = "\\s".toRegex()
+        private val weekend = listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
     }
-
 }
+
+
+
