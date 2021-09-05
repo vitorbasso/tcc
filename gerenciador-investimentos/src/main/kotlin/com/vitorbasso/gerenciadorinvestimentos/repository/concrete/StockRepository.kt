@@ -105,7 +105,6 @@ class StockRepository(
             )
     }
 
-
     private fun notUpdatedToday(stock: Stock) =
         stock.dateUpdated.atStartOfDay().isBefore(
             LocalDateTime.now().atStartOfDay()
@@ -117,6 +116,3 @@ class StockRepository(
         private val weekend = listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
     }
 }
-
-
-

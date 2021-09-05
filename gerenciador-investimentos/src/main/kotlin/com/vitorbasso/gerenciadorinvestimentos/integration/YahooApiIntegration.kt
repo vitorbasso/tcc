@@ -36,7 +36,8 @@ class YahooApiIntegration(
         Spark.from(cleanSymbol(key), value)
     }
 
-    private fun getProcessedSymbol(rawSymbol: String) = "${cleanSymbol(rawSymbol)}$SYMBOL_SUFFIX"
+    private fun getProcessedSymbol(rawSymbol: String) =
+        if (!rawSymbol.startsWith("^")) "${cleanSymbol(rawSymbol)}$SYMBOL_SUFFIX" else rawSymbol.toUpperCase()
 
     private fun cleanSymbol(processedSymbol: String) = processedSymbol.substringBeforeLast(SYMBOL_SUFFIX).toUpperCase()
 

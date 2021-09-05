@@ -17,7 +17,7 @@ class StockService(
     fun getStock(ticker: String) = this.stockRepository.findByTicker(ticker)
         ?: throw CustomEntityNotFoundException(ManagerErrorCode.MANAGER_03)
 
-    fun getStocksBatch(tickers: List<String>) = this.stockRepository.findByTickerBatch(tickers)
+    fun getStocksBatch(tickers: List<String>) = this.stockRepository.findByTickerBatch(tickers + listOf("^BVSP"))
 
     fun getAllStocks(): List<Stock> {
         val symbols = (walletService.getWallet() as WalletDto).stockAssets.map { it.stockSymbol }

@@ -4,9 +4,11 @@ import { percentFormatter } from "../../utils/formatterUtils";
 import { useContext } from "react";
 import WalletContext from "../../context/wallet-context";
 import { Link } from "react-router-dom";
+import StocksContext from "../../context/stock-context";
 
 function TopTickets() {
   const { wallet } = useContext(WalletContext);
+  const { stocks } = useContext(StocksContext);
   const topAssets = wallet.stockAssets
     .filter((asset) => asset.amount !== 0)
     .sort((first, second) => {
@@ -26,7 +28,10 @@ function TopTickets() {
         </Link>
       )}
       {topAssets.map((asset) => {
-        asset.valueChange = 0.0235;
+        const stock = stocks.find(
+          (stock) => stock.ticker === asset.stockSymbol
+        );
+        asset.valueChange = stock?.currentValue / stock?.lastClose - 1;
         const [arrow, css] =
           asset.valueChange > 0
             ? [<BsArrowUp />, styles.green]

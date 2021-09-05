@@ -6,8 +6,9 @@ import {
 } from "../../../utils/formatterUtils";
 import Money from "../../money/Money";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
+import StocksContext from "../../../context/stock-context";
 
 function sortByPercentage(first, second, weight = 1) {
   const firstValue = first.amount * first.averageCost;
@@ -41,6 +42,7 @@ const AVERAGE_VALUE_INVERSE = "-averageValue";
 function AssetTable(props) {
   const [sortBy, setSortBy] = useState(PERCENT);
   const [assetsToDisplay, setAssetsToDisplay] = useState([]);
+  const { stocks } = useContext(StocksContext);
   useEffect(() => {
     setAssetsToDisplay(props.assets);
   }, [props.assets]);
@@ -125,6 +127,10 @@ function AssetTable(props) {
         </button>
       </div>
       {assets.map((asset) => {
+        const stock = stocks.find(
+          (stock) => stock.ticker === asset.stockSymbol
+        );
+        const currentValue = stock?.currentValue ?? 0;
         const value = asset.averageCost * asset.amount;
         return (
           <Link
@@ -141,8 +147,9 @@ function AssetTable(props) {
                 <tr>
                   <th>Ação</th>
                   <th>Qnt</th>
-                  <th>Valor Médio</th>
-                  <th>Total</th>
+                  <th>Valor Pago</th>
+                  <th>Valor atual</th>
+                  <th>Valor Total</th>
                   <th>%</th>
                 </tr>
               </thead>
@@ -152,6 +159,9 @@ function AssetTable(props) {
                   <td>{numberFormatter.format(asset.amount)}</td>
                   <td>
                     <Money value={asset.averageCost} />
+                  </td>
+                  <td>
+                    <Money value={currentValue} />
                   </td>
                   <td>
                     <Money value={value} />

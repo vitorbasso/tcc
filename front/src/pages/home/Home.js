@@ -9,6 +9,7 @@ import AtAGlance from "../../components/atAGlance/AtAGlance";
 import Navigation from "../../components/navigation/Navigation";
 import { getMoneyClass } from "../../utils/cssUtils";
 import WalletContext from "../../context/wallet-context";
+import StocksContext from "../../context/stock-context";
 
 function getFirstName(result) {
   return result ? result.name?.split(" ")?.[0] : "-";
@@ -24,7 +25,8 @@ function getBalance(result) {
 }
 
 function Home() {
-  const { wallet, isLoading, fetchWallet } = useContext(WalletContext);
+  const { wallet, isWalletLoading, fetchWallet } = useContext(WalletContext);
+  const { isStocksLoading, fetchStocks } = useContext(StocksContext);
   const { result: resultName, sendRequest: sendRequestName } = useHttp();
   useEffect(() => {
     sendRequestName({
@@ -33,8 +35,9 @@ function Home() {
   }, [sendRequestName]);
 
   useEffect(() => {
-    if (!isLoading) fetchWallet();
-  }, [isLoading, fetchWallet]);
+    if (!isWalletLoading) fetchWallet();
+    if (!isStocksLoading) fetchStocks();
+  }, [isWalletLoading, fetchWallet, isStocksLoading, fetchStocks]);
 
   const firstName = getFirstName(resultName);
   const money = getBalance(wallet);

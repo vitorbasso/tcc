@@ -11,6 +11,7 @@ import { TRANSACTION_URL } from "../../constants/paths";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import WalletContext from "../../context/wallet-context";
 import TaxContext from "../../context/tax-context";
+import StocksContext from "../../context/stock-context";
 
 const BUY = "BUY";
 const SELL = "SELL";
@@ -29,6 +30,7 @@ function RegisterOperation() {
   const [resetNotification, setResetNotification] = useState(false);
   const { invalidateCache: invalidateWalletCache } = useContext(WalletContext);
   const { invalidateCache: invalidateTaxCache } = useContext(TaxContext);
+  const { invalidateCache: invalidateStocksCache } = useContext(StocksContext);
   function onCloseNotification() {
     setShowNotification(false);
   }
@@ -55,6 +57,7 @@ function RegisterOperation() {
         setNotificationMessage("SUCESSO");
         invalidateTaxCache();
         invalidateWalletCache();
+        invalidateStocksCache();
       } else if (error) {
         setNotificationType(ERROR_NOTIFICATION);
         setNotificationMessage("ERRO");
@@ -67,7 +70,14 @@ function RegisterOperation() {
       clearTimeout(timeout);
       setResetNotification(true);
     };
-  }, [isLoading, result, error, invalidateTaxCache, invalidateWalletCache]);
+  }, [
+    isLoading,
+    result,
+    error,
+    invalidateTaxCache,
+    invalidateWalletCache,
+    invalidateStocksCache,
+  ]);
 
   function onTypeClick(event) {
     event.preventDefault();
