@@ -22,8 +22,9 @@ function RegisterOperation() {
   const [showNotification, setShowNotification] = useState(false);
   const tickerRef = useRef();
   const quantityRef = useRef();
-  const valueRef = useRef();
+  const priceRef = useRef();
   const dateRef = useRef();
+  const totalValueRef = useRef();
   const [notificationType, setNotificationType] =
     useState(SUCCESS_NOTIFICATION);
   const [notificationMessage, setNotificationMessage] = useState("SUCESSO");
@@ -36,11 +37,23 @@ function RegisterOperation() {
   }
   function onSubmitHandler(event) {
     event.preventDefault();
+    let value;
+    if (priceRef.current.value !== "")
+      value = priceRef.current.value * quantityRef.current.value;
+    else value = totalValueRef.current.value;
+    console.log(
+      "priceRef = ",
+      priceRef.current.value,
+      "totalValueRef = ",
+      totalValueRef.current.value,
+      "value = ",
+      value
+    );
     sendRequest({
       url: TRANSACTION_URL,
       method: "POST",
       body: {
-        value: valueRef.current.value,
+        value,
         quantity: quantityRef.current.value,
         ticker: tickerRef.current.value,
         type,
@@ -78,6 +91,18 @@ function RegisterOperation() {
     invalidateWalletCache,
     invalidateStocksCache,
   ]);
+
+  function chooseField(event) {
+    let toChange;
+    if (event.target.name === "price")
+      toChange = document.querySelector("input[name='totalValue']");
+    else toChange = document.querySelector("input[name='price']");
+    if (event.target.value !== "") {
+      toChange.setAttribute("disabled", "");
+    } else {
+      toChange.removeAttribute("disabled");
+    }
+  }
 
   function onTypeClick(event) {
     event.preventDefault();
@@ -136,10 +161,21 @@ function RegisterOperation() {
           </div>
           <div className={baseStyles["form-control"]}>
             <input
-              ref={valueRef}
+              ref={priceRef}
               type="text"
-              name="value"
+              name="price"
+              placeholder="Preço"
+              onChange={chooseField}
+              required
+            />
+          </div>
+          <div className={baseStyles["form-control"]}>
+            <input
+              ref={totalValueRef}
+              type="text"
+              name="totalValue"
               placeholder="Valor Total"
+              onChange={chooseField}
               required
             />
           </div>
