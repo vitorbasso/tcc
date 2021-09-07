@@ -6,18 +6,48 @@ import { getMoneyClass } from "../../utils/cssUtils";
 import styles from "./PerformanceReport.module.css";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { moneyFormatter, percentFormatter } from "../../utils/formatterUtils";
-import useHttp from "../../hooks/useHttp";
-import { STOCKS_URL } from "../../constants/paths";
 import WalletContext from "../../context/wallet-context";
 import AssetTable from "../../components/table/assets/AssetTable";
+import StocksContext from "../../context/stock-context";
 
 const DAY = "day";
 const WEEK = "week";
 const MONTH = "month";
 const YEAR = "year";
+const IBOVESPA = "^BVSP";
 
 function updateNavSelected(id) {
   document.querySelector(`#${id}`).classList.add(styles.selected);
+}
+
+function getWalletWorth(stocks, assets, period) {
+  let value;
+  switch (period) {
+    case DAY:
+      value = "lastClose";
+      break;
+    case WEEK:
+      value = "lastWeekClose";
+      break;
+    case MONTH:
+      value = "lastMonthClose";
+      break;
+    case YEAR:
+      value = "lastYearClose";
+      break;
+    default:
+      value = "currentValue";
+  }
+  return stocks
+    .filter((stock) => stock.ticker !== IBOVESPA)
+    .reduce((total, stock) => {
+      return (
+        total +
+          stock[value] *
+            assets.find((asset) => asset.stockSymbol === stock.ticker)
+              ?.amount ?? 0
+      );
+    }, 0);
 }
 
 function getVariationStyle(variation) {
@@ -28,66 +58,87 @@ function getVariationStyle(variation) {
     : [null, ""];
 }
 
-function PerformanceReport(props) {
+function PerformanceReport() {
   const { wallet, fetchWallet } = useContext(WalletContext);
-  const { result: resultStock, sendRequest: sendRequestStock } = useHttp();
-  const [ibov, setIbov] = useState(0.0163);
+  const [variation, setVariation] = useState(0);
+  const [selection, setSelection] = useState("dia");
+  const { stocks, fetchStocks } = useContext(StocksContext);
+  const [ibovVariation, setIbovVariation] = useState(0);
   useEffect(() => {
     fetchWallet();
-  }, [fetchWallet]);
+    fetchStocks();
+  }, [fetchWallet, fetchStocks]);
   let assets = [];
-  let assetNames = "";
   let paidForAssets = 0;
   if (wallet) {
     assets = wallet.stockAssets;
-    assetNames = assets
-      .filter((asset) => asset.amount !== 0)
-      .map((asset) => asset.stockSymbol)
-      .join();
     paidForAssets = assets
       .filter((asset) => asset.amount > 0)
       .reduce((total, asset) => total + asset.amount * asset.averageCost, 0);
   }
-  useEffect(() => {
-    if (assetNames !== "")
-      sendRequestStock({
-        url: `${STOCKS_URL}?symbols=${assetNames}`,
-      });
-  }, [assetNames, sendRequestStock]);
   let walletWorth = 0;
-  if (resultStock) {
-    walletWorth = resultStock.reduce((total, asset) => {
-      return (
-        total +
-        asset.currentValue *
-          (assets.find(
-            (ass) =>
-              ass.stockSymbol.toUpperCase() === asset.ticker.toUpperCase()
-          )?.amount ?? 0)
-      );
-    }, 0);
+  let walletVariationDay = 0;
+  let walletVariationWeek = 0;
+  let walletVariationMonth = 0;
+  let walletVariationYear = 0;
+
+  let ibov = {};
+  let ibovVariationDay = 0;
+  let ibovVariationWeek = 0;
+  let ibovVariationMonth = 0;
+  let ibovVariationYear = 0;
+
+  if (stocks) {
+    walletWorth = getWalletWorth(stocks, assets);
+    const worthDay = getWalletWorth(stocks, assets, DAY);
+    walletVariationDay = (worthDay - paidForAssets) / worthDay;
+    const worthWeek = getWalletWorth(stocks, assets, WEEK);
+    walletVariationWeek = (worthWeek - paidForAssets) / worthWeek;
+    const worthMonth = getWalletWorth(stocks, assets, MONTH);
+    walletVariationMonth = (worthMonth - paidForAssets) / worthMonth;
+    const worthYear = getWalletWorth(stocks, assets, YEAR);
+    walletVariationYear = (worthYear - paidForAssets) / worthYear;
+    ibov = stocks.find((stock) => stock.ticker === IBOVESPA);
+    ibovVariationDay =
+      (ibov?.currentValue - ibov?.lastClose) / ibov?.currentValue;
+    ibovVariationWeek =
+      (ibov?.currentValue - ibov?.lastWeekClose) / ibov?.currentValue;
+    ibovVariationMonth =
+      (ibov?.currentValue - ibov?.lastMonthClose) / ibov?.currentValue;
+    ibovVariationYear =
+      (ibov?.currentValue - ibov?.lastYearClose) / ibov?.currentValue;
   }
-  const variation =
-    walletWorth !== 0 ? (walletWorth - paidForAssets) / walletWorth : 0;
+  useEffect(() => {
+    setVariation(walletVariationDay);
+    setIbovVariation(ibovVariationDay);
+  }, [walletVariationDay, ibovVariationDay]);
   function filter(filterBy) {
     const lastSelected = document.querySelector(`.${styles.selected}`);
     lastSelected.classList.remove(styles.selected);
     switch (filterBy) {
       case DAY:
-        setIbov(0.0001);
+        setVariation(walletVariationDay);
+        setIbovVariation(ibovVariationDay);
         updateNavSelected(DAY);
+        setSelection("dia");
         break;
       case WEEK:
-        setIbov(0.0005);
+        setVariation(walletVariationWeek);
+        setIbovVariation(ibovVariationWeek);
         updateNavSelected(WEEK);
+        setSelection("semana");
         break;
       case MONTH:
-        setIbov(0.0163);
+        setVariation(walletVariationMonth);
+        setIbovVariation(ibovVariationMonth);
         updateNavSelected(MONTH);
+        setSelection("mês");
         break;
       case YEAR:
-        setIbov(0.0634);
+        setVariation(walletVariationYear);
+        setIbovVariation(ibovVariationYear);
         updateNavSelected(YEAR);
+        setSelection("ano");
         break;
       default:
         console.error(`cannot filter by ${filterBy} `);
@@ -95,8 +146,9 @@ function PerformanceReport(props) {
   }
   const moneyClass = getMoneyClass(walletWorth);
   const [arrow, css] = getVariationStyle(variation);
-  const ibovDiff = variation - ibov;
+  const ibovDiff = variation - ibovVariation;
   const [, ibovCss] = getVariationStyle(ibovDiff);
+  const [difArrow, difCss] = getVariationStyle(walletWorth - paidForAssets);
   return (
     <div className={baseStyles.container}>
       <Header backButton>
@@ -106,7 +158,11 @@ function PerformanceReport(props) {
         <nav className={styles.nav}>
           <ul>
             <li>
-              <button id={DAY} onClick={filter.bind(this, DAY)}>
+              <button
+                id={DAY}
+                className={styles.selected}
+                onClick={filter.bind(this, DAY)}
+              >
                 dia
               </button>
             </li>
@@ -116,11 +172,7 @@ function PerformanceReport(props) {
               </button>
             </li>
             <li>
-              <button
-                id={MONTH}
-                className={styles.selected}
-                onClick={filter.bind(this, MONTH)}
-              >
+              <button id={MONTH} onClick={filter.bind(this, MONTH)}>
                 mês
               </button>
             </li>
@@ -136,6 +188,20 @@ function PerformanceReport(props) {
             value={walletWorth}
             className={`${styles.money} ${baseStyles[moneyClass]}`}
           />
+          <div className={styles.info}>
+            <p>Valor Pago {moneyFormatter.format(paidForAssets)}</p>
+          </div>
+          <div className={styles.info}>
+            <p>
+              Diferença{" "}
+              <span className={difCss}>
+                {difArrow} {moneyFormatter.format(walletWorth - paidForAssets)}
+              </span>
+            </p>
+          </div>
+          <div className={styles.info}>
+            <p>variação {selection}</p>
+          </div>
           <p className={`${styles.variation} ${css}`}>
             <span>
               {arrow} {percentFormatter.format(variation)}

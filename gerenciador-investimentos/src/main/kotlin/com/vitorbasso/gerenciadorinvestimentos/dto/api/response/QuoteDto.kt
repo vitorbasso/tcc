@@ -13,10 +13,6 @@ data class QuoteResponse(
 
 data class Quote(
     val symbol: String,
-    val regularMarketOpen: Double,
-    val regularMarketChangePercent: Double,
     val regularMarketPrice: Double,
-    val regularMarketDayLow: Double,
-    val regularMarketDayHigh: Double,
     val regularMarketPreviousClose: Double
 )

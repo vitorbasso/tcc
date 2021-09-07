@@ -11,6 +11,7 @@ import { TRANSACTION_URL } from "../../constants/paths";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import WalletContext from "../../context/wallet-context";
 import TaxContext from "../../context/tax-context";
+import StocksContext from "../../context/stock-context";
 
 const BUY = "BUY";
 const SELL = "SELL";
@@ -21,24 +22,38 @@ function RegisterOperation() {
   const [showNotification, setShowNotification] = useState(false);
   const tickerRef = useRef();
   const quantityRef = useRef();
-  const valueRef = useRef();
+  const priceRef = useRef();
   const dateRef = useRef();
+  const totalValueRef = useRef();
   const [notificationType, setNotificationType] =
     useState(SUCCESS_NOTIFICATION);
   const [notificationMessage, setNotificationMessage] = useState("SUCESSO");
   const [resetNotification, setResetNotification] = useState(false);
   const { invalidateCache: invalidateWalletCache } = useContext(WalletContext);
   const { invalidateCache: invalidateTaxCache } = useContext(TaxContext);
+  const { invalidateCache: invalidateStocksCache } = useContext(StocksContext);
   function onCloseNotification() {
     setShowNotification(false);
   }
   function onSubmitHandler(event) {
     event.preventDefault();
+    let value;
+    if (priceRef.current.value !== "")
+      value = priceRef.current.value * quantityRef.current.value;
+    else value = totalValueRef.current.value;
+    console.log(
+      "priceRef = ",
+      priceRef.current.value,
+      "totalValueRef = ",
+      totalValueRef.current.value,
+      "value = ",
+      value
+    );
     sendRequest({
       url: TRANSACTION_URL,
       method: "POST",
       body: {
-        value: valueRef.current.value,
+        value,
         quantity: quantityRef.current.value,
         ticker: tickerRef.current.value,
         type,
@@ -55,6 +70,7 @@ function RegisterOperation() {
         setNotificationMessage("SUCESSO");
         invalidateTaxCache();
         invalidateWalletCache();
+        invalidateStocksCache();
       } else if (error) {
         setNotificationType(ERROR_NOTIFICATION);
         setNotificationMessage("ERRO");
@@ -67,7 +83,26 @@ function RegisterOperation() {
       clearTimeout(timeout);
       setResetNotification(true);
     };
-  }, [isLoading, result, error, invalidateTaxCache, invalidateWalletCache]);
+  }, [
+    isLoading,
+    result,
+    error,
+    invalidateTaxCache,
+    invalidateWalletCache,
+    invalidateStocksCache,
+  ]);
+
+  function chooseField(event) {
+    let toChange;
+    if (event.target.name === "price")
+      toChange = document.querySelector("input[name='totalValue']");
+    else toChange = document.querySelector("input[name='price']");
+    if (event.target.value !== "") {
+      toChange.setAttribute("disabled", "");
+    } else {
+      toChange.removeAttribute("disabled");
+    }
+  }
 
   function onTypeClick(event) {
     event.preventDefault();
@@ -126,10 +161,21 @@ function RegisterOperation() {
           </div>
           <div className={baseStyles["form-control"]}>
             <input
-              ref={valueRef}
+              ref={priceRef}
               type="text"
-              name="value"
+              name="price"
+              placeholder="Preço"
+              onChange={chooseField}
+              required
+            />
+          </div>
+          <div className={baseStyles["form-control"]}>
+            <input
+              ref={totalValueRef}
+              type="text"
+              name="totalValue"
               placeholder="Valor Total"
+              onChange={chooseField}
               required
             />
           </div>

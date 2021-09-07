@@ -57,6 +57,14 @@
   text-align: center;
 }
 
+div.info {
+  display: flex;
+  justify-content: space-around;
+  margin: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
 .ibov span:first-child {
   font-weight: bold;
 }
@@ -68,6 +76,7 @@
 
 .variation span {
   margin: 0.6rem;
+  margin-top: 0;
 }
 
 .variation span:first-child {

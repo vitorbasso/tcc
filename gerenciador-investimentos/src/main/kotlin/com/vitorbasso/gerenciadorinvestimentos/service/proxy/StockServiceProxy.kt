@@ -13,8 +13,9 @@ class StockServiceProxy(
 
     override fun getStock(ticker: String) = this.stockService.getStock(ticker.toUpperCase())
 
-    override fun getStocksBatch(tickers: List<String>) =
-        this.stockService.getStocksBatch(tickers.map { it.toUpperCase() })
+    override fun getStocksBatch(tickers: List<String>?) = if (tickers.isNullOrEmpty())
+        this.stockService.getAllStocks()
+    else this.stockService.getStocksBatch(tickers.map { it.toUpperCase() })
 
     override fun getStockStartingWith(ticker: String) =
         getListDto(this.stockService.getStockStartingWith(ticker.toUpperCase()))

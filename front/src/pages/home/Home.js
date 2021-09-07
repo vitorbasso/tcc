@@ -9,22 +9,28 @@ import AtAGlance from "../../components/atAGlance/AtAGlance";
 import Navigation from "../../components/navigation/Navigation";
 import { getMoneyClass } from "../../utils/cssUtils";
 import WalletContext from "../../context/wallet-context";
+import StocksContext from "../../context/stock-context";
 
 function getFirstName(result) {
   return result ? result.name?.split(" ")?.[0] : "-";
 }
 
-function getBalance(result) {
-  return result
-    ? result.stockAssets.reduce((total, asset) => {
-        return (total +=
-          asset.amount > 0 ? asset.averageCost * asset.amount : 0);
-      }, 0)
+function getBalance(wallet, stocks) {
+  return wallet && stocks
+    ? wallet.stockAssets
+        .filter((asset) => asset.amount > 0)
+        .reduce((total, asset) => {
+          const stock = stocks.find(
+            (stock) => stock.ticker === asset.stockSymbol
+          );
+          return (total += stock ? stock?.currentValue * asset.amount : 0);
+        }, 0)
     : 0;
 }
 
 function Home() {
-  const { wallet, isLoading, fetchWallet } = useContext(WalletContext);
+  const { wallet, isWalletLoading, fetchWallet } = useContext(WalletContext);
+  const { stocks, isStocksLoading, fetchStocks } = useContext(StocksContext);
   const { result: resultName, sendRequest: sendRequestName } = useHttp();
   useEffect(() => {
     sendRequestName({
@@ -33,11 +39,12 @@ function Home() {
   }, [sendRequestName]);
 
   useEffect(() => {
-    if (!isLoading) fetchWallet();
-  }, [isLoading, fetchWallet]);
+    if (!isWalletLoading) fetchWallet();
+    if (!isStocksLoading) fetchStocks();
+  }, [isWalletLoading, fetchWallet, isStocksLoading, fetchStocks]);
 
   const firstName = getFirstName(resultName);
-  const money = getBalance(wallet);
+  const money = getBalance(wallet, stocks);
   const moneyClass = getMoneyClass(money);
   return (
     <div className={`${baseStyles.container} ${styles.container}`}>

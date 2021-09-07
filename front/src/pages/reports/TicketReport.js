@@ -5,6 +5,7 @@ import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
 import TickerTable from "../../components/table/ticker/TickerTable";
 import { ASSET_URL } from "../../constants/paths";
+import StocksContext from "../../context/stock-context";
 import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
 import useHttp from "../../hooks/useHttp";
@@ -35,7 +36,9 @@ function getVariationStyle(variation) {
 
 function TicketReport() {
   const { wallet, fetchWallet } = useContext(WalletContext);
-  const [variation, setVariation] = useState(0.0242);
+  const { stocks, fetchStocks } = useContext(StocksContext);
+  const [variation, setVariation] = useState(0);
+  const [selection, setSelection] = useState("dia");
   const location = useLocation();
   const [sentRequest, setSentRequest] = useState(false);
   const { result, error, isLoading, sendRequest } = useHttp();
@@ -43,6 +46,7 @@ function TicketReport() {
 
   useEffect(() => {
     fetchWallet();
+    fetchStocks();
     if (
       !sentRequest ||
       (result && result.stockSymbol.toLowerCase() !== id.toLowerCase())
@@ -52,23 +56,28 @@ function TicketReport() {
         url: `${ASSET_URL}/${id}`,
       });
     }
-  }, [fetchWallet, sendRequest, id, result, sentRequest]);
+  }, [fetchWallet, sendRequest, id, result, sentRequest, fetchStocks]);
 
   if (!isLoading && error && !result) setSentRequest(false);
 
   let averageValue = 0;
   let amount = 0;
-  let money = 0;
+  let assetTotalValue = 0;
   let percentOfWallet = 0;
   let lifetimeBalance = 0;
+  let variationDay = 0;
+  let variationWeek = 0;
+  let variationMonth = 0;
+  let variationYear = 0;
+  let currentValue = 0;
   if (wallet) {
     const asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);
     if (asset) {
-      money = asset.averageCost * asset.amount;
+      assetTotalValue = asset.averageCost * asset.amount;
       amount = asset.amount;
       averageValue = asset.averageCost;
       percentOfWallet =
-        money /
+        assetTotalValue /
         wallet.stockAssets.reduce((total, asset) => {
           return (total +=
             asset.amount > 0 ? asset.averageCost * asset.amount : 0);
@@ -76,38 +85,61 @@ function TicketReport() {
       lifetimeBalance = asset.lifetimeBalance;
     }
   }
+  if (stocks) {
+    const stock = stocks.find((stock) => stock.ticker === id);
+    if (stock) {
+      currentValue = stock.currentValue;
+      variationDay = currentValue / stock.lastClose - 1;
+      variationWeek = currentValue / stock.lastWeekClose - 1;
+      variationMonth = currentValue / stock.lastMonthClose - 1;
+      variationYear = currentValue / stock.lastYearClose - 1;
+    }
+  }
   let transactions = [];
   if (result) {
     transactions = result.transactions;
   }
 
-  const moneyClass = getMoneyClass(money);
+  useEffect(() => {
+    setVariation(variationDay);
+    updateNavSelected(DAY);
+  }, [variationDay]);
+
+  const profit = currentValue * amount - assetTotalValue;
+
+  const moneyClass = getMoneyClass(currentValue);
 
   function filter(filterBy) {
     const lastSelected = document.querySelector(`.${styles.selected}`);
     lastSelected.classList.remove(styles.selected);
     switch (filterBy) {
       case DAY:
-        setVariation(-0.0021);
+        setVariation(variationDay);
         updateNavSelected(DAY);
+        setSelection("dia");
         break;
       case WEEK:
-        setVariation(0.0098);
+        setVariation(variationWeek);
         updateNavSelected(WEEK);
+        setSelection("semana");
         break;
       case MONTH:
-        setVariation(0.0242);
+        setVariation(variationMonth);
         updateNavSelected(MONTH);
+        setSelection("mês");
         break;
       case YEAR:
-        setVariation(0.1876);
+        setVariation(variationYear);
         updateNavSelected(YEAR);
+        setSelection("ano");
         break;
       default:
         console.error(`cannot filter by ${filterBy} `);
     }
   }
   const [arrow, css] = getVariationStyle(variation);
+
+  const [difArrow, difCss] = getVariationStyle(profit);
 
   return (
     <div className={baseStyles.container}>
@@ -118,7 +150,11 @@ function TicketReport() {
         <nav className={styles.nav}>
           <ul>
             <li>
-              <button id={DAY} onClick={filter.bind(this, DAY)}>
+              <button
+                id={DAY}
+                className={styles.selected}
+                onClick={filter.bind(this, DAY)}
+              >
                 dia
               </button>
             </li>
@@ -128,11 +164,7 @@ function TicketReport() {
               </button>
             </li>
             <li>
-              <button
-                id={MONTH}
-                className={styles.selected}
-                onClick={filter.bind(this, MONTH)}
-              >
+              <button id={MONTH} onClick={filter.bind(this, MONTH)}>
                 mês
               </button>
             </li>
@@ -147,7 +179,7 @@ function TicketReport() {
           <span>{id}</span>
           <span>{percentFormatterWithoutSign.format(percentOfWallet)}</span>
         </section>
-        <Money value={money} className={`${baseStyles[moneyClass]}`} />
+        <Money value={currentValue} className={`${baseStyles[moneyClass]}`} />
         <section className={styles.info}>
           <div>
             <p>Qnt {Intl.NumberFormat("pt-BR").format(amount)}</p>
@@ -157,12 +189,36 @@ function TicketReport() {
             </p>
           </div>
           <div>
+            <p>Valor Pago {moneyFormatter.format(assetTotalValue)}</p>
+          </div>
+          <div>
+            <p>Valor Atual {moneyFormatter.format(currentValue * amount)}</p>
+          </div>
+          <div>
+            <p>
+              Diferença{" "}
+              <span className={difCss}>
+                {difArrow}
+                {moneyFormatter.format(profit)}
+              </span>
+            </p>
+          </div>
+          <div>
             <p>Balanço Total {moneyFormatter.format(lifetimeBalance)}</p>
+          </div>
+          <div>
+            <p>variação {selection}</p>
           </div>
           <div className={`${styles.variation} ${css}`}>
             <span>{arrow}</span>
             <span>{percentFormatter.format(variation)}</span>
-            <span>({moneyFormatter.format(variation * money)})</span>
+            <span>
+              (
+              {moneyFormatter.format(
+                currentValue - currentValue / (1 + variation)
+              )}
+              )
+            </span>
           </div>
         </section>
         <section>
