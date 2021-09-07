@@ -3,11 +3,22 @@
 :root {
   --pastel-green: #78bfaf;
   --pastel-green-dark: #70b3a4;
-  /* --active-blue: #0879a6; */
   --active-blue: #1f53c2;
   --main-gray: #484848;
   --secondary-gray: #8f8f8f;
   --error-red: #d4194b;
+
+  --chart-purple: #6f69ac;
+  --chart-dark-yellow: #ecd662;
+  --chart-red: #ea5455;
+  --chart-light-green: #95dac1;
+  --chart-dark-blue: #2d4059;
+  --chart-salmon: #fd6f96;
+  --chart-blue: #0f52ba;
+  --chart-yellow: #ffd460;
+  --chart-brown: #865439;
+  --chart-orange: #f07b3f;
+  --chart-green: #57cc99;
 }
 
 * {

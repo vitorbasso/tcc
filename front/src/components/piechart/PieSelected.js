@@ -1,37 +1,17 @@
-import { useContext } from "react";
 import { Link } from "react-router-dom";
-import WalletContext from "../../context/wallet-context";
 import { percentFormatterWithoutSign } from "../../utils/formatterUtils";
 import styles from "./PieSelected.module.css";
+import baseStyles from "../../css/base.module.css";
 
 function PieSelected(props) {
-  const { wallet } = useContext(WalletContext);
-  const assetValues = wallet.stockAssets
-    .filter((asset) => asset.amount > 0)
-    .map((asset) => ({
-      id: asset.id,
-      value: asset.amount * asset.averageCost,
-    }))
-    .sort((first, second) => {
-      if (first.value > second.value) return -1;
-      else if (first.value < second.value) return 1;
-      else return 0;
-    });
-  const walletTotalValue = assetValues.reduce(
-    (total, asset) => (total += asset.value),
-    0
-  );
-  const topTicker = wallet.stockAssets.find(
-    (asset) => asset.id === assetValues?.[0]?.id
-  );
-  const link = topTicker ? `performance/${topTicker.stockSymbol}` : "";
+  const link = `performance/${props.selected?.label}`;
 
   const percentOfWallet = percentFormatterWithoutSign.format(
-    topTicker && walletTotalValue !== 0
-      ? (topTicker.amount * topTicker.averageCost) / walletTotalValue
-      : 0
+    props.selected?.percentage
   );
-  const bar = `${styles.bar} ${styles["rebeccapurple"]}`;
+  const bar = `${styles.bar} ${
+    baseStyles[`chart-color-${props.selected?.index}`]
+  }`;
   return (
     <Link
       to={{
@@ -46,7 +26,7 @@ function PieSelected(props) {
         <div className={bar}></div>
       </div>
       <p>{percentOfWallet}</p>
-      {topTicker && <p>{topTicker.stockSymbol}</p>}
+      {props.selected?.label && <p>{props.selected.label}</p>}
     </Link>
   );
 }

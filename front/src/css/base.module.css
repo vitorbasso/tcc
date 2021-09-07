@@ -198,6 +198,50 @@
   box-shadow: none;
 }
 
+.chart-color-0 {
+  background-color: var(--chart-purple);
+}
+
+.chart-color-1 {
+  background-color: var(--chart-dark-yellow);
+}
+
+.chart-color-2 {
+  background-color: var(--chart-red);
+}
+
+.chart-color-3 {
+  background-color: var(--chart-light-green);
+}
+
+.chart-color-4 {
+  background-color: var(--chart-dark-blue);
+}
+
+.chart-color-5 {
+  background-color: var(--chart-salmon);
+}
+
+.chart-color-6 {
+  background-color: var(--chart-blue);
+}
+
+.chart-color-7 {
+  background-color: var(--chart-yellow);
+}
+
+.chart-color-8 {
+  background-color: var(--chart-brown);
+}
+
+.chart-color-9 {
+  background-color: var(--chart-orange);
+}
+
+.chart-color-10 {
+  background-color: var(--chart-green);
+}
+
 @media (min-width: 1280px) {
   .container {
     width: 1024px; /* 80% de 690 */
