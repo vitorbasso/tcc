@@ -20,6 +20,17 @@
   margin-bottom: 1rem;
 }
 
+.pie-chart__empty-phrase {
+  width: var(--pie-dimension);
+  height: var(--pie-dimension);
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 1.2rem;
+  text-align: justify;
+}
+
 .pie-chart__selected-legend {
   width: var(--pie-dimension);
   display: flex;

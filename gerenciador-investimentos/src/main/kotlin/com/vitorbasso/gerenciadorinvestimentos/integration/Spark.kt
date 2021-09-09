@@ -21,27 +21,27 @@ data class Spark(
             val dates = getDates()
             val datesList = dates.toList()
             val instantMap =
-                sparkDto.timestamp.filter {
+                sparkDto.timestamp?.filter {
                     val localDate = LocalDateTime.ofInstant(it, ZoneId.systemDefault()).atStartOfDay()
                     localDate in dates.values
-                }.mapNotNull { instant ->
+                }?.mapNotNull { instant ->
                     val localDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).atStartOfDay()
                     val date = datesList.find { it.second.isEqual(localDate) }
                     if (date?.first != null)
                         date.first to instant
                     else null
-                }.toMap()
+                }?.toMap()
 
             return Spark(
                 symbol = symbol,
-                lastClose = sparkDto.timestamp.indexOf(instantMap["lastClose"]).takeIf { it != -1 }
-                    ?.let { sparkDto.close[it] },
-                lastWeekClose = sparkDto.timestamp.indexOf(instantMap["lastWeekClose"]).takeIf { it != -1 }
-                    ?.let { sparkDto.close[it] },
-                lastMonthClose = sparkDto.timestamp.indexOf(instantMap["lastMonthClose"]).takeIf { it != -1 }
-                    ?.let { sparkDto.close[it] },
-                lastYearClose = sparkDto.timestamp.indexOf(instantMap["lastYearClose"]).takeIf { it != -1 }
-                    ?.let { sparkDto.close[it] },
+                lastClose = sparkDto.timestamp?.indexOf(instantMap?.get("lastClose"))?.takeIf { it != -1 }
+                    ?.let { sparkDto.close?.get(it) },
+                lastWeekClose = sparkDto.timestamp?.indexOf(instantMap?.get("lastWeekClose"))?.takeIf { it != -1 }
+                    ?.let { sparkDto.close?.get(it) },
+                lastMonthClose = sparkDto.timestamp?.indexOf(instantMap?.get("lastMonthClose"))?.takeIf { it != -1 }
+                    ?.let { sparkDto.close?.get(it) },
+                lastYearClose = sparkDto.timestamp?.indexOf(instantMap?.get("lastYearClose"))?.takeIf { it != -1 }
+                    ?.let { sparkDto.close?.get(it) },
             )
         }
     }

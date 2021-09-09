@@ -4,7 +4,7 @@ import styles from "./PieSelected.module.css";
 import baseStyles from "../../css/base.module.css";
 
 function PieSelected(props) {
-  const link = `performance/${props.selected?.label}`;
+  const link = props.selected ? `performance/${props.selected?.label}` : "";
 
   const percentOfWallet = percentFormatterWithoutSign.format(
     props.selected?.percentage
@@ -12,6 +12,7 @@ function PieSelected(props) {
   const bar = `${styles.bar} ${
     baseStyles[`chart-color-${props.selected?.index}`]
   }`;
+  if (!props.selected) return <div></div>;
   return (
     <Link
       to={{

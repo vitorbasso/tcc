@@ -6,6 +6,6 @@ import java.time.Instant
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SparkDto(
-    val timestamp: List<Instant?>,
-    val close: List<BigDecimal?>
+    val timestamp: List<Instant>?,
+    val close: List<BigDecimal>?
 )

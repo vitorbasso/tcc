@@ -8,6 +8,7 @@ import Money from "../../components/money/Money";
 import { useContext, useEffect, useMemo, useState } from "react";
 import WalletContext from "../../context/wallet-context";
 import AssetTable from "../../components/table/assets/AssetTable";
+import { Link } from "react-router-dom";
 
 function compareAssetValue(first, second) {
   const firstValue = first.amount * first.averageCost;
@@ -37,7 +38,10 @@ function Overview() {
           value: asset.amount * asset.averageCost,
           asset: asset,
           index,
-          percentage: (asset.amount * asset.averageCost) / totalValue,
+          percentage:
+            totalValue && totalValue !== 0 && !Number.isNaN(totalValue)
+              ? (asset.amount * asset.averageCost) / totalValue
+              : 0,
         };
       });
       const restAsset = sortedAssets.slice(9)?.reduce(
@@ -58,10 +62,15 @@ function Overview() {
           value: restAsset.value,
           asset: restAsset,
           index: 3,
-          percentage: restAsset.value / totalValue,
+          percentage:
+            totalValue && totalValue !== 0 && !Number.isNaN(totalValue)
+              ? restAsset.value / totalValue
+              : 0,
         };
       setSelectedAsset(assets[0]);
-      return [...assets.slice(0, 9), assetRest];
+      return [...assets.slice(0, 9), assetRest].filter(
+        (asset) => asset.value && asset.value !== 0 && asset.percentage
+      );
     }
   }, [wallet]);
   const labels = assetsMemo.map((asset) => asset.label);
@@ -82,12 +91,21 @@ function Overview() {
       </Header>
       <main>
         <section className={styles["section__pie-chart"]}>
-          <PieChart
-            data={data}
-            labels={labels}
-            onClick={chartClickHandler}
-            className={styles["pie-chart__pie-chart"]}
-          />
+          {data.length !== 0 && (
+            <PieChart
+              data={data}
+              labels={labels}
+              onClick={chartClickHandler}
+              className={styles["pie-chart__pie-chart"]}
+            />
+          )}
+          {data.length === 0 && (
+            <div className={styles["pie-chart__empty-phrase"]}>
+              <Link to={`/register-operation`}>
+                Registre transações para ter uma visão geral de suas ações aqui.
+              </Link>
+            </div>
+          )}
           <div className={styles["pie-chart__selected-info"]}>
             <PieSelected
               caller="/overview"
@@ -95,7 +113,7 @@ function Overview() {
               className={styles["pie-chart__selected-legend"]}
             />
             <div>
-              <p>{numberFormatter.format(assetAmount)}</p>
+              <p>{numberFormatter.format(assetAmount ?? 0)}</p>
               <div>
                 <Money value={assetAverageCost} />
               </div>

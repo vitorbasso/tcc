@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, Redirect } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
 import TickerTable from "../../components/table/ticker/TickerTable";
@@ -23,7 +23,7 @@ const MONTH = "month";
 const YEAR = "year";
 
 function updateNavSelected(id) {
-  document.querySelector(`#${id}`).classList.add(styles.selected);
+  document.querySelector(`#${id}`)?.classList?.add(styles.selected);
 }
 
 function getVariationStyle(variation) {
@@ -47,16 +47,26 @@ function TicketReport() {
   useEffect(() => {
     fetchWallet();
     fetchStocks();
+    const asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);
     if (
-      !sentRequest ||
-      (result && result.stockSymbol.toLowerCase() !== id.toLowerCase())
+      (!sentRequest ||
+        (result && result.stockSymbol.toLowerCase() !== id.toLowerCase())) &&
+      asset
     ) {
       setSentRequest(true);
       sendRequest({
         url: `${ASSET_URL}/${id}`,
       });
     }
-  }, [fetchWallet, sendRequest, id, result, sentRequest, fetchStocks]);
+  }, [
+    fetchWallet,
+    sendRequest,
+    id,
+    result,
+    sentRequest,
+    wallet.stockAssets,
+    fetchStocks,
+  ]);
 
   if (!isLoading && error && !result) setSentRequest(false);
 
@@ -70,8 +80,9 @@ function TicketReport() {
   let variationMonth = 0;
   let variationYear = 0;
   let currentValue = 0;
+  let asset;
   if (wallet) {
-    const asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);
+    asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);
     if (asset) {
       assetTotalValue = asset.averageCost * asset.amount;
       amount = asset.amount;
@@ -104,6 +115,7 @@ function TicketReport() {
     setVariation(variationDay);
     updateNavSelected(DAY);
   }, [variationDay]);
+  if (!asset) return <Redirect to="/not-found" />;
 
   const profit = currentValue * amount - assetTotalValue;
 
@@ -111,6 +123,7 @@ function TicketReport() {
 
   function filter(filterBy) {
     const lastSelected = document.querySelector(`.${styles.selected}`);
+    if (!lastSelected) return;
     lastSelected.classList.remove(styles.selected);
     switch (filterBy) {
       case DAY:

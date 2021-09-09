@@ -1,5 +1,5 @@
 import { Link, useHistory } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CLIENTS_URL } from "../../constants/paths";
 import { validateEmailInput } from "../../utils/validationUtils";
 import styles from "./forms.module.css";
@@ -35,6 +35,10 @@ function SignUp() {
   const [passwordError, setPasswordError] = useState(false);
   const confirmPasswordRef = useRef();
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+
+  useEffect(() => {
+    nameRef.current.focus();
+  }, []);
 
   function areFieldsValid() {
     const nameIsValid = isNameValid(nameRef.current.value);

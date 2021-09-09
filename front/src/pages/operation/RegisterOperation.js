@@ -41,14 +41,6 @@ function RegisterOperation() {
     if (priceRef.current.value !== "")
       value = priceRef.current.value * quantityRef.current.value;
     else value = totalValueRef.current.value;
-    console.log(
-      "priceRef = ",
-      priceRef.current.value,
-      "totalValueRef = ",
-      totalValueRef.current.value,
-      "value = ",
-      value
-    );
     sendRequest({
       url: TRANSACTION_URL,
       method: "POST",
@@ -61,6 +53,10 @@ function RegisterOperation() {
       },
     });
   }
+
+  useEffect(() => {
+    tickerRef.current.focus();
+  }, []);
 
   useEffect(() => {
     if (!isLoading && (result || error)) {
