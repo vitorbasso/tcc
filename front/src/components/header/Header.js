@@ -5,12 +5,14 @@ import { CgLogOut, CgArrowLeft } from "react-icons/cg";
 import { useHistory } from "react-router-dom";
 import TaxContext from "../../context/tax-context";
 import WalletContext from "../../context/wallet-context";
+import StocksContext from "../../context/stock-context";
 
 function Header(props) {
   const authCtx = useContext(AuthContext);
   const history = useHistory();
   const { resetContext: resetTaxContext } = useContext(TaxContext);
   const { resetContext: resetWalletContext } = useContext(WalletContext);
+  const { resetContext: resetStockContext } = useContext(StocksContext);
   function handleGoBackClick() {
     if (props.caller) history.push(props.caller);
     else history.push("/");
@@ -31,6 +33,7 @@ function Header(props) {
             onClick={authCtx.onLogout.bind(this, () => {
               resetTaxContext();
               resetWalletContext();
+              resetStockContext();
             })}
             title="Logout"
           >

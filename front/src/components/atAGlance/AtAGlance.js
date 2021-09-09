@@ -31,7 +31,10 @@ function AtAGlance(props) {
           value: asset.amount * asset.averageCost,
           asset: asset,
           index,
-          percentage: (asset.amount * asset.averageCost) / totalValue,
+          percentage:
+            totalValue && totalValue !== 0 && !Number.isNaN(totalValue)
+              ? (asset.amount * asset.averageCost) / totalValue
+              : 0,
         };
       });
       const restAsset = sortedAssets.slice(3)?.reduce(
@@ -52,10 +55,15 @@ function AtAGlance(props) {
           value: restAsset.value,
           asset: restAsset,
           index: 3,
-          percentage: restAsset.value / totalValue,
+          percentage:
+            totalValue && totalValue !== 0 && !Number.isNaN(totalValue)
+              ? restAsset.value / totalValue
+              : 0,
         };
       setSelectedAsset(assets[0]);
-      return [...assets.slice(0, 3), assetRest];
+      return [...assets.slice(0, 3), assetRest].filter(
+        (asset) => asset.value && asset.value !== 0 && asset.percentage
+      );
     }
   }, [wallet]);
   const labels = assetsMemo.map((asset) => asset.label);

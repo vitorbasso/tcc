@@ -9,6 +9,7 @@ import { moneyFormatter, percentFormatter } from "../../utils/formatterUtils";
 import WalletContext from "../../context/wallet-context";
 import AssetTable from "../../components/table/assets/AssetTable";
 import StocksContext from "../../context/stock-context";
+import { Link } from "react-router-dom";
 
 const DAY = "day";
 const WEEK = "week";
@@ -183,36 +184,50 @@ function PerformanceReport() {
             </li>
           </ul>
         </nav>
-        <section className={styles.overall}>
-          <Money
-            value={walletWorth}
-            className={`${styles.money} ${baseStyles[moneyClass]}`}
-          />
-          <div className={styles.info}>
-            <p>Valor Pago {moneyFormatter.format(paidForAssets)}</p>
-          </div>
-          <div className={styles.info}>
-            <p>
-              Diferença{" "}
-              <span className={difCss}>
-                {difArrow} {moneyFormatter.format(walletWorth - paidForAssets)}
+        {assets.length !== 0 && (
+          <section className={styles.overall}>
+            <Money
+              value={walletWorth}
+              className={`${styles.money} ${baseStyles[moneyClass]}`}
+            />
+            <div className={styles.info}>
+              <p>Valor Pago {moneyFormatter.format(paidForAssets)}</p>
+            </div>
+            <div className={styles.info}>
+              <p>
+                Diferença{" "}
+                <span className={difCss}>
+                  {difArrow}{" "}
+                  {moneyFormatter.format(walletWorth - paidForAssets)}
+                </span>
+              </p>
+            </div>
+            <div className={styles.info}>
+              <p>variação {selection}</p>
+            </div>
+            <p className={`${styles.variation} ${css}`}>
+              <span>
+                {arrow} {percentFormatter.format(variation)}
+              </span>
+              <span>({moneyFormatter.format(walletWorth * variation)})</span>
+            </p>
+            <p className={styles.ibov}>
+              <span>IBOV </span>
+              <span className={ibovCss}>
+                {percentFormatter.format(ibovDiff)}
               </span>
             </p>
-          </div>
-          <div className={styles.info}>
-            <p>variação {selection}</p>
-          </div>
-          <p className={`${styles.variation} ${css}`}>
-            <span>
-              {arrow} {percentFormatter.format(variation)}
-            </span>
-            <span>({moneyFormatter.format(walletWorth * variation)})</span>
-          </p>
-          <p className={styles.ibov}>
-            <span>IBOV </span>
-            <span className={ibovCss}>{percentFormatter.format(ibovDiff)}</span>
-          </p>
-        </section>
+          </section>
+        )}
+        {assets.length === 0 && (
+          <section
+            className={`${styles["empty-transaction-text"]} ${styles.overall}`}
+          >
+            <Link to={`/register-operation`}>
+              Registre transações para ver a performance da sua carteira aqui.
+            </Link>
+          </section>
+        )}
         <section className={styles["section__assets"]}>
           <AssetTable
             assets={assets}

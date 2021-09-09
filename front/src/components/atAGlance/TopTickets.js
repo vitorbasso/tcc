@@ -39,7 +39,14 @@ function TopTickets(props) {
               <div className={`${styles["chart-legend"]} ${colorCss}`}></div>
               {arrow} {assetInfo.asset.stockSymbol}
             </span>
-            <span>{percentFormatter.format(assetInfo.asset.valueChange)}</span>
+            <span>
+              {percentFormatter.format(
+                assetInfo.asset.valueChange &&
+                  !Number.isNaN(assetInfo.asset.valueChange)
+                  ? assetInfo.asset.valueChange
+                  : 0
+              )}
+            </span>
           </Link>
         );
       })}

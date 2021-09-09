@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { validateEmailInput } from "../../utils/validationUtils";
 import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
@@ -14,6 +14,10 @@ function SignIn() {
   const passwordRef = useRef();
   const authCtx = useContext(AuthContext);
   const { result, error, isLoading, sendRequest } = useHttp();
+
+  useEffect(() => {
+    emailRef.current.focus();
+  }, []);
 
   function submitHandler(event) {
     event.preventDefault();
