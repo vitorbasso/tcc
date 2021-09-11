@@ -6,8 +6,8 @@ on:
   # paths: ["gerenciador-investimentos/**"] deploy
 
 jobs:
-  deploy-verification:
-    name: Deploy Check
+  verify-and-deploy:
+    name: verify and deploy to heroku
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,12 +18,8 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: check
+      - name: verify
         working-directory: ./gerenciador-investimentos
-        env:
-          GERENCIADOR-INVESTIMENTO_SECURITY_SECRET: ${{secrets.TOKENSIGNINGKEY}}
         run: mvn verify
-      # - name: heroku create remote
-      #   run: heroku git:remote -a gerenciador-investimento-app
-      - name: heroku deploy
-        run: git subtree --prefix gerenciador-investimentos push https://heroku:${{secrets.HEROKU_API_KEY}}@git.heroku.com/gerenciador-investimento-app.git HEAD:main
+      - name: deploy to heroku
+        run: git subtree --prefix gerenciador-investimentos https://heroku:${{secrets.HEROKU_API_KEY}}@git.heroku.com/gerenciador-investimento-app.git HEAD:main
