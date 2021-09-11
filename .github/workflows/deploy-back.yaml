@@ -27,6 +27,6 @@ jobs:
         run: heroku login
       - name: heroku deploy
         run: |
-          heroku git:remote -a gerenciador-investimentos-app
+          heroku git:remote -a gerenciador-investimento-app
           git push heroku master
         working-directory: ./gerenciador-investimentos
