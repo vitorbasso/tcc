@@ -29,3 +29,4 @@ jobs:
           heroku_app_name: "gerenciador-investimento-app"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           appdir: "gerenciador-investimentos/"
+          remote_branch: ${{secrest.HEROKU_BRANCH}}
