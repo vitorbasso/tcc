@@ -23,10 +23,8 @@ jobs:
         env:
           GERENCIADOR-INVESTIMENTO_SECURITY_SECRET: ${{secrets.TOKENSIGNINGKEY}}
         run: mvn verify
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: gerenciador-investimento-app
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-          appdir: ./gerenciador-investimentos
-          remote_branch: ${{secrets.HEROKU_BRANCH}}
+      - name: heroku login
+        run: heroku login
+      - name: heroku deploy
+        run: git push ${{secrets.HEROKU_BRANCH}} main
+        working-directory: ./gerenciador-investimentos
