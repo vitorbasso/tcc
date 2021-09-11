@@ -27,6 +27,10 @@ jobs:
         run: mvn verify
       - name: heroku create remote
         run: heroku git:remote -a gerenciador-investimento-app
+      - name: heroku sucks
+        run: |
+          heroku create --ssh-git
+          git config --global url.ssh://git@heroku.com/.insteadOf https://git.heroku.com/
       - name: heroku deploy
         run: git push heroku HEAD:main
         working-directory: ./gerenciador-investimentos
