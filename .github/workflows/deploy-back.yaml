@@ -25,8 +25,8 @@ jobs:
         run: mvn verify
       - name: heroku login
         run: heroku login
+      - name: heroku create remote
+        run: heroku git:remote -a gerenciador-investimento-app
       - name: heroku deploy
-        run: |
-          heroku git:remote -a gerenciador-investimento-app
-          git push heroku HEAD:main
+        run: git push heroku HEAD:main
         working-directory: ./gerenciador-investimentos
