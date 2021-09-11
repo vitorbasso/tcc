@@ -9,8 +9,6 @@ jobs:
   deploy-verification:
     name: Deploy Check
     runs-on: ubuntu-latest
-    env:
-      HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
     steps:
       - uses: actions/checkout@v2
       - name: Cache local Maven repository
@@ -28,5 +26,4 @@ jobs:
       # - name: heroku create remote
       #   run: heroku git:remote -a gerenciador-investimento-app
       - name: heroku deploy
-        run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/gerenciador-investimento-app.git HEAD:main
-        working-directory: ./gerenciador-investimentos
+        run: git subtree --prefix gerenciador-investimentos push https://heroku:${{secrets.HEROKU_API_KEY}}@git.heroku.com/gerenciador-investimento-app.git HEAD:main
