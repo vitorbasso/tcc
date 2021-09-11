@@ -22,4 +22,4 @@ jobs:
         working-directory: ./gerenciador-investimentos
         run: mvn verify
       - name: deploy to heroku
-        run: git subtree --prefix gerenciador-investimentos push https://heroku:${{secrets.HEROKU_API_KEY}}@git.heroku.com/gerenciador-investimento-app.git HEAD:main
+        run: git subtree --prefix gerenciador-investimentos push --force https://heroku:${{secrets.HEROKU_API_KEY}}@git.heroku.com/gerenciador-investimento-app.git HEAD:main
