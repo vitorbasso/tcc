@@ -26,5 +26,7 @@ jobs:
       - name: heroku login
         run: heroku login
       - name: heroku deploy
-        run: git push ${{secrets.HEROKU_BRANCH}} develop
+        run: |
+          heroku git:remote -a gerenciador-investimentos-app
+          git push heroku master
         working-directory: ./gerenciador-investimentos
