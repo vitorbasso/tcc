@@ -1,9 +1,9 @@
 name: "BACK: Gerenciador de Investimentos DEPLOY"
 
 on:
-  pull_request:
-    branches: [master, develop]
-    # paths: ["gerenciador-investimentos/**"] deploy
+  push
+  # branches: [master, develop]
+  # paths: ["gerenciador-investimentos/**"] deploy
 
 jobs:
   deploy-verification:
