@@ -1,4 +1,6 @@
-export const BASE_URL = "http://localhost:8080/v1";
+const { REACT_APP_BASE_URL } = process.env;
+
+export const BASE_URL = REACT_APP_BASE_URL ?? "http://localhost:8080/v1";
 
 export const CLIENTS_URL = `${BASE_URL}/clients`;
 export const WALLETS_URL = `${BASE_URL}/wallets`;

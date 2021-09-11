@@ -1,19 +1,16 @@
-name: "BACK: Gerenciador de Investimentos PULL REQUEST"
+name: "BACK: Gerenciador de Investimentos DEPLOY"
 
 on:
-  pull_request:
-    branches: [develop, master]
+  push:
+    branches: [master]
     paths: ["gerenciador-investimentos/**"]
 
 jobs:
-  pr-verification:
-    name: PR Check
+  verify-and-deploy:
+    name: verify and deploy to heroku
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 11
       - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
@@ -21,8 +18,8 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: build
+      - name: verify
         working-directory: ./gerenciador-investimentos
-        env:
-          GERENCIADOR-INVESTIMENTO_SECURITY_SECRET: ${{secrets.TOKENSIGNINGKEY}}
         run: mvn verify
+      - name: deploy to heroku
+        run: git push https://heroku:${{secrets.HEROKU_API_KEY}}@git.heroku.com/gerenciador-investimento-app.git `git subtree split --prefix gerenciador-investimentos HEAD`:main --force
