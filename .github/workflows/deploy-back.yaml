@@ -9,6 +9,8 @@ jobs:
   deploy-verification:
     name: Deploy Check
     runs-on: ubuntu-latest
+    env:
+      HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
     steps:
       - uses: actions/checkout@v2
       - name: Cache local Maven repository
@@ -24,8 +26,6 @@ jobs:
           GERENCIADOR-INVESTIMENTO_SECURITY_SECRET: ${{secrets.TOKENSIGNINGKEY}}
         run: mvn verify
       - name: heroku login
-        env:
-          HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
         run: heroku login
       - name: heroku create remote
         run: heroku git:remote -a gerenciador-investimento-app
