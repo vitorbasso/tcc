@@ -4,10 +4,12 @@ import baseStyles from "../css/base.module.css";
 import TaxContext from "../context/tax-context";
 import WalletContext from "../context/wallet-context";
 import useHttp from "./useHttp";
+import StocksContext from "../context/stock-context";
 
 function useDeleteConfirmation() {
   const { invalidateCache: invalidateWalletCache } = useContext(WalletContext);
   const { invalidateCache: invalidateTaxCache } = useContext(TaxContext);
+  const { invalidateCache: invalidateStocksCache } = useContext(StocksContext);
   const { sendRequest } = useHttp();
   const confirmDelete = useCallback(
     (
@@ -35,6 +37,7 @@ function useDeleteConfirmation() {
                       .then(() => {
                         invalidateTaxCache();
                         invalidateWalletCache();
+                        invalidateStocksCache();
                       })
                       .then(() => {
                         config.onDelete?.();
@@ -54,7 +57,12 @@ function useDeleteConfirmation() {
         overlayClassName: `${baseStyles["delete-prompt-overlay"]}`,
       });
     },
-    [invalidateTaxCache, invalidateWalletCache, sendRequest]
+    [
+      invalidateTaxCache,
+      invalidateWalletCache,
+      invalidateStocksCache,
+      sendRequest,
+    ]
   );
   return confirmDelete;
 }
