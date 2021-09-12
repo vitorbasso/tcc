@@ -124,7 +124,10 @@ function TicketReport() {
     setVariation(variationDay);
     updateNavSelected(DAY);
   }, [variationDay]);
-  if (!asset) return <Redirect to="/not-found" />;
+
+  if (wallet && wallet.id !== -1 && !asset) {
+    return <Redirect to="/not-found" />;
+  }
 
   const profit = currentValue * amount - assetTotalValue;
 
