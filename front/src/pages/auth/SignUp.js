@@ -38,6 +38,7 @@ function SignUp() {
 
   useEffect(() => {
     nameRef.current.focus();
+    window.scrollTo(0, 0);
   }, []);
 
   function areFieldsValid() {

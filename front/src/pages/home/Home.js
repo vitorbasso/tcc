@@ -42,6 +42,9 @@ function Home() {
     if (!isWalletLoading) fetchWallet();
     if (!isStocksLoading) fetchStocks();
   }, [isWalletLoading, fetchWallet, isStocksLoading, fetchStocks]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const firstName = getFirstName(resultName);
   const money = getBalance(wallet, stocks);

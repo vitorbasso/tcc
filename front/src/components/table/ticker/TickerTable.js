@@ -1,9 +1,15 @@
 import styles from "./TickerTable.module.css";
-import { dateFormatter, numberFormatter } from "../../../utils/formatterUtils";
+import {
+  dateFormatter,
+  moneyFormatter,
+  numberFormatter,
+} from "../../../utils/formatterUtils";
 import Money from "../../money/Money";
 import { useEffect, useState } from "react";
-import { BsArrowDown, BsArrowUp } from "react-icons/bs";
+import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import baseStyles from "../../../css/base.module.css";
+import { TRANSACTION_URL } from "../../../constants/paths";
+import useDeleteConfirmation from "../../../hooks/useDeleteConfirmation";
 
 function sortByDate(first, second, weight = 1) {
   const firstValue = first.transactionDate;
@@ -39,6 +45,7 @@ const AVERAGE_VALUE_INVERSE = "-averageValue";
 function TickerTable(props) {
   const [sortBy, setSortBy] = useState(DATE);
   const [transactionsToDisplay, setTransactionsToDisplay] = useState([]);
+  const confirmDelete = useDeleteConfirmation();
   useEffect(() => {
     setTransactionsToDisplay(props.transactions);
   }, [props.transactions]);
@@ -105,6 +112,31 @@ function TickerTable(props) {
     else setSortBy(`-${btn.dataset.sort}`);
   }
 
+  function deleteHandler(event) {
+    event.preventDefault();
+    const transaction = assets.find(
+      (transaction) =>
+        "" + transaction.id === event.target.closest("i").dataset.id
+    );
+    if (!transaction) return;
+    confirmDelete({
+      title: `Remover?`,
+      message: `Tem certeza que deseja remover a transação de ${
+        transaction.type === "BUY" ? "COMPRA" : "VENDA"
+      } de ${transaction.quantity} por ${moneyFormatter.format(
+        transaction.value / transaction.quantity
+      )} cada do dia ${dateFormatter.format(
+        new Date(transaction.transactionDate)
+      )}?`,
+      url: `${TRANSACTION_URL}/${transaction.id}`,
+      onDelete: props?.onDelete,
+    });
+  }
+
+  if (assets.length === 0) {
+    return [];
+  }
+
   return (
     <div className={`${props.className} ${baseStyles.table}`}>
       <label htmlFor="hide-sell">
@@ -167,7 +199,12 @@ function TickerTable(props) {
             </thead>
             <tbody>
               <tr>
-                <td>{type}</td>
+                <td className={baseStyles["table-title"]}>
+                  {type}{" "}
+                  <i onClick={deleteHandler} data-id={transaction.id}>
+                    <BsTrash />
+                  </i>
+                </td>
                 <td>{numberFormatter.format(transaction.quantity)}</td>
                 <td>
                   <Money value={transaction.value / transaction.quantity} />

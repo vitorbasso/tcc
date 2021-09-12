@@ -3,7 +3,7 @@ import { WALLETS_URL } from "../constants/paths";
 import useHttp from "../hooks/useHttp";
 
 const INITIAL_WALLET = {
-  id: 0,
+  id: -1,
   balanceDaytrade: 0,
   balance: 0,
   withdrawn: 0,
@@ -11,7 +11,7 @@ const INITIAL_WALLET = {
   walletMonth: new Date(),
   stockAssets: [
     {
-      id: 0,
+      id: -1,
       stockSymbol: "",
       averageCost: 0,
       amount: 0,

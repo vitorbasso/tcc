@@ -56,6 +56,7 @@ function RegisterOperation() {
 
   useEffect(() => {
     tickerRef.current.focus();
+    window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
@@ -67,6 +68,7 @@ function RegisterOperation() {
         invalidateTaxCache();
         invalidateWalletCache();
         invalidateStocksCache();
+        document.querySelector(`form.${styles.form}`).reset();
       } else if (error) {
         setNotificationType(ERROR_NOTIFICATION);
         setNotificationMessage("ERRO");

@@ -7,8 +7,11 @@ import {
 import Money from "../../money/Money";
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import { BsArrowDown, BsArrowUp } from "react-icons/bs";
+import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import StocksContext from "../../../context/stock-context";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import useDeleteConfirmation from "../../../hooks/useDeleteConfirmation";
+import { ASSET_URL } from "../../../constants/paths";
 
 function sortByPercentage(first, second, weight = 1) {
   const firstValue = first.amount * first.averageCost;
@@ -40,6 +43,7 @@ const AVERAGE_VALUE = "averageValue";
 const AVERAGE_VALUE_INVERSE = "-averageValue";
 
 function AssetTable(props) {
+  const confirmDelete = useDeleteConfirmation();
   const [sortBy, setSortBy] = useState(PERCENT);
   const [assetsToDisplay, setAssetsToDisplay] = useState([]);
   const { stocks } = useContext(StocksContext);
@@ -82,6 +86,23 @@ function AssetTable(props) {
     btn.classList.add(styles.selected);
     if (btn.dataset.sort !== sortBy) setSortBy(btn.dataset.sort);
     else setSortBy(`-${btn.dataset.sort}`);
+  }
+
+  function deleteHandler(event) {
+    event.preventDefault();
+    const ticker = assets.find(
+      (asset) => asset.stockSymbol === event.target.closest("i").dataset.ticker
+    )?.stockSymbol;
+    if (!ticker) return;
+    confirmDelete({
+      title: `Deletar ${ticker}?`,
+      message: `Tem certeza que deseja deletar a ação ${ticker} da sua carteira?`,
+      url: `${ASSET_URL}/${ticker}`,
+    });
+  }
+
+  if (assets.length === 0) {
+    return [];
   }
 
   return (
@@ -155,7 +176,12 @@ function AssetTable(props) {
               </thead>
               <tbody>
                 <tr>
-                  <td>{asset.stockSymbol}</td>
+                  <td className={baseStyles["table-title"]}>
+                    <span>{asset.stockSymbol}</span>{" "}
+                    <i onClick={deleteHandler} data-ticker={asset.stockSymbol}>
+                      <BsTrash />
+                    </i>
+                  </td>
                   <td>{numberFormatter.format(asset.amount)}</td>
                   <td>
                     <Money value={asset.averageCost} />

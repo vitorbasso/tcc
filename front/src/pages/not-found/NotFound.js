@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useHistory } from "react-router";
 import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
@@ -9,6 +10,10 @@ function NotFound() {
   function onClickHandler() {
     history.push("/");
   }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className={baseStyles.container}>
       <Header backButton>

@@ -69,6 +69,9 @@ function PerformanceReport() {
     fetchWallet();
     fetchStocks();
   }, [fetchWallet, fetchStocks]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   let assets = [];
   let paidForAssets = 0;
   if (wallet) {
@@ -92,13 +95,13 @@ function PerformanceReport() {
   if (stocks) {
     walletWorth = getWalletWorth(stocks, assets);
     const worthDay = getWalletWorth(stocks, assets, DAY);
-    walletVariationDay = (worthDay - paidForAssets) / worthDay;
+    walletVariationDay = (walletWorth - worthDay) / walletWorth;
     const worthWeek = getWalletWorth(stocks, assets, WEEK);
-    walletVariationWeek = (worthWeek - paidForAssets) / worthWeek;
+    walletVariationWeek = (walletWorth - worthWeek) / walletWorth;
     const worthMonth = getWalletWorth(stocks, assets, MONTH);
-    walletVariationMonth = (worthMonth - paidForAssets) / worthMonth;
+    walletVariationMonth = (walletWorth - worthMonth) / walletWorth;
     const worthYear = getWalletWorth(stocks, assets, YEAR);
-    walletVariationYear = (worthYear - paidForAssets) / worthYear;
+    walletVariationYear = (walletWorth - worthYear) / walletWorth;
     ibov = stocks.find((stock) => stock.ticker === IBOVESPA);
     ibovVariationDay =
       (ibov?.currentValue - ibov?.lastClose) / ibov?.currentValue;

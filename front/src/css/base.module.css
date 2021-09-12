@@ -141,6 +141,15 @@
   font-size: 1.2rem;
 }
 
+.table tbody {
+  width: 100%;
+}
+
+.table tbody .table-title {
+  display: flex;
+  justify-content: space-between;
+}
+
 .table tbody tr {
   display: grid;
   grid-template-rows: repeat(5, 1fr);
@@ -240,6 +249,37 @@
 
 .chart-color-10 {
   background-color: var(--chart-green);
+}
+
+.delete-prompt {
+  width: 80%;
+  margin: auto;
+  padding: 1rem;
+  text-align: center;
+  color: var(--main-gray);
+  font-size: 1.2rem;
+  background-color: #ebeae6;
+  border-radius: 30px;
+  box-shadow: 10px 10px 35px rgba(0, 0, 0, 0.5);
+}
+
+.delete-prompt h1 {
+  color: var(--error-red);
+  margin-bottom: 1rem;
+}
+
+.delete-prompt > div {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.delete-prompt > div button {
+  width: 40%;
+}
+
+div.delete-prompt-overlay {
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 @media (min-width: 1280px) {

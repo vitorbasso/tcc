@@ -24,6 +24,9 @@ function Overview() {
   useEffect(() => {
     fetchWallet();
   }, [fetchWallet]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const assetsMemo = useMemo(() => {
     if (wallet) {
       const sortedAssets = wallet.stockAssets
@@ -112,15 +115,17 @@ function Overview() {
               selected={selectedAsset}
               className={styles["pie-chart__selected-legend"]}
             />
-            <div>
-              <p>{numberFormatter.format(assetAmount ?? 0)}</p>
+            {wallet.stockAssets.length !== 0 && (
               <div>
-                <Money value={assetAverageCost} />
+                <p>{numberFormatter.format(assetAmount ?? 0)}</p>
+                <div>
+                  <Money value={assetAverageCost} />
+                </div>
+                <div>
+                  <Money value={assetTotalValue} />
+                </div>
               </div>
-              <div>
-                <Money value={assetTotalValue} />
-              </div>
-            </div>
+            )}
           </div>
         </section>
         <section className={styles["section__assets"]}>

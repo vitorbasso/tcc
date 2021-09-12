@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { useLocation, useParams, Redirect } from "react-router-dom";
 import Header from "../../components/header/Header";
@@ -45,6 +45,17 @@ function TicketReport() {
   const id = useParams().id.toUpperCase();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const fetchTransactions = useCallback(() => {
+    setSentRequest(true);
+    sendRequest({
+      url: `${ASSET_URL}/${id}`,
+    });
+  }, [id, sendRequest]);
+
+  useEffect(() => {
     fetchWallet();
     fetchStocks();
     const asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);
@@ -53,10 +64,7 @@ function TicketReport() {
         (result && result.stockSymbol.toLowerCase() !== id.toLowerCase())) &&
       asset
     ) {
-      setSentRequest(true);
-      sendRequest({
-        url: `${ASSET_URL}/${id}`,
-      });
+      fetchTransactions();
     }
   }, [
     fetchWallet,
@@ -66,6 +74,7 @@ function TicketReport() {
     sentRequest,
     wallet.stockAssets,
     fetchStocks,
+    fetchTransactions,
   ]);
 
   if (!isLoading && error && !result) setSentRequest(false);
@@ -115,7 +124,10 @@ function TicketReport() {
     setVariation(variationDay);
     updateNavSelected(DAY);
   }, [variationDay]);
-  if (!asset) return <Redirect to="/not-found" />;
+
+  if (wallet && wallet.id !== -1 && !asset) {
+    return <Redirect to="/not-found" />;
+  }
 
   const profit = currentValue * amount - assetTotalValue;
 
@@ -190,7 +202,13 @@ function TicketReport() {
         </nav>
         <section className={styles.overview}>
           <span>{id}</span>
-          <span>{percentFormatterWithoutSign.format(percentOfWallet)}</span>
+          <span>
+            {percentFormatterWithoutSign.format(
+              percentOfWallet && !Number.isNaN(percentOfWallet)
+                ? percentOfWallet
+                : 0
+            )}
+          </span>
         </section>
         <Money value={currentValue} className={`${baseStyles[moneyClass]}`} />
         <section className={styles.info}>
@@ -235,7 +253,10 @@ function TicketReport() {
           </div>
         </section>
         <section>
-          <TickerTable transactions={transactions} />
+          <TickerTable
+            transactions={transactions}
+            onDelete={fetchTransactions}
+          />
         </section>
       </main>
     </div>
