@@ -45,6 +45,10 @@ function TicketReport() {
   const id = useParams().id.toUpperCase();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     fetchWallet();
     fetchStocks();
     const asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);

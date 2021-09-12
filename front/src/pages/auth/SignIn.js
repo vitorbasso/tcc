@@ -17,6 +17,7 @@ function SignIn() {
 
   useEffect(() => {
     emailRef.current.focus();
+    window.scrollTo(0, 0);
   }, []);
 
   function submitHandler(event) {

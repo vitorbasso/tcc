@@ -12,6 +12,10 @@ function TaxReport() {
   const { wallet, fetchWallet } = useContext(WalletContext);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     fetchTax();
     fetchWallet();
   }, [fetchTax, fetchWallet]);

@@ -56,6 +56,7 @@ function RegisterOperation() {
 
   useEffect(() => {
     tickerRef.current.focus();
+    window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {

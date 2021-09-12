@@ -69,6 +69,9 @@ function PerformanceReport() {
     fetchWallet();
     fetchStocks();
   }, [fetchWallet, fetchStocks]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   let assets = [];
   let paidForAssets = 0;
   if (wallet) {

@@ -24,6 +24,9 @@ function Overview() {
   useEffect(() => {
     fetchWallet();
   }, [fetchWallet]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const assetsMemo = useMemo(() => {
     if (wallet) {
       const sortedAssets = wallet.stockAssets
