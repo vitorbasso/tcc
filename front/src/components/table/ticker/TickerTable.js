@@ -2,8 +2,10 @@ import styles from "./TickerTable.module.css";
 import { dateFormatter, numberFormatter } from "../../../utils/formatterUtils";
 import Money from "../../money/Money";
 import { useEffect, useState } from "react";
-import { BsArrowDown, BsArrowUp } from "react-icons/bs";
+import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import baseStyles from "../../../css/base.module.css";
+import useHttp from "../../../hooks/useHttp";
+import { TRANSACTION_URL } from "../../../constants/paths";
 
 function sortByDate(first, second, weight = 1) {
   const firstValue = first.transactionDate;
@@ -39,6 +41,7 @@ const AVERAGE_VALUE_INVERSE = "-averageValue";
 function TickerTable(props) {
   const [sortBy, setSortBy] = useState(DATE);
   const [transactionsToDisplay, setTransactionsToDisplay] = useState([]);
+  const { sendRequest } = useHttp();
   useEffect(() => {
     setTransactionsToDisplay(props.transactions);
   }, [props.transactions]);
@@ -105,6 +108,21 @@ function TickerTable(props) {
     else setSortBy(`-${btn.dataset.sort}`);
   }
 
+  function deleteHandler(event) {
+    event.preventDefault();
+    const id = event.target.closest("i").dataset.id;
+    if (window.confirm("Tem certeza que deseja deletar essa transação?")) {
+      sendRequest({
+        url: `${TRANSACTION_URL}/${id}`,
+        method: "DELETE",
+      });
+    }
+  }
+
+  if (assets.length === 0) {
+    return [];
+  }
+
   return (
     <div className={`${props.className} ${baseStyles.table}`}>
       <label htmlFor="hide-sell">
@@ -167,7 +185,12 @@ function TickerTable(props) {
             </thead>
             <tbody>
               <tr>
-                <td>{type}</td>
+                <td className={baseStyles["table-title"]}>
+                  {type}{" "}
+                  <i onClick={deleteHandler} data-id={transaction.id}>
+                    <BsTrash />
+                  </i>
+                </td>
                 <td>{numberFormatter.format(transaction.quantity)}</td>
                 <td>
                   <Money value={transaction.value / transaction.quantity} />

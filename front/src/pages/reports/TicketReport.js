@@ -194,7 +194,13 @@ function TicketReport() {
         </nav>
         <section className={styles.overview}>
           <span>{id}</span>
-          <span>{percentFormatterWithoutSign.format(percentOfWallet)}</span>
+          <span>
+            {percentFormatterWithoutSign.format(
+              percentOfWallet && !Number.isNaN(percentOfWallet)
+                ? percentOfWallet
+                : 0
+            )}
+          </span>
         </section>
         <Money value={currentValue} className={`${baseStyles[moneyClass]}`} />
         <section className={styles.info}>

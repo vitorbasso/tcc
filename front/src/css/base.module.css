@@ -141,6 +141,15 @@
   font-size: 1.2rem;
 }
 
+.table tbody {
+  width: 100%;
+}
+
+.table tbody .table-title {
+  display: flex;
+  justify-content: space-between;
+}
+
 .table tbody tr {
   display: grid;
   grid-template-rows: repeat(5, 1fr);

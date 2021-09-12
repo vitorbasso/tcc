@@ -7,8 +7,10 @@ import {
 import Money from "../../money/Money";
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import { BsArrowDown, BsArrowUp } from "react-icons/bs";
+import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import StocksContext from "../../../context/stock-context";
+import useHttp from "../../../hooks/useHttp";
+import { ASSET_URL } from "../../../constants/paths";
 
 function sortByPercentage(first, second, weight = 1) {
   const firstValue = first.amount * first.averageCost;
@@ -43,6 +45,7 @@ function AssetTable(props) {
   const [sortBy, setSortBy] = useState(PERCENT);
   const [assetsToDisplay, setAssetsToDisplay] = useState([]);
   const { stocks } = useContext(StocksContext);
+  const { result, sendRequest } = useHttp();
   useEffect(() => {
     setAssetsToDisplay(props.assets);
   }, [props.assets]);
@@ -82,6 +85,29 @@ function AssetTable(props) {
     btn.classList.add(styles.selected);
     if (btn.dataset.sort !== sortBy) setSortBy(btn.dataset.sort);
     else setSortBy(`-${btn.dataset.sort}`);
+  }
+
+  function deleteHandler(event) {
+    event.preventDefault();
+    const ticker = event.target.closest("i").dataset.ticker;
+    if (
+      window.confirm(
+        `Tem certeza que deseja deletar ${ticker} da sua carteira?`
+      )
+    ) {
+      sendRequest({
+        url: `${ASSET_URL}/${ticker}`,
+        method: "DELETE",
+      });
+    }
+  }
+
+  if (result) {
+    console.log("result", result);
+  }
+
+  if (assets.length === 0) {
+    return [];
   }
 
   return (
@@ -155,7 +181,12 @@ function AssetTable(props) {
               </thead>
               <tbody>
                 <tr>
-                  <td>{asset.stockSymbol}</td>
+                  <td className={baseStyles["table-title"]}>
+                    <span>{asset.stockSymbol}</span>{" "}
+                    <i onClick={deleteHandler} data-ticker={asset.stockSymbol}>
+                      <BsTrash />
+                    </i>
+                  </td>
                   <td>{numberFormatter.format(asset.amount)}</td>
                   <td>
                     <Money value={asset.averageCost} />
