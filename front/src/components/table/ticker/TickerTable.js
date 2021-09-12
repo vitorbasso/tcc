@@ -1,11 +1,15 @@
 import styles from "./TickerTable.module.css";
-import { dateFormatter, numberFormatter } from "../../../utils/formatterUtils";
+import {
+  dateFormatter,
+  moneyFormatter,
+  numberFormatter,
+} from "../../../utils/formatterUtils";
 import Money from "../../money/Money";
 import { useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import baseStyles from "../../../css/base.module.css";
-import useHttp from "../../../hooks/useHttp";
 import { TRANSACTION_URL } from "../../../constants/paths";
+import useDeleteConfirmation from "../../../hooks/useDeleteConfirmation";
 
 function sortByDate(first, second, weight = 1) {
   const firstValue = first.transactionDate;
@@ -41,7 +45,7 @@ const AVERAGE_VALUE_INVERSE = "-averageValue";
 function TickerTable(props) {
   const [sortBy, setSortBy] = useState(DATE);
   const [transactionsToDisplay, setTransactionsToDisplay] = useState([]);
-  const { sendRequest } = useHttp();
+  const confirmDelete = useDeleteConfirmation();
   useEffect(() => {
     setTransactionsToDisplay(props.transactions);
   }, [props.transactions]);
@@ -110,13 +114,23 @@ function TickerTable(props) {
 
   function deleteHandler(event) {
     event.preventDefault();
-    const id = event.target.closest("i").dataset.id;
-    if (window.confirm("Tem certeza que deseja deletar essa transação?")) {
-      sendRequest({
-        url: `${TRANSACTION_URL}/${id}`,
-        method: "DELETE",
-      });
-    }
+    const transaction = assets.find(
+      (transaction) =>
+        "" + transaction.id === event.target.closest("i").dataset.id
+    );
+    if (!transaction) return;
+    confirmDelete({
+      title: `Remover?`,
+      message: `Tem certeza que deseja remover a transação de ${
+        transaction.type === "BUY" ? "COMPRA" : "VENDA"
+      } de ${transaction.quantity} por ${moneyFormatter.format(
+        transaction.value / transaction.quantity
+      )} cada do dia ${dateFormatter.format(
+        new Date(transaction.transactionDate)
+      )}?`,
+      url: `${TRANSACTION_URL}/${transaction.id}`,
+      onDelete: props?.onDelete,
+    });
   }
 
   if (assets.length === 0) {

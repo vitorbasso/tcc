@@ -9,7 +9,8 @@ import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import StocksContext from "../../../context/stock-context";
-import useHttp from "../../../hooks/useHttp";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import useDeleteConfirmation from "../../../hooks/useDeleteConfirmation";
 import { ASSET_URL } from "../../../constants/paths";
 
 function sortByPercentage(first, second, weight = 1) {
@@ -42,10 +43,10 @@ const AVERAGE_VALUE = "averageValue";
 const AVERAGE_VALUE_INVERSE = "-averageValue";
 
 function AssetTable(props) {
+  const confirmDelete = useDeleteConfirmation();
   const [sortBy, setSortBy] = useState(PERCENT);
   const [assetsToDisplay, setAssetsToDisplay] = useState([]);
   const { stocks } = useContext(StocksContext);
-  const { result, sendRequest } = useHttp();
   useEffect(() => {
     setAssetsToDisplay(props.assets);
   }, [props.assets]);
@@ -89,21 +90,15 @@ function AssetTable(props) {
 
   function deleteHandler(event) {
     event.preventDefault();
-    const ticker = event.target.closest("i").dataset.ticker;
-    if (
-      window.confirm(
-        `Tem certeza que deseja deletar ${ticker} da sua carteira?`
-      )
-    ) {
-      sendRequest({
-        url: `${ASSET_URL}/${ticker}`,
-        method: "DELETE",
-      });
-    }
-  }
-
-  if (result) {
-    console.log("result", result);
+    const ticker = assets.find(
+      (asset) => asset.stockSymbol === event.target.closest("i").dataset.ticker
+    )?.stockSymbol;
+    if (!ticker) return;
+    confirmDelete({
+      title: `Deletar ${ticker}?`,
+      message: `Tem certeza que deseja deletar a ação ${ticker} da sua carteira?`,
+      url: `${ASSET_URL}/${ticker}`,
+    });
   }
 
   if (assets.length === 0) {

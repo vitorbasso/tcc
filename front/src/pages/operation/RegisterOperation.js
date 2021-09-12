@@ -68,6 +68,7 @@ function RegisterOperation() {
         invalidateTaxCache();
         invalidateWalletCache();
         invalidateStocksCache();
+        document.querySelector(`form.${styles.form}`).reset();
       } else if (error) {
         setNotificationType(ERROR_NOTIFICATION);
         setNotificationMessage("ERRO");

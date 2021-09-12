@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { useLocation, useParams, Redirect } from "react-router-dom";
 import Header from "../../components/header/Header";
@@ -48,6 +48,13 @@ function TicketReport() {
     window.scrollTo(0, 0);
   }, []);
 
+  const fetchTransactions = useCallback(() => {
+    setSentRequest(true);
+    sendRequest({
+      url: `${ASSET_URL}/${id}`,
+    });
+  }, [id, sendRequest]);
+
   useEffect(() => {
     fetchWallet();
     fetchStocks();
@@ -57,10 +64,7 @@ function TicketReport() {
         (result && result.stockSymbol.toLowerCase() !== id.toLowerCase())) &&
       asset
     ) {
-      setSentRequest(true);
-      sendRequest({
-        url: `${ASSET_URL}/${id}`,
-      });
+      fetchTransactions();
     }
   }, [
     fetchWallet,
@@ -70,6 +74,7 @@ function TicketReport() {
     sentRequest,
     wallet.stockAssets,
     fetchStocks,
+    fetchTransactions,
   ]);
 
   if (!isLoading && error && !result) setSentRequest(false);
@@ -245,7 +250,10 @@ function TicketReport() {
           </div>
         </section>
         <section>
-          <TickerTable transactions={transactions} />
+          <TickerTable
+            transactions={transactions}
+            onDelete={fetchTransactions}
+          />
         </section>
       </main>
     </div>
