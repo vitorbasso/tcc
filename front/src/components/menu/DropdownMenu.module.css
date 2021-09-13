@@ -1,0 +1,44 @@
+.menu {
+  position: relative;
+  z-index: 11;
+}
+
+.overlay {
+  background-color: transparent;
+}
+
+.menu-options {
+  --menu-size: 9rem;
+  width: var(--menu-size);
+  position: fixed;
+  transform: translateX(calc(-1 * var(--menu-size)));
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 15px;
+  box-shadow: 8px 8px 25px rgba(0, 0, 0, 0.2);
+  height: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  overflow: hidden;
+  transition: padding 0.1s ease;
+}
+
+.show-menu {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  height: auto;
+}
+
+.menu-options li {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.menu-options li:last-child {
+  margin-top: 0.7rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.5);
+}
