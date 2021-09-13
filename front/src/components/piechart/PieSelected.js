@@ -4,7 +4,7 @@ import styles from "./PieSelected.module.css";
 import baseStyles from "../../css/base.module.css";
 
 function PieSelected(props) {
-  const link = props.selected ? `performance/${props.selected?.label}` : "";
+  const link = props.selected ? `performance${props.selected?.link}` : "";
 
   const percentOfWallet = percentFormatterWithoutSign.format(
     props.selected?.percentage

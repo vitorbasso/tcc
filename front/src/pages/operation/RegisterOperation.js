@@ -13,6 +13,7 @@ import WalletContext from "../../context/wallet-context";
 import TaxContext from "../../context/tax-context";
 import StocksContext from "../../context/stock-context";
 import CurrencyInput from "react-currency-input-field";
+import { numberFormatter } from "../../utils/formatterUtils";
 
 const BUY = "BUY";
 const SELL = "SELL";
@@ -23,6 +24,7 @@ function RegisterOperation() {
   const { result, error, isLoading, sendRequest } = useHttp();
   const [type, setType] = useState(BUY);
   const [price, setPrice] = useState();
+  const [totalPrice, setTotalPrice] = useState();
   const [priceType, setPriceType] = useState(EACH);
   const [showNotification, setShowNotification] = useState(false);
   const tickerRef = useRef();
@@ -43,13 +45,16 @@ function RegisterOperation() {
   function onSubmitHandler(event) {
     event.preventDefault();
     let value;
-    if (priceType === EACH) value = price * quantityRef.current.value;
-    else value = price;
+    if (priceType === EACH) {
+      value = price.replace(",", ".") * quantityRef.current.value;
+    } else {
+      value = Number.parseFloat(totalPrice.replace(",", "."));
+    }
     sendRequest({
       url: TRANSACTION_URL,
       method: "POST",
       body: {
-        value,
+        value: value.toFixed(2),
         quantity: quantityRef.current.value,
         ticker: tickerRef.current.value,
         type,
@@ -72,7 +77,15 @@ function RegisterOperation() {
         invalidateTaxCache();
         invalidateWalletCache();
         invalidateStocksCache();
+        setPrice("");
+        setTotalPrice("");
         document.querySelector(`form.${styles.form}`).reset();
+        document
+          .querySelector("input[name='price']")
+          .removeAttribute("disabled");
+        document
+          .querySelector("input[name='totalValue']")
+          .removeAttribute("disabled");
       } else if (error) {
         setNotificationType(ERROR_NOTIFICATION);
         setNotificationMessage("ERRO");
@@ -99,16 +112,17 @@ function RegisterOperation() {
     if (name === "price") {
       toChange = document.querySelector("input[name='totalValue']");
       if (priceType !== EACH) setPriceType(EACH);
+      setPrice(value);
     } else {
       toChange = document.querySelector("input[name='price']");
       if (priceType !== TOTAL) setPriceType(TOTAL);
+      setTotalPrice(value);
     }
     if (value) {
       toChange.setAttribute("disabled", "");
     } else {
       toChange.removeAttribute("disabled");
     }
-    setPrice(value);
   }
 
   function onTypeClick(event) {
@@ -168,21 +182,21 @@ function RegisterOperation() {
           </div>
           <div className={baseStyles["form-control"]}>
             <CurrencyInput
-              ref={priceRef}
               intlConfig={{ locale: "pt-BR", currency: "BRL" }}
               name="price"
               placeholder="Preço"
               onValueChange={onPriceChange}
+              value={price}
               required
             />
           </div>
           <div className={baseStyles["form-control"]}>
             <CurrencyInput
-              ref={totalValueRef}
               intlConfig={{ locale: "pt-BR", currency: "BRL" }}
               name="totalValue"
               placeholder="Valor Total"
               onValueChange={onPriceChange}
+              value={totalPrice}
               required
             />
           </div>

@@ -38,6 +38,7 @@ function Overview() {
       const assets = sortedAssets.map((asset, index) => {
         return {
           label: asset.stockSymbol,
+          link: `/${asset.stockSymbol}`,
           value: asset.amount * asset.averageCost,
           asset: asset,
           index,
@@ -62,6 +63,7 @@ function Overview() {
         ),
         assetRest = {
           label: "Outros",
+          link: "",
           value: restAsset.value,
           asset: restAsset,
           index: 3,
