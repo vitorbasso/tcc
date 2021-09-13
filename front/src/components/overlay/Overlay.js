@@ -3,7 +3,10 @@ import styles from "./Overlay.module.css";
 
 function Overlay(props) {
   return reactDom.createPortal(
-    <div onClick={props.onClick} className={styles.overlay}>
+    <div
+      onClick={props.onClick}
+      className={`${styles.overlay} ${props.className}`}
+    >
       {props.children}
     </div>,
     document.querySelector("body")

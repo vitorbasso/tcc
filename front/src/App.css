@@ -1,6 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
 
 :root {
+  --background-lighter: #ebeae6;
+  --background-darker: #faf4d4;
+
   --pastel-green: #78bfaf;
   --pastel-green-dark: #70b3a4;
   --active-blue: #1f53c2;
@@ -45,7 +48,11 @@ body {
   /* background-color: #ebeae6; */
   /* background-color: #e8e5d5; */
   /* background-color: #faf4d4; */
-  background: linear-gradient(0deg, #faf4d4, #ebeae6);
+  background: linear-gradient(
+    0deg,
+    var(--background-darker),
+    var(--background-lighter)
+  );
   background-repeat: no-repeat;
   background-attachment: fixed;
   font-family: "Lato", sans-serif;

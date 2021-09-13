@@ -12,13 +12,18 @@ import LoadingOverlay from "../../components/loading-overlay/LoadingOverlay";
 import WalletContext from "../../context/wallet-context";
 import TaxContext from "../../context/tax-context";
 import StocksContext from "../../context/stock-context";
+import CurrencyInput from "react-currency-input-field";
 
 const BUY = "BUY";
 const SELL = "SELL";
+const EACH = "each";
+const TOTAL = "total";
 
 function RegisterOperation() {
   const { result, error, isLoading, sendRequest } = useHttp();
   const [type, setType] = useState(BUY);
+  const [price, setPrice] = useState();
+  const [priceType, setPriceType] = useState(EACH);
   const [showNotification, setShowNotification] = useState(false);
   const tickerRef = useRef();
   const quantityRef = useRef();
@@ -38,9 +43,8 @@ function RegisterOperation() {
   function onSubmitHandler(event) {
     event.preventDefault();
     let value;
-    if (priceRef.current.value !== "")
-      value = priceRef.current.value * quantityRef.current.value;
-    else value = totalValueRef.current.value;
+    if (priceType === EACH) value = price * quantityRef.current.value;
+    else value = price;
     sendRequest({
       url: TRANSACTION_URL,
       method: "POST",
@@ -90,16 +94,21 @@ function RegisterOperation() {
     invalidateStocksCache,
   ]);
 
-  function chooseField(event) {
+  function onPriceChange(value, name) {
     let toChange;
-    if (event.target.name === "price")
+    if (name === "price") {
       toChange = document.querySelector("input[name='totalValue']");
-    else toChange = document.querySelector("input[name='price']");
-    if (event.target.value !== "") {
+      if (priceType !== EACH) setPriceType(EACH);
+    } else {
+      toChange = document.querySelector("input[name='price']");
+      if (priceType !== TOTAL) setPriceType(TOTAL);
+    }
+    if (value) {
       toChange.setAttribute("disabled", "");
     } else {
       toChange.removeAttribute("disabled");
     }
+    setPrice(value);
   }
 
   function onTypeClick(event) {
@@ -158,22 +167,22 @@ function RegisterOperation() {
             />
           </div>
           <div className={baseStyles["form-control"]}>
-            <input
+            <CurrencyInput
               ref={priceRef}
-              type="text"
+              intlConfig={{ locale: "pt-BR", currency: "BRL" }}
               name="price"
               placeholder="Preço"
-              onChange={chooseField}
+              onValueChange={onPriceChange}
               required
             />
           </div>
           <div className={baseStyles["form-control"]}>
-            <input
+            <CurrencyInput
               ref={totalValueRef}
-              type="text"
+              intlConfig={{ locale: "pt-BR", currency: "BRL" }}
               name="totalValue"
               placeholder="Valor Total"
-              onChange={chooseField}
+              onValueChange={onPriceChange}
               required
             />
           </div>
