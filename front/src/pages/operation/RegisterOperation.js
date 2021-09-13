@@ -13,7 +13,6 @@ import WalletContext from "../../context/wallet-context";
 import TaxContext from "../../context/tax-context";
 import StocksContext from "../../context/stock-context";
 import CurrencyInput from "react-currency-input-field";
-import { numberFormatter } from "../../utils/formatterUtils";
 
 const BUY = "BUY";
 const SELL = "SELL";
@@ -29,9 +28,7 @@ function RegisterOperation() {
   const [showNotification, setShowNotification] = useState(false);
   const tickerRef = useRef();
   const quantityRef = useRef();
-  const priceRef = useRef();
   const dateRef = useRef();
-  const totalValueRef = useRef();
   const [notificationType, setNotificationType] =
     useState(SUCCESS_NOTIFICATION);
   const [notificationMessage, setNotificationMessage] = useState("SUCESSO");
