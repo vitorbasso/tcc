@@ -26,6 +26,8 @@ function TaxReport() {
   let daytradeBalance = 0;
   let deductable = 0;
   let daytradeDeductable = 0;
+  let deducted = 0;
+  let daytradeDeducted = 0;
   let withdrawn = 0;
   let daytradeWithdrawn = 0;
   let base = 0;
@@ -45,8 +47,10 @@ function TaxReport() {
     daytradeTax = tax.daytradeTax;
     deductable = tax.availableToDeduct;
     daytradeDeductable = tax.daytradeAvailableToDeduct;
-    base = tax.baseForCalculation;
-    daytradeBase = tax.daytradeBaseForCalculation;
+    deducted = tax.deducted;
+    daytradeDeducted = tax.daytradeDeducted;
+    base = tax.baseForCalculation - deducted;
+    daytradeBase = tax.daytradeBaseForCalculation - daytradeDeducted;
   } else {
     normalTax = 0;
     daytradeTax = 0;
@@ -56,6 +60,7 @@ function TaxReport() {
   const totalBalance = balance + daytradeBalance;
   const totalIrrf = irrf + daytradeIrrf;
   const totalDeductable = deductable + daytradeDeductable;
+  const totalDeducted = deducted + daytradeDeducted;
   const totalWithdrawn = withdrawn + daytradeWithdrawn;
 
   const moneyClass = getMoneyClass(totalTax);
@@ -153,6 +158,34 @@ function TaxReport() {
               </span>
             </li>
             <li>
+              <span>
+                Prejuízo
+                <br />
+                descontado:
+              </span>
+              <span>
+                <Money
+                  className={styles["inline-money"]}
+                  value={totalDeducted}
+                />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Normal:</span>
+              <span>
+                <Money className={styles["inline-money"]} value={deducted} />
+              </span>
+            </li>
+            <li className={styles["sub-list"]}>
+              <span>- Daytrade:</span>
+              <span>
+                <Money
+                  className={styles["inline-money"]}
+                  value={daytradeDeducted}
+                />
+              </span>
+            </li>
+            <li>
               <span>IRRF:</span>
               <span>
                 <Money className={styles["inline-money"]} value={totalIrrf} />
@@ -201,9 +234,6 @@ function TaxReport() {
           />
         </section>
         <section className={styles.action}>
-          <button type="button" className={baseStyles.btn}>
-            Descontar Prejuizo
-          </button>
           <button type="button" className={baseStyles.btn}>
             Imprimir
           </button>

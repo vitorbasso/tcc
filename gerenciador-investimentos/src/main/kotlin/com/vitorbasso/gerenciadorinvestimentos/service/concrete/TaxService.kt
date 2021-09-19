@@ -64,8 +64,12 @@ internal class TaxService(
         val walletsByMonth = wallets.groupBy { it.walletMonth }.toSortedMap()
         return walletsByMonth.values.fold(TaxInfo()) { taxInfo, taxables ->
             val taxable = taxables.single()
-            val availableToDeduct = taxInfo.availableToDeduct
-            val daytradeAvailableToDeduct = taxInfo.availableToDeduct
+            val availableToDeduct = taxInfo.availableToDeduct.let {
+                if (!isProfit(taxable.balance)) it.minus(taxable.balance) else it
+            }
+            val daytradeAvailableToDeduct = taxInfo.daytradeAvailableToDeduct.let {
+                if (!isProfit(taxable.balanceDaytrade)) it.minus(taxable.balanceDaytrade) else it
+            }
             val deducted = if (withdrawnOverAllowance(taxable.withdrawn)) {
                 if (isProfit(taxable.balance)) {
                     if (availableToDeduct.compareTo(taxable.balance) <= 0) {
@@ -73,7 +77,9 @@ internal class TaxService(
                     } else {
                         taxable.balance
                     }
-                } else BigDecimal.ZERO
+                } else {
+                    BigDecimal.ZERO
+                }
             } else BigDecimal.ZERO
             val daytradeDeducted = if (isProfit(taxable.balanceDaytrade)) {
                 if (daytradeAvailableToDeduct.compareTo(taxable.balanceDaytrade) <= 0) {
@@ -81,14 +87,16 @@ internal class TaxService(
                 } else {
                     taxable.balanceDaytrade
                 }
-            } else BigDecimal.ZERO
+            } else {
+                BigDecimal.ZERO
+            }
             val normalTax = if (isProfit(taxable.balance)) {
                 if (withdrawnOverAllowance(taxable.withdrawn)) {
                     taxable.balance.minus(deducted).multiply(PERCENT_15).minus(taxable.withdrawn.multiply(IRRF))
                 } else BigDecimal.ZERO
             } else BigDecimal.ZERO
             val daytradeTax = if (isProfit(taxable.balanceDaytrade)) {
-                taxable.balanceDaytrade.minus(daytradeDeducted).multiply(PERCENT_20).minus(
+                ((taxable.balanceDaytrade.minus(daytradeDeducted)).multiply(PERCENT_20)).minus(
                     taxable.balanceDaytrade.multiply(
                         DAYTRADE_IRRF
                     )
@@ -101,10 +109,10 @@ internal class TaxService(
                 daytradeWithdrawn = taxable.withdrawnDaytrade,
                 deducted = deducted,
                 daytradeDeducted = daytradeDeducted,
-                availableToDeduct = taxInfo.availableToDeduct.minus(deducted),
-                daytradeAvailableToDeduct = taxInfo.daytradeAvailableToDeduct.minus(daytradeDeducted),
-                normalTax = normalTax,
-                daytradeTax = daytradeTax
+                availableToDeduct = availableToDeduct.minus(deducted),
+                daytradeAvailableToDeduct = daytradeAvailableToDeduct.minus(daytradeDeducted),
+                normalTax = normalTax.takeIf { isPositive(it) } ?: BigDecimal.ZERO,
+                daytradeTax = daytradeTax.takeIf { isPositive(it) } ?: BigDecimal.ZERO
             )
         }
     }
