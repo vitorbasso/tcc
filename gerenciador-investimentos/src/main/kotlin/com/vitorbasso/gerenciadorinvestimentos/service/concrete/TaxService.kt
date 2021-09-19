@@ -59,6 +59,61 @@ internal class TaxService(
     }
 
     fun calculateTax(
+        wallets: List<ITaxable>
+    ): TaxInfo {
+        val walletsByMonth = wallets.groupBy { it.walletMonth }.toSortedMap()
+        return walletsByMonth.values.fold(TaxInfo()) { taxInfo, taxables ->
+            val taxable = taxables.single()
+            val availableToDeduct = taxInfo.availableToDeduct
+            val daytradeAvailableToDeduct = taxInfo.availableToDeduct
+            val deducted = if (withdrawnOverAllowance(taxable.withdrawn)) {
+                if (isProfit(taxable.balance)) {
+                    if (availableToDeduct.compareTo(taxable.balance) <= 0) {
+                        availableToDeduct
+                    } else {
+                        taxable.balance
+                    }
+                } else BigDecimal.ZERO
+            } else BigDecimal.ZERO
+            val daytradeDeducted = if (isProfit(taxable.balanceDaytrade)) {
+                if (daytradeAvailableToDeduct.compareTo(taxable.balanceDaytrade) <= 0) {
+                    daytradeAvailableToDeduct
+                } else {
+                    taxable.balanceDaytrade
+                }
+            } else BigDecimal.ZERO
+            val normalTax = if (isProfit(taxable.balance)) {
+                if (withdrawnOverAllowance(taxable.withdrawn)) {
+                    taxable.balance.minus(deducted).multiply(PERCENT_15).minus(taxable.withdrawn.multiply(IRRF))
+                } else BigDecimal.ZERO
+            } else BigDecimal.ZERO
+            val daytradeTax = if (isProfit(taxable.balanceDaytrade)) {
+                taxable.balanceDaytrade.minus(daytradeDeducted).multiply(PERCENT_20).minus(
+                    taxable.balanceDaytrade.multiply(
+                        DAYTRADE_IRRF
+                    )
+                )
+            } else BigDecimal.ZERO
+            TaxInfo(
+                balance = taxable.balance,
+                withdrawn = taxable.withdrawn,
+                daytradeBalance = taxable.balanceDaytrade,
+                daytradeWithdrawn = taxable.withdrawnDaytrade,
+                deducted = deducted,
+                daytradeDeducted = daytradeDeducted,
+                availableToDeduct = taxInfo.availableToDeduct.minus(deducted),
+                daytradeAvailableToDeduct = taxInfo.daytradeAvailableToDeduct.minus(daytradeDeducted),
+                normalTax = normalTax,
+                daytradeTax = daytradeTax
+            )
+        }
+    }
+
+    private fun isProfit(balance: BigDecimal) = isPositive(balance)
+
+    private fun withdrawnOverAllowance(withdrawn: BigDecimal) = withdrawn.compareTo(MAX_WITHDRAWN) >= 0
+
+    fun calculateTax(
         month: LocalDate,
         wallets: List<ITaxable>,
         deductibles: List<TaxDeductible>

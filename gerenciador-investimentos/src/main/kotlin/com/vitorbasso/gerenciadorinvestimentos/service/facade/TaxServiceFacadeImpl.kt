@@ -25,10 +25,13 @@ internal class TaxServiceFacadeImpl(
     private val clientService: IClientService
 ) : ITaxService {
 
+    //    override fun getTax(month: LocalDate) = this.taxService.calculateTax(
+//        month = month,
+//        wallets = getTaxables(month),
+//        deductibles = this.taxService.getTaxDeductibles(month, SecurityContextUtil.getClientDetails())
+//    )
     override fun getTax(month: LocalDate) = this.taxService.calculateTax(
-        month = month,
-        wallets = getTaxables(month),
-        deductibles = this.taxService.getTaxDeductibles(month, SecurityContextUtil.getClientDetails())
+        wallets = getTaxables(month)
     )
 
     override fun deduct(taxDeductibleRequest: TaxDeductibleRequest) = this.taxService.deductFromTax(
