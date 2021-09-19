@@ -10,6 +10,7 @@ import WalletContext from "../../context/wallet-context";
 import AssetTable from "../../components/table/assets/AssetTable";
 import StocksContext from "../../context/stock-context";
 import { Link } from "react-router-dom";
+import ExpandableAssetTable from "../../components/table/expandable/ExpandableAssetTable";
 
 const DAY = "day";
 const WEEK = "week";
@@ -232,7 +233,7 @@ function PerformanceReport() {
           </section>
         )}
         <section className={styles["section__assets"]}>
-          <AssetTable
+          <ExpandableAssetTable
             assets={assets}
             className={styles["asset-table"]}
             caller={"/performance"}

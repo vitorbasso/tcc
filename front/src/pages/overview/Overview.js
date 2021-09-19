@@ -7,8 +7,11 @@ import { numberFormatter } from "../../utils/formatterUtils";
 import Money from "../../components/money/Money";
 import { useContext, useEffect, useMemo, useState } from "react";
 import WalletContext from "../../context/wallet-context";
-import AssetTable from "../../components/table/assets/AssetTable";
 import { Link } from "react-router-dom";
+import ExpendableAssetTable from "../../components/table/expandable/ExpandableAssetTable";
+import StocksContext from "../../context/stock-context";
+import AssetTable from "../../components/table/assets/AssetTable";
+import ExpandableAssetTable from "../../components/table/expandable/ExpandableAssetTable";
 
 function compareAssetValue(first, second) {
   const firstValue = first.amount * first.averageCost;
@@ -20,10 +23,12 @@ function compareAssetValue(first, second) {
 
 function Overview() {
   const { wallet, fetchWallet } = useContext(WalletContext);
+  const { fetchStocks } = useContext(StocksContext);
   const [selectedAsset, setSelectedAsset] = useState({});
   useEffect(() => {
     fetchWallet();
-  }, [fetchWallet]);
+    fetchStocks();
+  }, [fetchWallet, fetchStocks]);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -131,7 +136,7 @@ function Overview() {
           </div>
         </section>
         <section className={styles["section__assets"]}>
-          <AssetTable
+          <ExpandableAssetTable
             assets={wallet.stockAssets}
             className={styles["asset-table"]}
             caller={"/overview"}
