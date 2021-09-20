@@ -24,18 +24,6 @@ create table if not exists `client`(
     foreign key (`wallet_id`) references `wallet` (`id`)
 )engine=InnoDB;
 
-create table if not exists `tax_deductible` (
-	`id` bigint auto_increment,
-    `deducted` decimal(20,2) default 0,
-    `daytrade_deducted` decimal(20,2) default 0,
-    `month` date not null,
-    `client_id` bigint not null,
-    `date_created` timestamp not null default NOW(),
-    `date_updated` timestamp default NOW(),
-    primary key (`id`),
-    foreign key (`client_id`) references `client` (`id`)
-)engine=InnoDB;
-
 create table if not exists `monthly_wallet`(
 	`id` bigint auto_increment,
     `balance_daytrade` decimal(20,2) default 0,
@@ -94,4 +82,3 @@ create table if not exists `transaction`(
 
 CREATE INDEX `transaction_date` ON `transaction` (`transaction_date`);
 ALTER TABLE `monthly_wallet` ADD UNIQUE `unique_monthly_wallet` (`wallet_month`, `wallet_id`);
-ALTER TABLE `tax_deductible` ADD UNIQUE `unique_tax` (`client_id`, `month`);

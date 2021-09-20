@@ -54,19 +54,17 @@ internal class TransactionServiceFacadeImpl(
             .findLast { it.id == newTransaction.id } ?: newTransaction
     }
 
-    private fun checkDate(dateToCheck: LocalDateTime, asset: Asset) = dateToCheck.takeIf {
+    private fun checkDate(dateToCheck: LocalDateTime) = dateToCheck.takeIf {
         !it.toLocalDate().isAfter(LocalDate.now()) &&
             (it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY)
     } ?: throw CustomWrongDateException()
 
-    private fun TransactionRequest.getTransaction() = (assetService.getAsset(this.ticker) as Asset).let {
-        Transaction(
-            type = this.type,
-            quantity = this.quantity,
-            value = this.value,
-            asset = it,
-            transactionDate = checkDate(this.date, it)
-        )
-    }
+    private fun TransactionRequest.getTransaction() = Transaction(
+        type = this.type,
+        quantity = this.quantity,
+        value = this.value,
+        asset = (assetService.getAsset(this.ticker) as Asset),
+        transactionDate = checkDate(this.date)
+    )
 
 }
