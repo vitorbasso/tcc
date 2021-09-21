@@ -1,7 +1,6 @@
 package com.vitorbasso.gerenciadorinvestimentos.service.proxy
 
 import com.vitorbasso.gerenciadorinvestimentos.domain.ITax
-import com.vitorbasso.gerenciadorinvestimentos.dto.request.TaxDeductibleRequest
 import com.vitorbasso.gerenciadorinvestimentos.dto.response.TaxDto
 import com.vitorbasso.gerenciadorinvestimentos.service.ITaxService
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.TaxService
@@ -19,9 +18,6 @@ class TaxServiceProxyImpl(
 ) : ITaxService {
 
     override fun getTax(month: LocalDate) = this.taxService.getTax(month).toDto()
-
-    override fun deduct(taxDeductibleRequest: TaxDeductibleRequest) =
-        this.taxService.deduct(taxDeductibleRequest).toDto()
 
 }
 

@@ -6,6 +6,29 @@
   color: var(--error-red);
 }
 
+.red {
+  color: #ea526f;
+}
+
+.green {
+  color: #57cc99;
+}
+
+.month-input {
+  border: none;
+  background-color: transparent;
+  font-size: inherit;
+  width: 3rem;
+}
+
+.month-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+input.month-input:focus {
+  outline: none;
+}
+
 .inline-money {
   display: inline;
   font-size: 1.2rem;
@@ -61,6 +84,6 @@ li.sub-list .inline-money {
 .action {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  height: 10rem;
+  justify-content: flex-start;
+  height: 8rem;
 }

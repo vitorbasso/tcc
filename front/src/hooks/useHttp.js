@@ -2,6 +2,11 @@ import { useCallback, useContext, useState } from "react";
 import { BASE_URL } from "../constants/paths";
 import AuthContext from "../context/auth-context";
 
+function HttpException(response = { status: 500, body: {} }) {
+  this.body = response.body;
+  this.status = response.status;
+}
+
 function useHttp() {
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
@@ -39,8 +44,10 @@ function useHttp() {
           body: JSON.stringify(defaultConfig.body),
           headers: defaultConfig.headers,
         });
-        if (!response.ok) throw new Error(defaultConfig.errorMsg);
         const data = await response.json();
+        if (!response.ok) {
+          throw new HttpException({ status: response.status, body: data });
+        }
         setResult(data);
       } catch (err) {
         setError(err);

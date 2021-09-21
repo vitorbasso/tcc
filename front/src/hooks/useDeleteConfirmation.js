@@ -5,11 +5,17 @@ import TaxContext from "../context/tax-context";
 import WalletContext from "../context/wallet-context";
 import useHttp from "./useHttp";
 import StocksContext from "../context/stock-context";
+import MonthWallet from "../context/month-wallet-context";
+import WalletMonths from "../context/month-wallets-context";
 
 function useDeleteConfirmation() {
   const { invalidateCache: invalidateWalletCache } = useContext(WalletContext);
   const { invalidateCache: invalidateTaxCache } = useContext(TaxContext);
   const { invalidateCache: invalidateStocksCache } = useContext(StocksContext);
+  const { invalidateCache: invalidateMonthWalletCache } =
+    useContext(MonthWallet);
+  const { invalidateCache: invalidateWalletMonthsCache } =
+    useContext(WalletMonths);
   const { sendRequest } = useHttp();
   const confirmDelete = useCallback(
     (
@@ -38,6 +44,8 @@ function useDeleteConfirmation() {
                         invalidateTaxCache();
                         invalidateWalletCache();
                         invalidateStocksCache();
+                        invalidateMonthWalletCache();
+                        invalidateWalletMonthsCache();
                       })
                       .then(() => {
                         config.onDelete?.();
@@ -62,6 +70,8 @@ function useDeleteConfirmation() {
       invalidateWalletCache,
       invalidateStocksCache,
       sendRequest,
+      invalidateMonthWalletCache,
+      invalidateWalletMonthsCache,
     ]
   );
   return confirmDelete;
