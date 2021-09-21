@@ -14,11 +14,13 @@ import TaxContext from "../../context/tax-context";
 import StocksContext from "../../context/stock-context";
 import CurrencyInput from "react-currency-input-field";
 import { BUY, SELL } from "../../constants/constants";
+import useLogout from "../../hooks/useLogout";
 
 const EACH = "each";
 const TOTAL = "total";
 
 function RegisterOperation() {
+  const logout = useLogout();
   const { result, error, isLoading, sendRequest } = useHttp();
   const [type, setType] = useState(BUY);
   const [price, setPrice] = useState();
@@ -102,6 +104,10 @@ function RegisterOperation() {
     invalidateWalletCache,
     invalidateStocksCache,
   ]);
+
+  if (error?.status === 403) {
+    logout();
+  }
 
   function onPriceChange(value, name) {
     let toChange;

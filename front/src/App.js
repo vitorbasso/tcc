@@ -11,9 +11,32 @@ import PerformanceReport from "./pages/reports/PerformanceReport";
 import RegisterOperation from "./pages/operation/RegisterOperation";
 import TaxReport from "./pages/tax/TaxReport";
 import TicketReport from "./pages/reports/TicketReport";
+import MonthWallet from "./context/month-wallet-context";
+import WalletContext from "./context/wallet-context";
+import useLogout from "./hooks/useLogout";
+import StocksContext from "./context/stock-context";
+import WalletMonths from "./context/month-wallets-context";
+import TaxContext from "./context/tax-context";
 
 function App() {
+  const logout = useLogout();
   const { isLoggedIn } = useContext(AuthContext);
+  const { error: walletError } = useContext(WalletContext);
+  const { error: stocksError } = useContext(StocksContext);
+  const { error: walletMonthsError } = useContext(WalletMonths);
+  const { error: taxError } = useContext(TaxContext);
+  const { error: monthWalletError } = useContext(MonthWallet);
+
+  if (
+    walletError?.status === 403 ||
+    walletMonthsError?.status === 403 ||
+    stocksError?.status === 403 ||
+    taxError?.status === 403 ||
+    monthWalletError?.status === 403
+  ) {
+    logout();
+  }
+
   return (
     <Switch>
       {!isLoggedIn && (

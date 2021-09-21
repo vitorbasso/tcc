@@ -1,10 +1,7 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { CgLogOut, CgMenu } from "react-icons/cg";
 import { BsTrash } from "react-icons/bs";
-import AuthContext from "../../context/auth-context";
-import StocksContext from "../../context/stock-context";
-import TaxContext from "../../context/tax-context";
-import WalletContext from "../../context/wallet-context";
+import useLogout from "../../hooks/useLogout";
 import styles from "./DropdownMenu.module.css";
 import Overlay from "../overlay/Overlay";
 import { CLIENTS_URL } from "../../constants/paths";
@@ -12,20 +9,10 @@ import useDeleteConfirmation from "../../hooks/useDeleteConfirmation";
 import baseStyles from "../../css/base.module.css";
 
 function DropdownMenu() {
-  const authCtx = useContext(AuthContext);
-  const { resetContext: resetTaxContext } = useContext(TaxContext);
-  const { resetContext: resetWalletContext } = useContext(WalletContext);
-  const { resetContext: resetStockContext } = useContext(StocksContext);
+  const logout = useLogout();
   const [visible, setVisible] = useState(false);
   const animateRef = useRef();
   const confirmDelete = useDeleteConfirmation();
-  function handleLogout() {
-    return authCtx.onLogout.bind(this, () => {
-      resetTaxContext();
-      resetWalletContext();
-      resetStockContext();
-    });
-  }
 
   function handleDeleteAccount() {
     confirmDelete({
@@ -35,7 +22,7 @@ function DropdownMenu() {
       url: `${CLIENTS_URL}`,
       method: "DELETE",
       onDelete: () => {
-        handleLogout()();
+        logout();
       },
     });
   }
@@ -71,7 +58,7 @@ function DropdownMenu() {
               <BsTrash />
             </i>
           </li>
-          <li onClick={handleLogout()}>
+          <li onClick={logout}>
             Logout{" "}
             <i title="Logout">
               <CgLogOut />
