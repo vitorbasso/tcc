@@ -7,6 +7,7 @@ import { WalletContextProvider } from "./context/wallet-context";
 import { TaxContextProvider } from "./context/tax-context";
 import { StocksContextProvider } from "./context/stock-context";
 import { MonthWalletsContextProvider } from "./context/month-wallets-context";
+import { MonthWalletContextProvider } from "./context/month-wallet-context";
 
 ReactDOM.render(
   <AuthContextProvider>
@@ -14,11 +15,13 @@ ReactDOM.render(
       <StocksContextProvider>
         <TaxContextProvider>
           <MonthWalletsContextProvider>
-            <Router>
-              <React.StrictMode>
-                <App />
-              </React.StrictMode>
-            </Router>
+            <MonthWalletContextProvider>
+              <Router>
+                <React.StrictMode>
+                  <App />
+                </React.StrictMode>
+              </Router>
+            </MonthWalletContextProvider>
           </MonthWalletsContextProvider>
         </TaxContextProvider>
       </StocksContextProvider>

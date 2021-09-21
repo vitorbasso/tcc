@@ -9,6 +9,7 @@ import StocksContext from "../../context/stock-context";
 import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
 import useHttp from "../../hooks/useHttp";
+import useLogout from "../../hooks/useLogout";
 import { getMoneyClass } from "../../utils/cssUtils";
 import {
   moneyFormatter,
@@ -35,6 +36,7 @@ function getVariationStyle(variation) {
 }
 
 function TicketReport() {
+  const logout = useLogout();
   const { wallet, fetchWallet } = useContext(WalletContext);
   const { stocks, fetchStocks } = useContext(StocksContext);
   const [variation, setVariation] = useState(0);
@@ -47,6 +49,10 @@ function TicketReport() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (error?.status === 403) {
+    logout();
+  }
 
   const fetchTransactions = useCallback(() => {
     setSentRequest(true);
