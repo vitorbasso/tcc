@@ -4,6 +4,9 @@ on:
   push:
     branches: [master]
     paths: ["gerenciador-investimentos/**"]
+  pull_request:
+    branches: [develop]
+    paths: ["gerenciador-investimentos/**"]
 
 jobs:
   verify-and-deploy:
