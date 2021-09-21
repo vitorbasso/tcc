@@ -28,13 +28,6 @@ function TaxReport() {
   }, []);
 
   useEffect(() => {
-    if (wallet.id !== -1) {
-      setBalance(wallet.balance);
-      setBalanceDaytrade(wallet.balanceDaytrade);
-    }
-  }, [wallet.balance, wallet.balanceDaytrade, wallet.id]);
-
-  useEffect(() => {
     fetchTax();
     fetchWallet();
     fetchWalletMonthsList();
@@ -45,13 +38,29 @@ function TaxReport() {
   }, [fetchWalletMonth, walletId]);
 
   useEffect(() => {
-    if (monthWallet.walletMonth === month + "-01") {
+    if (wallet.id !== -1 && month + "-01" === wallet.walletMonth) {
+      setWalletBalances({
+        balance: wallet.balance,
+        balanceDaytrade: wallet.balanceDaytrade,
+      });
+    }
+  }, [
+    wallet.balance,
+    wallet.balanceDaytrade,
+    month,
+    wallet.walletMonth,
+    wallet.id,
+  ]);
+
+  useEffect(() => {
+    if (monthWallet.id !== -1 && monthWallet.walletMonth === month + "-01") {
       setWalletBalances({
         balance: monthWallet.balance,
         balanceDaytrade: monthWallet.balanceDaytrade,
       });
     }
   }, [
+    monthWallet.id,
     monthWallet.walletMonth,
     month,
     monthWallet.balance,
@@ -119,10 +128,6 @@ function TaxReport() {
     }
   }
 
-  function handleMonthClick() {
-    document.querySelector(`.${styles.test}`).focus();
-  }
-
   const moneyClass = getMoneyClass(totalTax);
   return (
     <div className={baseStyles.container}>
@@ -131,7 +136,7 @@ function TaxReport() {
       </Header>
       <main>
         <section className={styles.glance}>
-          <h3 onClick={handleMonthClick}>
+          <h3>
             Imposto{" "}
             {new Date(month + "-02").toLocaleDateString("pt-BR", {
               month: "long",

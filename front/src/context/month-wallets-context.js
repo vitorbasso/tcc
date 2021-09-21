@@ -5,7 +5,7 @@ import useHttp from "../hooks/useHttp";
 const INITIAL_WALLET_MONTHS = [
   {
     id: -1,
-    month: "2021-09-01",
+    month: "",
   },
 ];
 

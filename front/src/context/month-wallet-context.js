@@ -9,7 +9,7 @@ const INITIAL_WALLET_MONTH = {
   withdrawn: 0,
   withdrawnDaytrade: 0,
   walletId: 0,
-  walletMonth: "2021-09-01",
+  walletMonth: "",
 };
 
 export const DEFAULT_WALLET_MONTH = {
