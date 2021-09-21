@@ -6,6 +6,21 @@
   color: var(--error-red);
 }
 
+.red {
+  color: #ea526f;
+}
+
+.green {
+  color: #57cc99;
+}
+
+.month-input {
+  border: none;
+  background-color: transparent;
+  font-size: inherit;
+  width: 3rem;
+}
+
 .inline-money {
   display: inline;
   font-size: 1.2rem;

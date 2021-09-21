@@ -6,17 +6,20 @@ import { AuthContextProvider } from "./context/auth-context";
 import { WalletContextProvider } from "./context/wallet-context";
 import { TaxContextProvider } from "./context/tax-context";
 import { StocksContextProvider } from "./context/stock-context";
+import { MonthWalletsContextProvider } from "./context/month-wallets-context";
 
 ReactDOM.render(
   <AuthContextProvider>
     <WalletContextProvider>
       <StocksContextProvider>
         <TaxContextProvider>
-          <Router>
-            <React.StrictMode>
-              <App />
-            </React.StrictMode>
-          </Router>
+          <MonthWalletsContextProvider>
+            <Router>
+              <React.StrictMode>
+                <App />
+              </React.StrictMode>
+            </Router>
+          </MonthWalletsContextProvider>
         </TaxContextProvider>
       </StocksContextProvider>
     </WalletContextProvider>

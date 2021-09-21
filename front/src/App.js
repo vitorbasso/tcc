@@ -11,6 +11,7 @@ import PerformanceReport from "./pages/reports/PerformanceReport";
 import RegisterOperation from "./pages/operation/RegisterOperation";
 import TaxReport from "./pages/tax/TaxReport";
 import TicketReport from "./pages/reports/TicketReport";
+import { MonthWalletContextProvider } from "./context/month-wallet-context";
 
 function App() {
   const { isLoggedIn } = useContext(AuthContext);
@@ -53,7 +54,9 @@ function App() {
       )}
       {isLoggedIn && (
         <Route path="/tax" exact>
-          <TaxReport />
+          <MonthWalletContextProvider>
+            <TaxReport />
+          </MonthWalletContextProvider>
         </Route>
       )}
       <Route path="*">

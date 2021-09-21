@@ -10,6 +10,7 @@ import Navigation from "../../components/navigation/Navigation";
 import { getMoneyClass } from "../../utils/cssUtils";
 import WalletContext from "../../context/wallet-context";
 import StocksContext from "../../context/stock-context";
+import WalletMonths from "../../context/month-wallets-context";
 
 function getFirstName(result) {
   return result ? result.name?.split(" ")?.[0] : "-";
@@ -29,8 +30,18 @@ function getBalance(wallet, stocks) {
 }
 
 function Home() {
-  const { wallet, isWalletLoading, fetchWallet } = useContext(WalletContext);
-  const { stocks, isStocksLoading, fetchStocks } = useContext(StocksContext);
+  const {
+    wallet,
+    isLoading: isWalletLoading,
+    fetchWallet,
+  } = useContext(WalletContext);
+  const {
+    stocks,
+    isLoading: isStocksLoading,
+    fetchStocks,
+  } = useContext(StocksContext);
+  const { isLoading: isWalletMonthsLoading, fetchWalletMonthsList } =
+    useContext(WalletMonths);
   const { result: resultName, sendRequest: sendRequestName } = useHttp();
   useEffect(() => {
     sendRequestName({
@@ -41,7 +52,15 @@ function Home() {
   useEffect(() => {
     if (!isWalletLoading) fetchWallet();
     if (!isStocksLoading) fetchStocks();
-  }, [isWalletLoading, fetchWallet, isStocksLoading, fetchStocks]);
+    if (!isWalletMonthsLoading) fetchWalletMonthsList();
+  }, [
+    isWalletLoading,
+    fetchWallet,
+    isStocksLoading,
+    fetchStocks,
+    isWalletMonthsLoading,
+    fetchWalletMonthsList,
+  ]);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

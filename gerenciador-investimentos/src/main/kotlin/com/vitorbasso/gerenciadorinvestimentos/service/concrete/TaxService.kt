@@ -23,8 +23,13 @@ internal class TaxService {
                     availableToDeduct = taxInfo.daytradeAvailableToDeduct
                 )
             val availableToDeduct =
-                calculateAvailableToDeduct(availableToDeduct = taxInfo.availableToDeduct, deducted = deducted)
+                calculateAvailableToDeduct(
+                    balance = taxable.balance,
+                    availableToDeduct = taxInfo.availableToDeduct,
+                    deducted = deducted
+                )
             val daytradeAvailableToDeduct = calculateAvailableToDeduct(
+                balance = taxable.balanceDaytrade,
                 availableToDeduct = taxInfo.daytradeAvailableToDeduct,
                 deducted = daytradeDeducted
             )
@@ -63,9 +68,15 @@ internal class TaxService {
         if (availableToDeduct.compareTo(balance) <= 0) availableToDeduct else balance
     } else BigDecimal.ZERO
 
-    private fun calculateAvailableToDeduct(availableToDeduct: BigDecimal, deducted: BigDecimal) =
+    private fun calculateAvailableToDeduct(
+        balance: BigDecimal,
+        availableToDeduct: BigDecimal,
+        deducted: BigDecimal
+    ) =
         availableToDeduct.let {
-            if (!isPositive(deducted)) it.minus(deducted) else it
+            if (!isPositive(deducted)) it.plus(deducted) else it
+        }.let {
+            if (!isPositive(balance)) it.minus(balance) else it
         }
 
     private fun withdrawnOverAllowance(withdrawn: BigDecimal) = withdrawn.compareTo(MAX_WITHDRAWN) >= 0
