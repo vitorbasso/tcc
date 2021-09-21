@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
 import MonthWallet from "../../context/month-wallet-context";
@@ -7,6 +7,7 @@ import TaxContext from "../../context/tax-context";
 import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
 import { getMoneyClass } from "../../utils/cssUtils";
+import ReactToPrint from "react-to-print";
 import styles from "./TaxReport.module.css";
 
 function TaxReport() {
@@ -14,6 +15,7 @@ function TaxReport() {
   const { wallet, fetchWallet } = useContext(WalletContext);
   const [balance, setBalance] = useState(0);
   const [balanceDaytrade, setBalanceDaytrade] = useState(0);
+  const printRef = useRef();
   const { walletMonths, walletId, fetchWalletMonthsList } =
     useContext(WalletMonths);
   const {
@@ -156,7 +158,7 @@ function TaxReport() {
             value={totalTax}
           />
         </section>
-        <section className={styles.overview}>
+        <section className={styles.overview} ref={printRef}>
           <ul>
             <li>
               <span>Balanço:</span>
@@ -340,9 +342,19 @@ function TaxReport() {
           />
         </section>
         <section className={styles.action}>
-          <button type="button" className={baseStyles.btn}>
-            Imprimir
-          </button>
+          <ReactToPrint
+            trigger={() => {
+              return (
+                <button type="button" className={baseStyles.btn}>
+                  Imprimir
+                </button>
+              );
+            }}
+            pageStyle={() => {
+              return "width: 60%";
+            }}
+            content={() => printRef.current}
+          />
         </section>
       </main>
     </div>
