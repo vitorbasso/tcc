@@ -8,9 +8,7 @@ import Money from "../../components/money/Money";
 import { useContext, useEffect, useMemo, useState } from "react";
 import WalletContext from "../../context/wallet-context";
 import { Link } from "react-router-dom";
-import ExpendableAssetTable from "../../components/table/expandable/ExpandableAssetTable";
 import StocksContext from "../../context/stock-context";
-import AssetTable from "../../components/table/assets/AssetTable";
 import ExpandableAssetTable from "../../components/table/expandable/ExpandableAssetTable";
 
 function compareAssetValue(first, second) {
