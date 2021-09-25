@@ -3,7 +3,7 @@ name: "FRONT: Gerenciador de Investimentos PULL REQUEST"
 on:
   pull_request:
     branches: [develop, release, master]
-    paths: ['front/**']
+    paths: ["front/**"]
 
 jobs:
   pr-verification:
@@ -18,6 +18,9 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
       - name: Install dependencies
         run: npm install
         working-directory: ./front
