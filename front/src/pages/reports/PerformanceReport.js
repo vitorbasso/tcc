@@ -7,7 +7,7 @@ import styles from "./PerformanceReport.module.css";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import { moneyFormatter, percentFormatter } from "../../utils/formatterUtils";
 import WalletContext from "../../context/wallet-context";
-import AssetTable from "../../components/table/assets/AssetTable";
+import AssetTable from "../../components/table/AssetTable";
 import StocksContext from "../../context/stock-context";
 import { Link } from "react-router-dom";
 
