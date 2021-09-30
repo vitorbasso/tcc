@@ -9,7 +9,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import WalletContext from "../../context/wallet-context";
 import { Link } from "react-router-dom";
 import StocksContext from "../../context/stock-context";
-import AssetTable from "../../components/table/assets/AssetTable";
+import AssetTable from "../../components/table/AssetTable";
 
 function compareAssetValue(first, second) {
   const firstValue = first.amount * first.averageCost;
