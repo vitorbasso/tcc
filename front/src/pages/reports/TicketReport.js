@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { BsArrowDown, BsArrowUp } from "react-icons/bs";
+import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import { useLocation, useParams, Redirect } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
@@ -8,6 +8,7 @@ import { ASSET_URL } from "../../constants/paths";
 import StocksContext from "../../context/stock-context";
 import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
+import useDeleteConfirmation from "../../hooks/useDeleteConfirmation";
 import useHttp from "../../hooks/useHttp";
 import useLogout from "../../hooks/useLogout";
 import { getMoneyClass } from "../../utils/cssUtils";
@@ -37,6 +38,7 @@ function getVariationStyle(variation) {
 
 function TicketReport() {
   const logout = useLogout();
+  const confirmDelete = useDeleteConfirmation();
   const { wallet, fetchWallet } = useContext(WalletContext);
   const { stocks, fetchStocks } = useContext(StocksContext);
   const [variation, setVariation] = useState(0);
@@ -135,6 +137,16 @@ function TicketReport() {
     return <Redirect to="/not-found" />;
   }
 
+  function deleteHandler(event) {
+    event.preventDefault();
+    if (!id && wallet && wallet.id !== -1 && !asset) return;
+    confirmDelete({
+      title: `Deletar ${id}?`,
+      message: `Tem certeza que deseja deletar a ação ${id} da sua carteira?`,
+      url: `${ASSET_URL}/${id}`,
+    });
+  }
+
   const profit = currentValue * amount - assetTotalValue;
 
   const moneyClass = getMoneyClass(currentValue);
@@ -214,6 +226,11 @@ function TicketReport() {
                 ? percentOfWallet
                 : 0
             )}
+          </span>
+          <span>
+            <i onClick={deleteHandler} data-id={id}>
+              <BsTrash />
+            </i>
           </span>
         </section>
         <Money value={currentValue} className={`${baseStyles[moneyClass]}`} />
