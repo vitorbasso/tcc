@@ -13,10 +13,9 @@ import WalletContext from "../../context/wallet-context";
 import TaxContext from "../../context/tax-context";
 import StocksContext from "../../context/stock-context";
 import CurrencyInput from "react-currency-input-field";
+import { BUY, SELL } from "../../constants/constants";
 import useLogout from "../../hooks/useLogout";
 
-const BUY = "BUY";
-const SELL = "SELL";
 const EACH = "each";
 const TOTAL = "total";
 

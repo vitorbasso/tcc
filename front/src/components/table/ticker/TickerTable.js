@@ -10,6 +10,7 @@ import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import baseStyles from "../../../css/base.module.css";
 import { TRANSACTION_URL } from "../../../constants/paths";
 import useDeleteConfirmation from "../../../hooks/useDeleteConfirmation";
+import { BUY, SELL } from "../../../constants/constants";
 
 function sortByDate(first, second, weight = 1) {
   const firstValue = first.transactionDate;
@@ -68,17 +69,17 @@ function TickerTable(props) {
   function toggleSellTransactions(event) {
     if (event.currentTarget.checked)
       setTransactionsToDisplay((state) =>
-        state.filter((transaction) => transaction.type !== "SELL")
+        state.filter((transaction) => transaction.type !== SELL)
       );
     else
       setTransactionsToDisplay((state) => {
         const thereIsSellTransactions = state.find(
-          (transaction) => transaction.type === "BUY"
+          (transaction) => transaction.type === BUY
         );
         if (thereIsSellTransactions) return props.transactions;
         else
           return props.transactions.filter(
-            (transaction) => transaction.type === "SELL"
+            (transaction) => transaction.type === SELL
           );
       });
   }
@@ -86,17 +87,17 @@ function TickerTable(props) {
   function toggleBuyTransactions(event) {
     if (event.currentTarget.checked)
       setTransactionsToDisplay((state) =>
-        state.filter((transaction) => transaction.type !== "BUY")
+        state.filter((transaction) => transaction.type !== BUY)
       );
     else
       setTransactionsToDisplay((state) => {
         const thereIsSellTransactions = state.find(
-          (transaction) => transaction.type === "SELL"
+          (transaction) => transaction.type === SELL
         );
         if (thereIsSellTransactions) return props.transactions;
         else
           return props.transactions.filter(
-            (transaction) => transaction.type === "BUY"
+            (transaction) => transaction.type === BUY
           );
       });
   }
@@ -122,7 +123,7 @@ function TickerTable(props) {
     confirmDelete({
       title: `Remover?`,
       message: `Tem certeza que deseja remover a transação de ${
-        transaction.type === "BUY" ? "COMPRA" : "VENDA"
+        transaction.type === BUY ? "COMPRA" : "VENDA"
       } de ${transaction.quantity} por ${moneyFormatter.format(
         transaction.value / transaction.quantity
       )} cada do dia ${dateFormatter.format(
@@ -133,7 +134,7 @@ function TickerTable(props) {
     });
   }
 
-  if (assets.length === 0) {
+  if (props.transaction?.length === 0) {
     return [];
   }
 
@@ -185,7 +186,7 @@ function TickerTable(props) {
         </button>
       </div>
       {assets.map((transaction) => {
-        const type = transaction.type === "BUY" ? "Compra" : "Venda";
+        const type = transaction.type === BUY ? "Compra" : "Venda";
         return (
           <table key={transaction.id}>
             <thead>

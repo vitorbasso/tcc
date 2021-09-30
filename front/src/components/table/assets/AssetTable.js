@@ -101,7 +101,7 @@ function AssetTable(props) {
     });
   }
 
-  if (assets.length === 0) {
+  if (props.assets?.length === 0) {
     return [];
   }
 
