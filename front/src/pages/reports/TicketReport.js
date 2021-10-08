@@ -232,7 +232,7 @@ function TicketReport() {
             )}
           </span>
           <span>
-            <i onClick={deleteHandler} data-id={id}>
+            <i onClick={deleteHandler} className={styles.red} data-id={id}>
               <BsTrash />
             </i>
           </span>

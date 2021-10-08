@@ -8,50 +8,40 @@ import {
 } from "../../utils/formatterUtils";
 import ReactTooltip from "react-tooltip";
 import styles from "./TickerTable.module.css";
-import { BUY } from "../../constants/constants";
+import { BUY, SELL } from "../../constants/constants";
 import { TRANSACTION_URL } from "../../constants/paths";
 import useDeleteConfirmation from "../../hooks/useDeleteConfirmation";
 
-function sortByPercentage(first, second, stocks, weight = 1) {
-  const firstStock =
-    stocks.find((stock) => stock.ticker === first.stockSymbol)?.currentValue ??
-    0;
-  const secondStock =
-    stocks.find((stock) => stock.ticker === second.stockSymbol)?.currentValue ??
-    0;
-  const firstValue = (firstStock - first.averageCost) / first.averageCost;
-  const secondValue = (secondStock - second.averageCost) / second.averageCost;
+function sortByDate(first, second, weight = 1) {
+  const firstValue = first.transactionDate;
+  const secondValue = second.transactionDate;
   const value =
     firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
   return value * weight;
 }
 
-function sortByValorization(first, second, stocks, weight = 1) {
-  const firstStock =
-    stocks.find((stock) => stock.ticker === first.stockSymbol)?.currentValue ??
-    0;
-  const secondStock =
-    stocks.find((stock) => stock.ticker === second.stockSymbol)?.currentValue ??
-    0;
-  const firstValue = (firstStock - first.averageCost) * first.quantity;
-  const secondValue = (secondStock - second.averageCost) * second.quantity;
+function sortByValue(first, second, weight = 1) {
+  const firstValue = first.value;
+  const secondValue = second.value;
   const value =
     firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
   return value * weight;
 }
 
-function sortByName(first, second, weight = 1) {
-  const firstName = first.stockSymbol;
-  const secondName = second.stockSymbol;
-  return firstName.localeCompare(secondName, "pt-BR") * weight;
+function sortByAverageValue(first, second, weight = 1) {
+  const firstValue = first.value / first.quantity;
+  const secondValue = second.value / second.quantity;
+  const value =
+    firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
+  return value * weight;
 }
 
-const PERCENT = "%";
-const PERCENT_INVERSE = "-%";
-const NAME = "name";
-const NAME_INVERSE = "-name";
-const VALORIZATION = "averageValue";
-const VALORIZATION_INVERSE = "-averageValue";
+const DATE = "date";
+const DATE_INVERSE = "-date";
+const VALUE = "value";
+const VALUE_INVERSE = "-value";
+const AVERAGE_VALUE = "averageValue";
+const AVERAGE_VALUE_INVERSE = "-averageValue";
 
 function getVariationStyle(variation) {
   return variation > 0 ? styles.green : variation < 0 ? styles.red : "";
@@ -59,7 +49,7 @@ function getVariationStyle(variation) {
 
 function TickerTable(props) {
   const confirmDelete = useDeleteConfirmation();
-  const [sortBy, setSortBy] = useState(NAME);
+  const [sortBy, setSortBy] = useState(DATE);
   const [transactionsToDisplay, setTransactionsToDisplay] = useState([]);
   const { stocks } = useContext(StocksContext);
   useEffect(() => {
@@ -67,18 +57,18 @@ function TickerTable(props) {
   }, [props.transactions]);
   const transactions = transactionsToDisplay.sort((first, second) => {
     switch (sortBy) {
-      case NAME_INVERSE:
-        return sortByName(first, second, -1);
-      case VALORIZATION:
-        return sortByValorization(first, second, stocks);
-      case VALORIZATION_INVERSE:
-        return sortByValorization(first, second, stocks, -1);
-      case PERCENT_INVERSE:
-        return sortByPercentage(first, second, stocks, -1);
-      case PERCENT:
-        return sortByPercentage(first, second, stocks);
+      case AVERAGE_VALUE:
+        return sortByAverageValue(first, second);
+      case AVERAGE_VALUE_INVERSE:
+        return sortByAverageValue(first, second, -1);
+      case VALUE:
+        return sortByValue(first, second);
+      case VALUE_INVERSE:
+        return sortByValue(first, second, -1);
+      case DATE_INVERSE:
+        return sortByDate(first, second, -1);
       default:
-        return sortByName(first, second);
+        return sortByDate(first, second);
     }
   });
   function toggleZeroQuantityTransactions(event) {
@@ -110,6 +100,42 @@ function TickerTable(props) {
     });
   }
 
+  function toggleSellTransactions(event) {
+    if (event.currentTarget.checked)
+      setTransactionsToDisplay((state) =>
+        state.filter((transaction) => transaction.type !== SELL)
+      );
+    else
+      setTransactionsToDisplay((state) => {
+        const thereIsSellTransactions = state.find(
+          (transaction) => transaction.type === BUY
+        );
+        if (thereIsSellTransactions) return props.transactions;
+        else
+          return props.transactions.filter(
+            (transaction) => transaction.type === SELL
+          );
+      });
+  }
+
+  function toggleBuyTransactions(event) {
+    if (event.currentTarget.checked)
+      setTransactionsToDisplay((state) =>
+        state.filter((transaction) => transaction.type !== BUY)
+      );
+    else
+      setTransactionsToDisplay((state) => {
+        const thereIsSellTransactions = state.find(
+          (transaction) => transaction.type === SELL
+        );
+        if (thereIsSellTransactions) return props.transactions;
+        else
+          return props.transactions.filter(
+            (transaction) => transaction.type === BUY
+          );
+      });
+  }
+
   function handleSorting(event) {
     const btn = event.target.closest("button");
     if (!btn) return;
@@ -127,18 +153,51 @@ function TickerTable(props) {
 
   return (
     <div className={`${props.className} ${styles.container}`}>
-      <label htmlFor="hide-zero">
-        <span className={styles["hide-zero"]}>
-          <input
-            id="hide-zero"
-            type="checkbox"
-            onChange={toggleZeroQuantityTransactions}
-          />
-          Esconder ações com quantidade zero
-        </span>
+      <label htmlFor="hide-sell">
+        <input
+          id="hide-sell"
+          type="checkbox"
+          onChange={toggleSellTransactions}
+        />
+        Esconder transações de venda
+      </label>
+      <br />
+      <label htmlFor="hide-buy">
+        <input id="hide-buy" type="checkbox" onChange={toggleBuyTransactions} />
+        Esconder transações de compra
       </label>
       <div onClick={handleSorting}>
-        <button className={styles.selected} data-sort={NAME} type="button">
+        <button className={styles.selected} data-sort={DATE} type="button">
+          Data{" "}
+          {sortBy === DATE ? (
+            <BsArrowDown />
+          ) : sortBy === DATE_INVERSE ? (
+            <BsArrowUp />
+          ) : (
+            ""
+          )}
+        </button>
+        <button data-sort={VALUE} type="button">
+          Valor{" "}
+          {sortBy === VALUE ? (
+            <BsArrowDown />
+          ) : sortBy === VALUE_INVERSE ? (
+            <BsArrowUp />
+          ) : (
+            ""
+          )}
+        </button>
+        <button data-sort={AVERAGE_VALUE} type="button">
+          Avg{" "}
+          {sortBy === AVERAGE_VALUE ? (
+            <BsArrowDown />
+          ) : sortBy === AVERAGE_VALUE_INVERSE ? (
+            <BsArrowUp />
+          ) : (
+            ""
+          )}
+        </button>
+        {/* <button className={styles.selected} data-sort={NAME} type="button">
           Ação{" "}
           {sortBy === NAME ? (
             <BsArrowUp />
@@ -167,7 +226,7 @@ function TickerTable(props) {
           ) : (
             ""
           )}
-        </button>
+        </button> */}
       </div>
       <div className={styles.table}>
         <ReactTooltip />
@@ -207,7 +266,11 @@ function TickerTable(props) {
                 <div className={`${css} ${styles.td}`}>
                   {dateFormatter.format(new Date(transaction.transactionDate))}
                 </div>
-                <i onClick={deleteHandler} data-id={transaction.id}>
+                <i
+                  onClick={deleteHandler}
+                  className={styles.red}
+                  data-id={transaction.id}
+                >
                   <BsTrash />
                 </i>
               </div>
