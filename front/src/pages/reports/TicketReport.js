@@ -3,7 +3,7 @@ import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import { useLocation, useParams, Redirect } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
-import TickerTable from "../../components/table/ticker/TickerTable";
+import TickerTable from "../../components/table/TickerTable";
 import { ASSET_URL } from "../../constants/paths";
 import StocksContext from "../../context/stock-context";
 import WalletContext from "../../context/wallet-context";
@@ -41,6 +41,7 @@ function TicketReport() {
   const confirmDelete = useDeleteConfirmation();
   const { wallet, fetchWallet } = useContext(WalletContext);
   const { stocks, fetchStocks } = useContext(StocksContext);
+  const [deleted, setDeleted] = useState(false);
   const [variation, setVariation] = useState(0);
   const [selection, setSelection] = useState("dia");
   const location = useLocation();
@@ -134,7 +135,7 @@ function TicketReport() {
   }, [variationDay]);
 
   if (wallet && wallet.id !== -1 && !asset) {
-    return <Redirect to="/not-found" />;
+    return <Redirect to={deleted ? "/" : "/not-found"} />;
   }
 
   function deleteHandler(event) {
@@ -144,6 +145,9 @@ function TicketReport() {
       title: `Deletar ${id}?`,
       message: `Tem certeza que deseja deletar a ação ${id} da sua carteira?`,
       url: `${ASSET_URL}/${id}`,
+      onDelete: () => {
+        setDeleted(true);
+      },
     });
   }
 
@@ -278,6 +282,7 @@ function TicketReport() {
         <section>
           <TickerTable
             transactions={transactions}
+            symbol={id}
             onDelete={fetchTransactions}
           />
         </section>
