@@ -23,7 +23,6 @@ export const numberFormatter = Intl.NumberFormat("pt-BR");
 export const numberFormatterDecimal = Intl.NumberFormat("pt-BR", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
-  maximumSignificantDigits: 3,
 });
 
 export const moneyFormatter = Intl.NumberFormat("pt-BR", {
@@ -45,12 +44,13 @@ export const dateFormatter = Intl.DateTimeFormat("pt-BR", {
 
 function getFormattedNumber(integer, divider) {
   const shorter = (Math.abs(integer / divider.value) + "").split(".");
-  shorter[1] = shorter[1]?.substr(0, 2);
+  shorter[1] = (shorter[1]?.substr(0, 2) ?? "00").padEnd(2, "0");
   return shorter.join(",") + divider.symbol;
 }
 
 export function abbreviateNumber(number) {
-  if (number < THOUSAND.value) return numberFormatter.format(Math.abs(number));
+  if (number < THOUSAND.value)
+    return numberFormatterDecimal.format(Math.abs(number));
   if (number < MILLION.value) return getFormattedNumber(number, THOUSAND);
   if (number < BILLION.value) return getFormattedNumber(number, MILLION);
   return getFormattedNumber(number, BILLION);

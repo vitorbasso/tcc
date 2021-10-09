@@ -190,36 +190,6 @@ function TickerTable(props) {
             ""
           )}
         </button>
-        {/* <button className={styles.selected} data-sort={NAME} type="button">
-          Ação{" "}
-          {sortBy === NAME ? (
-            <BsArrowUp />
-          ) : sortBy === NAME_INVERSE ? (
-            <BsArrowDown />
-          ) : (
-            ""
-          )}
-        </button>
-        <button data-sort={PERCENT} type="button">
-          %{" "}
-          {sortBy === PERCENT ? (
-            <BsArrowDown />
-          ) : sortBy === PERCENT_INVERSE ? (
-            <BsArrowUp />
-          ) : (
-            ""
-          )}
-        </button>
-        <button data-sort={VALORIZATION} type="button">
-          VAL{" "}
-          {sortBy === VALORIZATION ? (
-            <BsArrowDown />
-          ) : sortBy === VALORIZATION_INVERSE ? (
-            <BsArrowUp />
-          ) : (
-            ""
-          )}
-        </button> */}
       </div>
       <div className={styles.table}>
         <ReactTooltip />
@@ -233,6 +203,9 @@ function TickerTable(props) {
             </div>
             <div className={styles.th} data-tip="Preço Médio (R$)">
               PM
+            </div>
+            <div className={styles.th} data-tip="Valor da Transação (R$)">
+              VT
             </div>
             <div className={styles.th} data-tip="Valor Atual (R$)">
               DATA
@@ -256,16 +229,21 @@ function TickerTable(props) {
                 <div className={styles.td}>
                   {abbreviateNumber(transaction.value / transaction.quantity)}
                 </div>
-                <div className={`${css} ${styles.td}`}>
-                  {dateFormatter.format(new Date(transaction.transactionDate))}
+                <div className={styles.td}>
+                  {abbreviateNumber(transaction.value)}
                 </div>
-                <i
-                  onClick={deleteHandler}
-                  className={styles.red}
-                  data-id={transaction.id}
-                >
-                  <BsTrash />
-                </i>
+                <div className={`${css} ${styles.td}`}>
+                  {dateFormatter
+                    .format(new Date(transaction.transactionDate))
+                    .slice(0, 10)}
+                  <i
+                    onClick={deleteHandler}
+                    className={`${styles.red} ${styles.delete}`}
+                    data-id={transaction.id}
+                  >
+                    <BsTrash />
+                  </i>
+                </div>
               </div>
             );
           })}
