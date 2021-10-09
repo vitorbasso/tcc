@@ -71,13 +71,6 @@ function TickerTable(props) {
         return sortByDate(first, second);
     }
   });
-  function toggleZeroQuantityTransactions(event) {
-    if (event.currentTarget.checked)
-      setTransactionsToDisplay(
-        props.transactions.filter((transaction) => transaction.quantity > 0)
-      );
-    else setTransactionsToDisplay(props.transactions);
-  }
 
   function deleteHandler(event) {
     event.preventDefault();

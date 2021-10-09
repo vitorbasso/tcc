@@ -9,6 +9,7 @@ import baseStyles from "../../css/base.module.css";
 import { getMoneyClass } from "../../utils/cssUtils";
 import ReactToPrint from "react-to-print";
 import styles from "./TaxReport.module.css";
+import { BiCalendarCheck } from "react-icons/bi";
 
 function TaxReport() {
   const { tax, fetchTax, query: queryTax } = useContext(TaxContext);
@@ -152,6 +153,9 @@ function TaxReport() {
               onChange={handleMonthSelect}
               lang="pt-BR"
             />
+            <span className={styles["calendar-icon"]}>
+              <BiCalendarCheck />
+            </span>
           </h3>
           <Money
             className={`${styles.money} ${baseStyles[moneyClass]}`}

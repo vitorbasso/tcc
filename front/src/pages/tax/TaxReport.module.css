@@ -16,13 +16,27 @@
 
 .month-input {
   border: none;
+  color: transparent;
   background-color: transparent;
   font-size: inherit;
-  width: 3rem;
+  width: 2.8rem;
 }
 
 .month-input::-webkit-calendar-picker-indicator {
   cursor: pointer;
+  color: transparent;
+  background: transparent;
+  font-size: 1.5rem;
+}
+
+.calendar-icon {
+  pointer-events: none;
+  cursor: pointer;
+  position: relative;
+  font-size: 1.5rem;
+  left: -25px;
+  top: 5px;
+  user-select: none;
 }
 
 input.month-input:focus {
