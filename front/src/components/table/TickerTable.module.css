@@ -119,6 +119,7 @@
 .table .tbody .tr .td:first-child,
 .table .thead .tr .th:first-child {
   grid-column: span 1;
+  font-weight: bold;
 }
 
 .table .tbody .tr .td:last-child,

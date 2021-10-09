@@ -152,6 +152,7 @@ function TicketReport() {
   }
 
   const profit = currentValue * amount - assetTotalValue;
+  const profitVariation = profit / assetTotalValue;
 
   const moneyClass = getMoneyClass(currentValue);
 
@@ -254,15 +255,16 @@ function TicketReport() {
           </div>
           <div>
             <p>
-              Diferença{" "}
+              Situação{" "}
               <span className={difCss}>
                 {difArrow}
-                {moneyFormatter.format(profit)}
+                {percentFormatterWithoutSign.format(profitVariation)} - (
+                {moneyFormatter.format(profit)})
               </span>
             </p>
           </div>
           <div>
-            <p>Balanço Total {moneyFormatter.format(lifetimeBalance)}</p>
+            <p>Balanço Histórico {moneyFormatter.format(lifetimeBalance)}</p>
           </div>
           <div>
             <p>variação {selection}</p>

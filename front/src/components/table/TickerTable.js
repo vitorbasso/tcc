@@ -170,21 +170,21 @@ function TickerTable(props) {
             ""
           )}
         </button>
-        <button data-sort={VALUE} type="button">
-          Valor{" "}
-          {sortBy === VALUE ? (
+        <button data-sort={AVERAGE_VALUE} type="button">
+          PM{" "}
+          {sortBy === AVERAGE_VALUE ? (
             <BsArrowDown />
-          ) : sortBy === VALUE_INVERSE ? (
+          ) : sortBy === AVERAGE_VALUE_INVERSE ? (
             <BsArrowUp />
           ) : (
             ""
           )}
         </button>
-        <button data-sort={AVERAGE_VALUE} type="button">
-          Avg{" "}
-          {sortBy === AVERAGE_VALUE ? (
+        <button data-sort={VALUE} type="button">
+          VT{" "}
+          {sortBy === VALUE ? (
             <BsArrowDown />
-          ) : sortBy === AVERAGE_VALUE_INVERSE ? (
+          ) : sortBy === VALUE_INVERSE ? (
             <BsArrowUp />
           ) : (
             ""
