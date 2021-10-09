@@ -43,12 +43,22 @@ function sortByName(first, second, weight = 1) {
   return firstName.localeCompare(secondName, "pt-BR") * weight;
 }
 
+function sortByAveragePrice(first, second, weight = 1) {
+  const firstValue = first.averageCost;
+  const secondValue = second.averageCost;
+  const value =
+    firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
+  return value * weight;
+}
+
 const PERCENT = "%";
 const PERCENT_INVERSE = "-%";
 const NAME = "name";
 const NAME_INVERSE = "-name";
-const VALORIZATION = "averageValue";
-const VALORIZATION_INVERSE = "-averageValue";
+const AVERAGE_PRICE = "averagePrice";
+const AVERAGE_PRICE_INVERSE = "-averagePrice";
+const VALORIZATION = "valorization";
+const VALORIZATION_INVERSE = "-valorization";
 
 function getVariationStyle(variation) {
   return variation > 0 ? styles.green : variation < 0 ? styles.red : "";
@@ -69,6 +79,10 @@ function AssetTable(props) {
         return sortByValorization(first, second, stocks);
       case VALORIZATION_INVERSE:
         return sortByValorization(first, second, stocks, -1);
+      case AVERAGE_PRICE:
+        return sortByAveragePrice(first, second);
+      case AVERAGE_PRICE_INVERSE:
+        return sortByAveragePrice(first, second, -1);
       case PERCENT_INVERSE:
         return sortByPercentage(first, second, stocks, -1);
       case PERCENT:
@@ -117,6 +131,16 @@ function AssetTable(props) {
             <BsArrowUp />
           ) : sortBy === NAME_INVERSE ? (
             <BsArrowDown />
+          ) : (
+            ""
+          )}
+        </button>
+        <button data-sort={AVERAGE_PRICE} type="button">
+          PM{" "}
+          {sortBy === AVERAGE_PRICE ? (
+            <BsArrowDown />
+          ) : sortBy === AVERAGE_PRICE_INVERSE ? (
+            <BsArrowUp />
           ) : (
             ""
           )}

@@ -32,6 +32,7 @@
 .calendar-icon {
   pointer-events: none;
   cursor: pointer;
+  color: var(--active-blue);
   position: relative;
   font-size: 1.5rem;
   left: -25px;
