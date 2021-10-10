@@ -14,7 +14,6 @@ import useLogout from "../../hooks/useLogout";
 import { getMoneyClass } from "../../utils/cssUtils";
 import {
   moneyFormatter,
-  percentFormatter,
   percentFormatterWithoutSign,
 } from "../../utils/formatterUtils";
 import styles from "./TicketReport.module.css";
@@ -236,13 +235,13 @@ function TicketReport() {
             </span>
           </div>
           <div>
-            <p>
-              Balanço Histórico{" "}
-              <span className={balanceCss}>
-                {balanceArrow}
-                {moneyFormatter.format(lifetimeBalance)}
-              </span>
-            </p>
+            <p>Balanço Histórico </p>
+          </div>
+          <div>
+            <span className={balanceCss}>
+              {balanceArrow}
+              {moneyFormatter.format(lifetimeBalance)}
+            </span>
           </div>
         </section>
         <section className={styles.info}>
@@ -286,7 +285,7 @@ function TicketReport() {
           </div>
           <div className={`${styles.variation} ${css}`}>
             <span>{arrow}</span>
-            <span>{percentFormatter.format(variation)}</span>
+            <span>{percentFormatterWithoutSign.format(variation)}</span>
             <span>
               (
               {moneyFormatter.format(

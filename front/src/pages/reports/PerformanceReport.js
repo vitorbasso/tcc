@@ -1,11 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
 import baseStyles from "../../css/base.module.css";
 import { getMoneyClass } from "../../utils/cssUtils";
 import styles from "./PerformanceReport.module.css";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
-import { moneyFormatter, percentFormatter } from "../../utils/formatterUtils";
+import {
+  moneyFormatter,
+  percentFormatterWithoutSign,
+} from "../../utils/formatterUtils";
 import WalletContext from "../../context/wallet-context";
 import AssetTable from "../../components/table/assets/AssetTable";
 import StocksContext from "../../context/stock-context";
@@ -74,11 +77,17 @@ function PerformanceReport() {
   }, []);
   let assets = [];
   let paidForAssets = 0;
+  let lifetimeBalance = 0;
   if (wallet) {
     assets = wallet.stockAssets;
     paidForAssets = assets
       .filter((asset) => asset.amount > 0)
       .reduce((total, asset) => total + asset.amount * asset.averageCost, 0);
+    lifetimeBalance =
+      Number.parseFloat(paidForAssets.toFixed(2)) +
+      assets
+        .filter((asset) => asset.amount > 0)
+        .reduce((total, asset) => total + asset.lifetimeBalance, 0);
   }
   let walletWorth = 0;
   let walletVariationDay = 0;
@@ -95,13 +104,13 @@ function PerformanceReport() {
   if (stocks) {
     walletWorth = getWalletWorth(stocks, assets);
     const worthDay = getWalletWorth(stocks, assets, DAY);
-    walletVariationDay = (walletWorth - worthDay) / walletWorth;
+    walletVariationDay = walletWorth / worthDay - 1;
     const worthWeek = getWalletWorth(stocks, assets, WEEK);
-    walletVariationWeek = (walletWorth - worthWeek) / walletWorth;
+    walletVariationWeek = walletWorth / worthWeek - 1;
     const worthMonth = getWalletWorth(stocks, assets, MONTH);
-    walletVariationMonth = (walletWorth - worthMonth) / walletWorth;
+    walletVariationMonth = walletWorth / worthMonth - 1;
     const worthYear = getWalletWorth(stocks, assets, YEAR);
-    walletVariationYear = (walletWorth - worthYear) / walletWorth;
+    walletVariationYear = walletWorth / worthYear - 1;
     ibov = stocks.find((stock) => stock.ticker === IBOVESPA);
     ibovVariationDay =
       (ibov?.currentValue - ibov?.lastClose) / ibov?.currentValue;
@@ -151,76 +160,104 @@ function PerformanceReport() {
   const moneyClass = getMoneyClass(walletWorth);
   const [arrow, css] = getVariationStyle(variation);
   const ibovDiff = variation - ibovVariation;
-  const [, ibovCss] = getVariationStyle(ibovDiff);
+  const profit = walletWorth - paidForAssets;
+  const profitVariation = profit / paidForAssets;
+  const [ibovArrow, ibovCss] = getVariationStyle(ibovDiff);
   const [difArrow, difCss] = getVariationStyle(walletWorth - paidForAssets);
+  const [balanceArrow, balanceCss] = getVariationStyle(lifetimeBalance);
   return (
     <div className={baseStyles.container}>
       <Header backButton>
         <h2>Desempenho</h2>
       </Header>
       <main>
-        <nav className={styles.nav}>
-          <ul>
-            <li>
-              <button
-                id={DAY}
-                className={styles.selected}
-                onClick={filter.bind(this, DAY)}
-              >
-                dia
-              </button>
-            </li>
-            <li>
-              <button id={WEEK} onClick={filter.bind(this, WEEK)}>
-                semana
-              </button>
-            </li>
-            <li>
-              <button id={MONTH} onClick={filter.bind(this, MONTH)}>
-                mês
-              </button>
-            </li>
-            <li>
-              <button id={YEAR} onClick={filter.bind(this, YEAR)}>
-                ano
-              </button>
-            </li>
-          </ul>
-        </nav>
         {assets.length !== 0 && (
-          <section className={styles.overall}>
-            <Money
-              value={walletWorth}
-              className={`${styles.money} ${baseStyles[moneyClass]}`}
-            />
-            <div className={styles.info}>
-              <p>Valor Pago {moneyFormatter.format(paidForAssets)}</p>
-            </div>
-            <div className={styles.info}>
-              <p>
-                Diferença{" "}
-                <span className={difCss}>
+          <Fragment>
+            <section className={styles.overall}>
+              <Money
+                value={walletWorth}
+                className={`${styles.money} ${baseStyles[moneyClass]}`}
+              />
+              <div className={styles.info}>
+                <p>Valor Pago {moneyFormatter.format(paidForAssets)}</p>
+              </div>
+              <div className={styles.info}>
+                <p>Situação Atual </p>
+              </div>
+              <div className={`${difCss} ${styles.info}`}>
+                <span>
                   {difArrow}{" "}
-                  {moneyFormatter.format(walletWorth - paidForAssets)}
+                  {percentFormatterWithoutSign.format(profitVariation)} (
+                  {moneyFormatter.format(profit)})
+                </span>
+              </div>
+              <div className={styles.info}>
+                <p>Balanço Histórico </p>
+              </div>
+              <div className={`${styles.info}`}>
+                <span className={balanceCss}>
+                  {balanceArrow}
+                  {moneyFormatter.format(lifetimeBalance)}
+                </span>
+              </div>
+            </section>
+            <nav className={styles.nav}>
+              <ul>
+                <li>
+                  <button
+                    id={DAY}
+                    className={styles.selected}
+                    onClick={filter.bind(this, DAY)}
+                  >
+                    dia
+                  </button>
+                </li>
+                <li>
+                  <button id={WEEK} onClick={filter.bind(this, WEEK)}>
+                    semana
+                  </button>
+                </li>
+                <li>
+                  <button id={MONTH} onClick={filter.bind(this, MONTH)}>
+                    mês
+                  </button>
+                </li>
+                <li>
+                  <button id={YEAR} onClick={filter.bind(this, YEAR)}>
+                    ano
+                  </button>
+                </li>
+              </ul>
+            </nav>
+            <section className={styles.overall}>
+              <div className={styles.info}>Valor Fechamento</div>
+              <div className={styles.info}>
+                {moneyFormatter.format(walletWorth / (1 + variation))}
+              </div>
+              <div className={styles.info}>
+                <p>variação {selection}</p>
+              </div>
+              <p className={`${styles.variation} ${css}`}>
+                <span>
+                  {arrow} {percentFormatterWithoutSign.format(variation)}
+                </span>
+                <span>
+                  (
+                  {moneyFormatter.format(
+                    walletWorth - walletWorth / (1 + variation)
+                  )}
+                  )
                 </span>
               </p>
-            </div>
-            <div className={styles.info}>
-              <p>variação {selection}</p>
-            </div>
-            <p className={`${styles.variation} ${css}`}>
-              <span>
-                {arrow} {percentFormatter.format(variation)}
-              </span>
-              <span>({moneyFormatter.format(walletWorth * variation)})</span>
-            </p>
-            <p className={styles.ibov}>
-              <span>IBOV </span>
-              <span className={ibovCss}>
-                {percentFormatter.format(ibovDiff)}
-              </span>
-            </p>
-          </section>
+              <div className={styles.info}>Comparação IBOV</div>
+              <div className={`${styles.info} ${ibovCss}`}>
+                <span>
+                  {ibovArrow}
+                  {percentFormatterWithoutSign.format(ibovDiff)}
+                </span>
+              </div>
+            </section>
+          </Fragment>
         )}
         {assets.length === 0 && (
           <section
@@ -232,6 +269,7 @@ function PerformanceReport() {
           </section>
         )}
         <section className={styles["section__assets"]}>
+          <h3 className={styles["table-title"]}>Ações</h3>
           <AssetTable
             assets={assets}
             className={styles["asset-table"]}

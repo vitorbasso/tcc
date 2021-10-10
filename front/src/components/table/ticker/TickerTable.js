@@ -207,7 +207,7 @@ function TickerTable(props) {
             <div className={styles.th} data-tip="Valor da Transação (R$)">
               VT
             </div>
-            <div className={styles.th} data-tip="Valor Atual (R$)">
+            <div className={styles.th} data-tip="Data da Transação">
               DATA
             </div>
           </div>
