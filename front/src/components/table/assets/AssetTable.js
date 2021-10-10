@@ -1,29 +1,37 @@
-import styles from "./AssetTable.module.css";
-import baseStyles from "../../../css/base.module.css";
-import {
-  numberFormatter,
-  percentFormatterWithoutSign,
-} from "../../../utils/formatterUtils";
-import Money from "../../money/Money";
-import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
+import { BsArrowDown, BsArrowUp } from "react-icons/bs";
+import { Link } from "react-router-dom";
 import StocksContext from "../../../context/stock-context";
-import "react-confirm-alert/src/react-confirm-alert.css";
-import useDeleteConfirmation from "../../../hooks/useDeleteConfirmation";
-import { ASSET_URL } from "../../../constants/paths";
+import {
+  abbreviateNumber,
+  percentFormatterClean,
+} from "../../../utils/formatterUtils";
+import ReactTooltip from "react-tooltip";
+import styles from "./AssetTable.module.css";
 
-function sortByPercentage(first, second, weight = 1) {
-  const firstValue = first.amount * first.averageCost;
-  const secondValue = second.amount * second.averageCost;
+function sortByPercentage(first, second, stocks, weight = 1) {
+  const firstStock =
+    stocks.find((stock) => stock.ticker === first.stockSymbol)?.currentValue ??
+    0;
+  const secondStock =
+    stocks.find((stock) => stock.ticker === second.stockSymbol)?.currentValue ??
+    0;
+  const firstValue = (firstStock - first.averageCost) / first.averageCost;
+  const secondValue = (secondStock - second.averageCost) / second.averageCost;
   const value =
     firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
   return value * weight;
 }
 
-function sortByAverageValue(first, second, weight = 1) {
-  const firstValue = first.averageCost;
-  const secondValue = second.averageCost;
+function sortByValorization(first, second, stocks, weight = 1) {
+  const firstStock =
+    stocks.find((stock) => stock.ticker === first.stockSymbol)?.currentValue ??
+    0;
+  const secondStock =
+    stocks.find((stock) => stock.ticker === second.stockSymbol)?.currentValue ??
+    0;
+  const firstValue = (firstStock - first.averageCost) * first.amount;
+  const secondValue = (secondStock - second.averageCost) * second.amount;
   const value =
     firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
   return value * weight;
@@ -35,16 +43,29 @@ function sortByName(first, second, weight = 1) {
   return firstName.localeCompare(secondName, "pt-BR") * weight;
 }
 
+function sortByAveragePrice(first, second, weight = 1) {
+  const firstValue = first.averageCost;
+  const secondValue = second.averageCost;
+  const value =
+    firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
+  return value * weight;
+}
+
 const PERCENT = "%";
 const PERCENT_INVERSE = "-%";
 const NAME = "name";
 const NAME_INVERSE = "-name";
-const AVERAGE_VALUE = "averageValue";
-const AVERAGE_VALUE_INVERSE = "-averageValue";
+const AVERAGE_PRICE = "averagePrice";
+const AVERAGE_PRICE_INVERSE = "-averagePrice";
+const VALORIZATION = "valorization";
+const VALORIZATION_INVERSE = "-valorization";
+
+function getVariationStyle(variation) {
+  return variation > 0 ? styles.green : variation < 0 ? styles.red : "";
+}
 
 function AssetTable(props) {
-  const confirmDelete = useDeleteConfirmation();
-  const [sortBy, setSortBy] = useState(PERCENT);
+  const [sortBy, setSortBy] = useState(NAME);
   const [assetsToDisplay, setAssetsToDisplay] = useState([]);
   const { stocks } = useContext(StocksContext);
   useEffect(() => {
@@ -52,25 +73,24 @@ function AssetTable(props) {
   }, [props.assets]);
   const assets = assetsToDisplay.sort((first, second) => {
     switch (sortBy) {
-      case NAME:
-        return sortByName(first, second);
       case NAME_INVERSE:
         return sortByName(first, second, -1);
-      case AVERAGE_VALUE:
-        return sortByAverageValue(first, second);
-      case AVERAGE_VALUE_INVERSE:
-        return sortByAverageValue(first, second, -1);
+      case VALORIZATION:
+        return sortByValorization(first, second, stocks);
+      case VALORIZATION_INVERSE:
+        return sortByValorization(first, second, stocks, -1);
+      case AVERAGE_PRICE:
+        return sortByAveragePrice(first, second);
+      case AVERAGE_PRICE_INVERSE:
+        return sortByAveragePrice(first, second, -1);
       case PERCENT_INVERSE:
-        return sortByPercentage(first, second, -1);
+        return sortByPercentage(first, second, stocks, -1);
+      case PERCENT:
+        return sortByPercentage(first, second, stocks);
       default:
-        return sortByPercentage(first, second);
+        return sortByName(first, second);
     }
   });
-  const totalValue = props.assets
-    .filter((asset) => asset.amount > 0)
-    .reduce((total, asset) => {
-      return (total += asset.averageCost * asset.amount);
-    }, 0);
   function toggleZeroQuantityTransactions(event) {
     if (event.currentTarget.checked)
       setAssetsToDisplay(props.assets.filter((asset) => asset.amount > 0));
@@ -88,35 +108,44 @@ function AssetTable(props) {
     else setSortBy(`-${btn.dataset.sort}`);
   }
 
-  function deleteHandler(event) {
-    event.preventDefault();
-    const ticker = assets.find(
-      (asset) => asset.stockSymbol === event.target.closest("i").dataset.ticker
-    )?.stockSymbol;
-    if (!ticker) return;
-    confirmDelete({
-      title: `Deletar ${ticker}?`,
-      message: `Tem certeza que deseja deletar a ação ${ticker} da sua carteira?`,
-      url: `${ASSET_URL}/${ticker}`,
-    });
-  }
-
   if (props.assets?.length === 0) {
     return [];
   }
 
   return (
-    <div className={`${props.className} ${baseStyles.table}`}>
+    <div className={`${props.className} ${styles.container}`}>
       <label htmlFor="hide-zero">
-        <input
-          id="hide-zero"
-          type="checkbox"
-          onChange={toggleZeroQuantityTransactions}
-        />
-        Esconder ações com quantidade zero
+        <span className={styles["hide-zero"]}>
+          <input
+            id="hide-zero"
+            type="checkbox"
+            onChange={toggleZeroQuantityTransactions}
+          />
+          Esconder ações com quantidade zero
+        </span>
       </label>
       <div onClick={handleSorting}>
-        <button className={styles.selected} data-sort={PERCENT} type="button">
+        <button className={styles.selected} data-sort={NAME} type="button">
+          Ação{" "}
+          {sortBy === NAME ? (
+            <BsArrowUp />
+          ) : sortBy === NAME_INVERSE ? (
+            <BsArrowDown />
+          ) : (
+            ""
+          )}
+        </button>
+        <button data-sort={AVERAGE_PRICE} type="button">
+          PM{" "}
+          {sortBy === AVERAGE_PRICE ? (
+            <BsArrowDown />
+          ) : sortBy === AVERAGE_PRICE_INVERSE ? (
+            <BsArrowUp />
+          ) : (
+            ""
+          )}
+        </button>
+        <button data-sort={PERCENT} type="button">
           %{" "}
           {sortBy === PERCENT ? (
             <BsArrowDown />
@@ -126,83 +155,87 @@ function AssetTable(props) {
             ""
           )}
         </button>
-        <button data-sort={NAME} type="button">
-          Nome{" "}
-          {sortBy === NAME ? (
-            <BsArrowUp />
-          ) : sortBy === NAME_INVERSE ? (
+        <button data-sort={VALORIZATION} type="button">
+          VAL{" "}
+          {sortBy === VALORIZATION ? (
             <BsArrowDown />
-          ) : (
-            ""
-          )}
-        </button>
-        <button data-sort={AVERAGE_VALUE} type="button">
-          Avg{" "}
-          {sortBy === AVERAGE_VALUE ? (
-            <BsArrowDown />
-          ) : sortBy === AVERAGE_VALUE_INVERSE ? (
+          ) : sortBy === VALORIZATION_INVERSE ? (
             <BsArrowUp />
           ) : (
             ""
           )}
         </button>
       </div>
-      {assets.map((asset) => {
-        const stock = stocks.find(
-          (stock) => stock.ticker === asset.stockSymbol
-        );
-        const currentValue = stock?.currentValue ?? 0;
-        const value = asset.averageCost * asset.amount;
-        return (
-          <Link
-            key={asset.id}
-            to={{
-              pathname: `performance/${asset.stockSymbol}`,
-              state: {
-                caller: props.caller || "/",
-              },
-            }}
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th>Ação</th>
-                  <th>Qnt</th>
-                  <th>Valor Pago</th>
-                  <th>Valor atual</th>
-                  <th>Valor Total</th>
-                  <th>%</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className={baseStyles["table-title"]}>
-                    <span>{asset.stockSymbol}</span>{" "}
-                    <i onClick={deleteHandler} data-ticker={asset.stockSymbol}>
-                      <BsTrash />
-                    </i>
-                  </td>
-                  <td>{numberFormatter.format(asset.amount)}</td>
-                  <td>
-                    <Money value={asset.averageCost} />
-                  </td>
-                  <td>
-                    <Money value={currentValue} />
-                  </td>
-                  <td>
-                    <Money value={value} />
-                  </td>
-                  <td>
-                    {percentFormatterWithoutSign.format(
-                      totalValue !== 0 ? value / totalValue : 0
-                    )}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </Link>
-        );
-      })}
+      <div className={styles.table}>
+        <ReactTooltip />
+        <div className={styles.thead}>
+          <div className={styles.tr}>
+            <div className={styles.th} data-tip="Ação">
+              Ação
+            </div>
+            <div className={styles.th} data-tip="Quantidade">
+              QNT
+            </div>
+            <div className={styles.th} data-tip="Preço Médio (R$)">
+              PM
+            </div>
+            <div className={styles.th} data-tip="Valor Atual (R$)">
+              VA
+            </div>
+            <div className={styles.th} data-tip="Variação">
+              %
+            </div>
+            <div className={styles.th} data-tip="Valorização (R$)">
+              Val
+            </div>
+          </div>
+        </div>
+        <div className={styles.tbody}>
+          {assets.map((asset) => {
+            const stock = stocks.find(
+              (stock) => stock.ticker === asset.stockSymbol
+            );
+            const currentValue = stock?.currentValue ?? 0;
+            const variation =
+              (currentValue - asset.averageCost) / asset.averageCost;
+            const css = getVariationStyle(variation);
+            const valorization =
+              (currentValue - asset.averageCost) * asset.amount;
+            return (
+              <Link
+                key={asset.id}
+                to={{
+                  pathname: `/performance/${asset.stockSymbol}`,
+                  state: {
+                    caller: props.caller || "/",
+                  },
+                }}
+              >
+                <div className={styles.tr}>
+                  <div
+                    className={`${styles["table-ticker-name"]} ${styles.td}`}
+                  >
+                    {asset.stockSymbol}
+                  </div>
+                  <div className={styles.td}>{asset.amount}</div>
+                  <div className={styles.td}>
+                    {abbreviateNumber(asset.averageCost)}
+                  </div>
+                  <div className={`${css} ${styles.td}`}>
+                    {abbreviateNumber(currentValue)}
+                  </div>
+                  <div className={`${css} ${styles.td}`}>
+                    {percentFormatterClean(variation)}
+                  </div>
+                  <div className={`${css} ${styles.td}`}>
+                    {abbreviateNumber(valorization)}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

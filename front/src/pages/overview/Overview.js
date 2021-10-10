@@ -9,7 +9,6 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import WalletContext from "../../context/wallet-context";
 import { Link } from "react-router-dom";
 import StocksContext from "../../context/stock-context";
-import AssetTable from "../../components/table/assets/AssetTable";
 
 function compareAssetValue(first, second) {
   const firstValue = first.amount * first.averageCost;
@@ -132,13 +131,6 @@ function Overview() {
               </div>
             )}
           </div>
-        </section>
-        <section className={styles["section__assets"]}>
-          <AssetTable
-            assets={wallet.stockAssets}
-            className={styles["asset-table"]}
-            caller={"/overview"}
-          />
         </section>
       </main>
     </div>

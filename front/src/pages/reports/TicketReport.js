@@ -3,7 +3,7 @@ import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import { useLocation, useParams, Redirect } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
-import TickerTable from "../../components/table/TickerTable";
+import TickerTable from "../../components/table/ticker/TickerTable";
 import { ASSET_URL } from "../../constants/paths";
 import StocksContext from "../../context/stock-context";
 import WalletContext from "../../context/wallet-context";
