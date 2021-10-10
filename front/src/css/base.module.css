@@ -1,7 +1,7 @@
 .container {
   margin: 0 auto;
-  width: 80%;
-  padding: 10vh 0 0;
+  width: 88%;
+  padding: 5vh 0 5vh;
   color: var(--main-gray);
 }
 

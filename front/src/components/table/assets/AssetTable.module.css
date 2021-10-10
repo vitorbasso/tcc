@@ -29,8 +29,6 @@
   justify-items: center;
   margin-bottom: 1rem;
   position: relative;
-  left: -8%;
-  width: 116%;
 }
 
 .container > div button {
@@ -79,8 +77,10 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  left: -8%;
-  width: 116%;
+  left: -4%;
+  width: 108%;
+  /* left: -8%;
+  width: 116%; */
 }
 
 .container .table .thead .tr {
