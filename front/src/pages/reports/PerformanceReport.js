@@ -65,7 +65,6 @@ function getVariationStyle(variation) {
 function PerformanceReport() {
   const { wallet, fetchWallet } = useContext(WalletContext);
   const [variation, setVariation] = useState(0);
-  const [selection, setSelection] = useState("dia");
   const { stocks, fetchStocks } = useContext(StocksContext);
   const [ibovVariation, setIbovVariation] = useState(0);
   useEffect(() => {
@@ -133,25 +132,21 @@ function PerformanceReport() {
         setVariation(walletVariationDay);
         setIbovVariation(ibovVariationDay);
         updateNavSelected(DAY);
-        setSelection("dia");
         break;
       case WEEK:
         setVariation(walletVariationWeek);
         setIbovVariation(ibovVariationWeek);
         updateNavSelected(WEEK);
-        setSelection("semana");
         break;
       case MONTH:
         setVariation(walletVariationMonth);
         setIbovVariation(ibovVariationMonth);
         updateNavSelected(MONTH);
-        setSelection("mês");
         break;
       case YEAR:
         setVariation(walletVariationYear);
         setIbovVariation(ibovVariationYear);
         updateNavSelected(YEAR);
-        setSelection("ano");
         break;
       default:
         console.error(`cannot filter by ${filterBy} `);
@@ -235,21 +230,18 @@ function PerformanceReport() {
                 {moneyFormatter.format(walletWorth / (1 + variation))}
               </div>
               <div className={styles.info}>
-                <p>variação {selection}</p>
+                <p>Variação Posição</p>
               </div>
-              <p className={`${styles.variation} ${css}`}>
+              <div className={`${styles.info} ${css}`}>
                 <span>
-                  {arrow} {percentFormatterWithoutSign.format(variation)}
-                </span>
-                <span>
-                  (
+                  {arrow} {percentFormatterWithoutSign.format(variation)}(
                   {moneyFormatter.format(
                     walletWorth - walletWorth / (1 + variation)
                   )}
                   )
                 </span>
-              </p>
-              <div className={styles.info}>Comparação IBOV</div>
+              </div>
+              <div className={styles.info}>Contra IBOV</div>
               <div className={`${styles.info} ${ibovCss}`}>
                 <span>
                   {ibovArrow}
