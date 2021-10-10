@@ -13,10 +13,9 @@ import WalletContext from "../../context/wallet-context";
 import TaxContext from "../../context/tax-context";
 import StocksContext from "../../context/stock-context";
 import CurrencyInput from "react-currency-input-field";
+import { BUY, SELL } from "../../constants/constants";
 import useLogout from "../../hooks/useLogout";
 
-const BUY = "BUY";
-const SELL = "SELL";
 const EACH = "each";
 const TOTAL = "total";
 
@@ -38,6 +37,9 @@ function RegisterOperation() {
   const { invalidateCache: invalidateWalletCache } = useContext(WalletContext);
   const { invalidateCache: invalidateTaxCache } = useContext(TaxContext);
   const { invalidateCache: invalidateStocksCache } = useContext(StocksContext);
+  const time = new Date().toLocaleTimeString("pt-BR").slice(0, 5);
+  const day = new Date().toISOString().slice(0, 11);
+  const today = `${day}${time}`;
   function onCloseNotification() {
     setShowNotification(false);
   }
@@ -204,7 +206,13 @@ function RegisterOperation() {
             />
           </div>
           <div className={baseStyles["form-control"]}>
-            <input ref={dateRef} type="datetime-local" name="date" />
+            <input
+              ref={dateRef}
+              type="datetime-local"
+              max={today}
+              defaultValue={today}
+              name="date"
+            />
           </div>
           <div className={baseStyles["form-control"]}>
             <button type="submit" className={baseStyles.btn}>

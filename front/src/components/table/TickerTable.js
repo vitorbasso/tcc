@@ -1,16 +1,16 @@
-import styles from "./TickerTable.module.css";
+import { useContext, useEffect, useState } from "react";
+import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
+import StocksContext from "../../context/stock-context";
 import {
+  abbreviateNumber,
   dateFormatter,
   moneyFormatter,
-  numberFormatter,
-} from "../../../utils/formatterUtils";
-import Money from "../../money/Money";
-import { useEffect, useState } from "react";
-import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
-import baseStyles from "../../../css/base.module.css";
-import { TRANSACTION_URL } from "../../../constants/paths";
-import useDeleteConfirmation from "../../../hooks/useDeleteConfirmation";
-import { BUY, SELL } from "../../../constants/constants";
+} from "../../utils/formatterUtils";
+import ReactTooltip from "react-tooltip";
+import styles from "./TickerTable.module.css";
+import { BUY, SELL } from "../../constants/constants";
+import { TRANSACTION_URL } from "../../constants/paths";
+import useDeleteConfirmation from "../../hooks/useDeleteConfirmation";
 
 function sortByDate(first, second, weight = 1) {
   const firstValue = first.transactionDate;
@@ -43,14 +43,19 @@ const VALUE_INVERSE = "-value";
 const AVERAGE_VALUE = "averageValue";
 const AVERAGE_VALUE_INVERSE = "-averageValue";
 
+function getVariationStyle(variation) {
+  return variation > 0 ? styles.green : variation < 0 ? styles.red : "";
+}
+
 function TickerTable(props) {
+  const confirmDelete = useDeleteConfirmation();
   const [sortBy, setSortBy] = useState(DATE);
   const [transactionsToDisplay, setTransactionsToDisplay] = useState([]);
-  const confirmDelete = useDeleteConfirmation();
+  const { stocks } = useContext(StocksContext);
   useEffect(() => {
     setTransactionsToDisplay(props.transactions);
   }, [props.transactions]);
-  const assets = transactionsToDisplay.sort((first, second) => {
+  const transactions = transactionsToDisplay.sort((first, second) => {
     switch (sortBy) {
       case AVERAGE_VALUE:
         return sortByAverageValue(first, second);
@@ -66,6 +71,28 @@ function TickerTable(props) {
         return sortByDate(first, second);
     }
   });
+
+  function deleteHandler(event) {
+    event.preventDefault();
+    const transaction = transactions.find(
+      (transaction) =>
+        "" + transaction.id === event.target.closest("i").dataset.id
+    );
+    if (!transaction) return;
+    confirmDelete({
+      title: `Remover?`,
+      message: `Tem certeza que deseja remover a transação de ${
+        transaction.type === BUY ? "COMPRA" : "VENDA"
+      } de ${transaction.quantity} por ${moneyFormatter.format(
+        transaction.value / transaction.quantity
+      )} cada do dia ${dateFormatter.format(
+        new Date(transaction.transactionDate)
+      )}?`,
+      url: `${TRANSACTION_URL}/${transaction.id}`,
+      onDelete: props?.onDelete,
+    });
+  }
+
   function toggleSellTransactions(event) {
     if (event.currentTarget.checked)
       setTransactionsToDisplay((state) =>
@@ -113,33 +140,12 @@ function TickerTable(props) {
     else setSortBy(`-${btn.dataset.sort}`);
   }
 
-  function deleteHandler(event) {
-    event.preventDefault();
-    const transaction = assets.find(
-      (transaction) =>
-        "" + transaction.id === event.target.closest("i").dataset.id
-    );
-    if (!transaction) return;
-    confirmDelete({
-      title: `Remover?`,
-      message: `Tem certeza que deseja remover a transação de ${
-        transaction.type === BUY ? "COMPRA" : "VENDA"
-      } de ${transaction.quantity} por ${moneyFormatter.format(
-        transaction.value / transaction.quantity
-      )} cada do dia ${dateFormatter.format(
-        new Date(transaction.transactionDate)
-      )}?`,
-      url: `${TRANSACTION_URL}/${transaction.id}`,
-      onDelete: props?.onDelete,
-    });
-  }
-
-  if (props.transaction?.length === 0) {
+  if (props.transactions?.length === 0) {
     return [];
   }
 
   return (
-    <div className={`${props.className} ${baseStyles.table}`}>
+    <div className={`${props.className} ${styles.container}`}>
       <label htmlFor="hide-sell">
         <input
           id="hide-sell"
@@ -164,18 +170,8 @@ function TickerTable(props) {
             ""
           )}
         </button>
-        <button data-sort={VALUE} type="button">
-          Valor{" "}
-          {sortBy === VALUE ? (
-            <BsArrowDown />
-          ) : sortBy === VALUE_INVERSE ? (
-            <BsArrowUp />
-          ) : (
-            ""
-          )}
-        </button>
         <button data-sort={AVERAGE_VALUE} type="button">
-          Avg{" "}
+          PM{" "}
           {sortBy === AVERAGE_VALUE ? (
             <BsArrowDown />
           ) : sortBy === AVERAGE_VALUE_INVERSE ? (
@@ -184,43 +180,75 @@ function TickerTable(props) {
             ""
           )}
         </button>
+        <button data-sort={VALUE} type="button">
+          VT{" "}
+          {sortBy === VALUE ? (
+            <BsArrowDown />
+          ) : sortBy === VALUE_INVERSE ? (
+            <BsArrowUp />
+          ) : (
+            ""
+          )}
+        </button>
       </div>
-      {assets.map((transaction) => {
-        const type = transaction.type === BUY ? "Compra" : "Venda";
-        return (
-          <table key={transaction.id}>
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Qnt</th>
-                <th>Valor Médio</th>
-                <th>Valor</th>
-                <th>Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className={baseStyles["table-title"]}>
-                  {type}{" "}
-                  <i onClick={deleteHandler} data-id={transaction.id}>
+      <div className={styles.table}>
+        <ReactTooltip />
+        <div className={styles.thead}>
+          <div className={styles.tr}>
+            <div className={styles.th} data-tip="Compra ou Venda">
+              C/V
+            </div>
+            <div className={styles.th} data-tip="Quantidade">
+              QNT
+            </div>
+            <div className={styles.th} data-tip="Preço Médio (R$)">
+              PM
+            </div>
+            <div className={styles.th} data-tip="Valor da Transação (R$)">
+              VT
+            </div>
+            <div className={styles.th} data-tip="Valor Atual (R$)">
+              DATA
+            </div>
+          </div>
+        </div>
+        <div className={styles.tbody}>
+          {transactions.map((transaction) => {
+            const stock = stocks.find((stock) => stock.ticker === props.symbol);
+            const currentValue = stock?.currentValue ?? 0;
+            const variation =
+              (currentValue - transaction.averageCost) /
+              transaction.averageCost;
+            const css = getVariationStyle(variation);
+            return (
+              <div key={transaction.id} className={styles.tr}>
+                <div className={styles.td}>
+                  {transaction.type === BUY ? "C" : "V"}
+                </div>
+                <div className={styles.td}>{transaction.quantity}</div>
+                <div className={styles.td}>
+                  {abbreviateNumber(transaction.value / transaction.quantity)}
+                </div>
+                <div className={styles.td}>
+                  {abbreviateNumber(transaction.value)}
+                </div>
+                <div className={`${css} ${styles.td}`}>
+                  {dateFormatter
+                    .format(new Date(transaction.transactionDate))
+                    .slice(0, 10)}
+                  <i
+                    onClick={deleteHandler}
+                    className={`${styles.red} ${styles.delete}`}
+                    data-id={transaction.id}
+                  >
                     <BsTrash />
                   </i>
-                </td>
-                <td>{numberFormatter.format(transaction.quantity)}</td>
-                <td>
-                  <Money value={transaction.value / transaction.quantity} />
-                </td>
-                <td>
-                  <Money value={transaction.value} />
-                </td>
-                <td>
-                  {dateFormatter.format(new Date(transaction.transactionDate))}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        );
-      })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

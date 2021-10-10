@@ -40,10 +40,19 @@
 }
 
 .overview {
-  margin: 2rem 2rem 2rem 0;
+  margin: 2rem 0 2rem;
   display: flex;
   font-size: 2.4rem;
-  justify-content: space-around;
+  justify-content: space-between;
+}
+
+.overview i {
+  font-size: 1.4rem;
+}
+
+.overview span:last-child {
+  display: flex;
+  align-items: center;
 }
 
 .info {

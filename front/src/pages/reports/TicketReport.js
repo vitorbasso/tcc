@@ -1,13 +1,14 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { BsArrowDown, BsArrowUp } from "react-icons/bs";
+import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import { useLocation, useParams, Redirect } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
-import TickerTable from "../../components/table/ticker/TickerTable";
+import TickerTable from "../../components/table/TickerTable";
 import { ASSET_URL } from "../../constants/paths";
 import StocksContext from "../../context/stock-context";
 import WalletContext from "../../context/wallet-context";
 import baseStyles from "../../css/base.module.css";
+import useDeleteConfirmation from "../../hooks/useDeleteConfirmation";
 import useHttp from "../../hooks/useHttp";
 import useLogout from "../../hooks/useLogout";
 import { getMoneyClass } from "../../utils/cssUtils";
@@ -37,8 +38,10 @@ function getVariationStyle(variation) {
 
 function TicketReport() {
   const logout = useLogout();
+  const confirmDelete = useDeleteConfirmation();
   const { wallet, fetchWallet } = useContext(WalletContext);
   const { stocks, fetchStocks } = useContext(StocksContext);
+  const [deleted, setDeleted] = useState(false);
   const [variation, setVariation] = useState(0);
   const [selection, setSelection] = useState("dia");
   const location = useLocation();
@@ -132,10 +135,24 @@ function TicketReport() {
   }, [variationDay]);
 
   if (wallet && wallet.id !== -1 && !asset) {
-    return <Redirect to="/not-found" />;
+    return <Redirect to={deleted ? "/" : "/not-found"} />;
+  }
+
+  function deleteHandler(event) {
+    event.preventDefault();
+    if (!id && wallet && wallet.id !== -1 && !asset) return;
+    confirmDelete({
+      title: `Deletar ${id}?`,
+      message: `Tem certeza que deseja deletar a ação ${id} da sua carteira?`,
+      url: `${ASSET_URL}/${id}`,
+      onDelete: () => {
+        setDeleted(true);
+      },
+    });
   }
 
   const profit = currentValue * amount - assetTotalValue;
+  const profitVariation = profit / assetTotalValue;
 
   const moneyClass = getMoneyClass(currentValue);
 
@@ -215,6 +232,11 @@ function TicketReport() {
                 : 0
             )}
           </span>
+          <span>
+            <i onClick={deleteHandler} className={styles.red} data-id={id}>
+              <BsTrash />
+            </i>
+          </span>
         </section>
         <Money value={currentValue} className={`${baseStyles[moneyClass]}`} />
         <section className={styles.info}>
@@ -233,15 +255,16 @@ function TicketReport() {
           </div>
           <div>
             <p>
-              Diferença{" "}
+              Situação{" "}
               <span className={difCss}>
                 {difArrow}
-                {moneyFormatter.format(profit)}
+                {percentFormatterWithoutSign.format(profitVariation)} - (
+                {moneyFormatter.format(profit)})
               </span>
             </p>
           </div>
           <div>
-            <p>Balanço Total {moneyFormatter.format(lifetimeBalance)}</p>
+            <p>Balanço Histórico {moneyFormatter.format(lifetimeBalance)}</p>
           </div>
           <div>
             <p>variação {selection}</p>
@@ -261,6 +284,7 @@ function TicketReport() {
         <section>
           <TickerTable
             transactions={transactions}
+            symbol={id}
             onDelete={fetchTransactions}
           />
         </section>
