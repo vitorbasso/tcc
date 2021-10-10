@@ -219,6 +219,15 @@ function TicketReport() {
             </p>
           </div>
           <div>
+            <p>
+              Diferença{" "}
+              <span className={css}>
+                {arrow}
+                {moneyFormatter.format(currentValue - averageValue)}
+              </span>
+            </p>
+          </div>
+          <div>
             <p>Valor Pago {moneyFormatter.format(assetTotalValue)}</p>
           </div>
           <div>
