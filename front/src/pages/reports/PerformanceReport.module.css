@@ -39,10 +39,8 @@
   box-shadow: none;
 }
 
-.overall {
-  padding-bottom: 2rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+.money {
+  margin-top: 2rem;
 }
 
 .empty-transaction-text {
@@ -59,34 +57,17 @@
   height: 5rem;
 }
 
-.ibov {
-  text-align: center;
+section.info {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-div.info {
+section.info div {
   display: flex;
-  justify-content: space-around;
-  margin: 1rem;
-  font-size: 1.2rem;
-  text-align: center;
-}
-
-.ibov span:first-child {
-  font-weight: bold;
-}
-
-.variation {
-  display: flex;
-  justify-content: center;
-}
-
-.variation span {
-  margin: 0.6rem;
-  margin-top: 0;
-}
-
-.variation span:first-child {
-  margin-right: 0;
+  justify-content: space-between;
+  margin: 1rem 0px;
+  font-size: 1.1rem;
 }
 
 .red {

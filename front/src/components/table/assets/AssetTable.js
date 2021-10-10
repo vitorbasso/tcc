@@ -23,15 +23,15 @@ function sortByPercentage(first, second, stocks, weight = 1) {
   return value * weight;
 }
 
-function sortByValorization(first, second, stocks, weight = 1) {
+function sortByValueInWallet(first, second, stocks, weight = 1) {
   const firstStock =
     stocks.find((stock) => stock.ticker === first.stockSymbol)?.currentValue ??
     0;
   const secondStock =
     stocks.find((stock) => stock.ticker === second.stockSymbol)?.currentValue ??
     0;
-  const firstValue = (firstStock - first.averageCost) * first.amount;
-  const secondValue = (secondStock - second.averageCost) * second.amount;
+  const firstValue = firstStock * first.amount;
+  const secondValue = secondStock * second.amount;
   const value =
     firstValue > secondValue ? -1 : firstValue < secondValue ? 1 : 0;
   return value * weight;
@@ -76,9 +76,9 @@ function AssetTable(props) {
       case NAME_INVERSE:
         return sortByName(first, second, -1);
       case VALORIZATION:
-        return sortByValorization(first, second, stocks);
+        return sortByValueInWallet(first, second, stocks);
       case VALORIZATION_INVERSE:
-        return sortByValorization(first, second, stocks, -1);
+        return sortByValueInWallet(first, second, stocks, -1);
       case AVERAGE_PRICE:
         return sortByAveragePrice(first, second);
       case AVERAGE_PRICE_INVERSE:
@@ -156,7 +156,7 @@ function AssetTable(props) {
           )}
         </button>
         <button data-sort={VALORIZATION} type="button">
-          VAL{" "}
+          VC{" "}
           {sortBy === VALORIZATION ? (
             <BsArrowDown />
           ) : sortBy === VALORIZATION_INVERSE ? (
@@ -185,8 +185,8 @@ function AssetTable(props) {
             <div className={styles.th} data-tip="Variação">
               %
             </div>
-            <div className={styles.th} data-tip="Valorização (R$)">
-              Val
+            <div className={styles.th} data-tip="Valor Em Carteira (R$)">
+              VC
             </div>
           </div>
         </div>
@@ -199,8 +199,7 @@ function AssetTable(props) {
             const variation =
               (currentValue - asset.averageCost) / asset.averageCost;
             const css = getVariationStyle(variation);
-            const valorization =
-              (currentValue - asset.averageCost) * asset.amount;
+            const valorization = currentValue * asset.amount;
             return (
               <Link
                 key={asset.id}

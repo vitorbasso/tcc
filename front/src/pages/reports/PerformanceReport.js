@@ -168,32 +168,29 @@ function PerformanceReport() {
       <main>
         {assets.length !== 0 && (
           <Fragment>
-            <section className={styles.overall}>
-              <Money
-                value={walletWorth}
-                className={`${styles.money} ${baseStyles[moneyClass]}`}
-              />
-              <div className={styles.info}>
-                <p>Valor Pago {moneyFormatter.format(paidForAssets)}</p>
+            <Money
+              value={walletWorth}
+              className={`${styles.money} ${baseStyles[moneyClass]}`}
+            />
+            <section className={styles.info}>
+              <div>
+                <p>Valor Pago </p>
+                <p>{moneyFormatter.format(paidForAssets)}</p>
               </div>
-              <div className={styles.info}>
+              <div>
                 <p>Situação Atual </p>
-              </div>
-              <div className={`${difCss} ${styles.info}`}>
-                <span>
+                <p className={difCss}>
                   {difArrow}{" "}
                   {percentFormatterWithoutSign.format(profitVariation)} (
                   {moneyFormatter.format(profit)})
-                </span>
+                </p>
               </div>
-              <div className={styles.info}>
+              <div>
                 <p>Balanço Histórico </p>
-              </div>
-              <div className={`${styles.info}`}>
-                <span className={balanceCss}>
+                <p className={balanceCss}>
                   {balanceArrow}
                   {moneyFormatter.format(lifetimeBalance)}
-                </span>
+                </p>
               </div>
             </section>
             <nav className={styles.nav}>
@@ -224,29 +221,27 @@ function PerformanceReport() {
                 </li>
               </ul>
             </nav>
-            <section className={styles.overall}>
-              <div className={styles.info}>Valor Fechamento</div>
-              <div className={styles.info}>
-                {moneyFormatter.format(walletWorth / (1 + variation))}
+            <section className={styles.info}>
+              <div>
+                <p>Valor Fechamento</p>
+                <p>{moneyFormatter.format(walletWorth / (1 + variation))}</p>
               </div>
-              <div className={styles.info}>
+              <div>
                 <p>Variação Posição</p>
-              </div>
-              <div className={`${styles.info} ${css}`}>
-                <span>
+                <p className={css}>
                   {arrow} {percentFormatterWithoutSign.format(variation)}(
                   {moneyFormatter.format(
                     walletWorth - walletWorth / (1 + variation)
                   )}
                   )
-                </span>
+                </p>
               </div>
-              <div className={styles.info}>Contra IBOV</div>
-              <div className={`${styles.info} ${ibovCss}`}>
-                <span>
+              <div>
+                <p>Contra IBOV</p>
+                <p className={ibovCss}>
                   {ibovArrow}
                   {percentFormatterWithoutSign.format(ibovDiff)}
-                </span>
+                </p>
               </div>
             </section>
           </Fragment>

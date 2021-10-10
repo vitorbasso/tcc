@@ -156,7 +156,7 @@ function TicketReport() {
   const profit = currentValue * amount - assetTotalValue;
   const profitVariation = profit / assetTotalValue;
 
-  const moneyClass = getMoneyClass(currentValue);
+  const moneyClass = getMoneyClass(currentTotalValue);
 
   function filter(filterBy) {
     const lastSelected = document.querySelector(`.${styles.selected}`);
@@ -209,48 +209,49 @@ function TicketReport() {
             </i>
           </span>
         </section>
-        <Money value={currentValue} className={`${baseStyles[moneyClass]}`} />
+        <Money
+          value={currentTotalValue}
+          className={`${baseStyles[moneyClass]}`}
+        />
         <section className={styles.info}>
           <div>
-            <p>Qnt {Intl.NumberFormat("pt-BR").format(amount)}</p>
-            <p>
-              <span>Preço médio </span>
-              <span>{moneyFormatter.format(averageValue)}</span>
-            </p>
-          </div>
-          <div>
-            <p>
-              Diferença{" "}
-              <span className={css}>
-                {arrow}
-                {moneyFormatter.format(currentValue - averageValue)}
-              </span>
-            </p>
-          </div>
-          <div>
-            <p>Valor Pago {moneyFormatter.format(assetTotalValue)}</p>
-          </div>
-          <div>
-            <p>Valor Atual {moneyFormatter.format(currentTotalValue)}</p>
+            <p>Valor Pago</p>
+            <p>{moneyFormatter.format(assetTotalValue)}</p>
           </div>
           <div>
             <p>Situação Atual </p>
+            <p className={difCss}>
+              {difArrow}
+              {percentFormatterWithoutSign.format(profitVariation)} (
+              {moneyFormatter.format(profit)})
+            </p>
+          </div>
+
+          <div>
+            <p>Preço Médio</p>
+            <p>{moneyFormatter.format(averageValue)}</p>
           </div>
           <div>
-            <span className={difCss}>
-              {difArrow}
-              {percentFormatterWithoutSign.format(profitVariation)} - (
-              {moneyFormatter.format(profit)})
-            </span>
+            <p>Qnt</p>
+            <p>{Intl.NumberFormat("pt-BR").format(amount)}</p>
+          </div>
+          <div>
+            <p>Preço Atual</p>
+            <p>{moneyFormatter.format(currentValue)}</p>
+          </div>
+          <div>
+            <p>Diferença</p>
+            <p className={css}>
+              {arrow}
+              {moneyFormatter.format(currentValue - averageValue)}
+            </p>
           </div>
           <div>
             <p>Balanço Histórico </p>
-          </div>
-          <div>
-            <span className={balanceCss}>
+            <p className={balanceCss}>
               {balanceArrow}
               {moneyFormatter.format(lifetimeBalance)}
-            </span>
+            </p>
           </div>
         </section>
         <section className={styles.info}>
@@ -284,35 +285,32 @@ function TicketReport() {
           </nav>
           <div>
             <p>Valor fechamento</p>
+            <p>{moneyFormatter.format(currentValue / (1 + variation))}</p>
           </div>
-          <div className={styles.variation}>
-            {moneyFormatter.format(currentValue / (1 + variation))}
-          </div>
-
           <div>
             <p>Variação Ticker</p>
-          </div>
-          <div className={`${styles.variation} ${css}`}>
-            <span>{arrow}</span>
-            <span>{percentFormatterWithoutSign.format(variation)}</span>
-            <span>
-              (
-              {moneyFormatter.format(
-                currentValue - currentValue / (1 + variation)
-              )}
-              )
-            </span>
+            <p className={css}>
+              <span>{arrow}</span>
+              <span>{percentFormatterWithoutSign.format(variation)}</span>
+              <span>
+                (
+                {moneyFormatter.format(
+                  currentValue - currentValue / (1 + variation)
+                )}
+                )
+              </span>
+            </p>
           </div>
           <div>
             <p>Variação Posição</p>
-          </div>
-          <div className={`${styles.variation} ${css}`}>
-            <span>{arrow}</span>
-            <span>
-              {moneyFormatter.format(
-                currentTotalValue - currentTotalValue / (1 + variation)
-              )}
-            </span>
+            <p className={css}>
+              <span>{arrow}</span>
+              <span>
+                {moneyFormatter.format(
+                  currentTotalValue - currentTotalValue / (1 + variation)
+                )}
+              </span>
+            </p>
           </div>
         </section>
         <section>
