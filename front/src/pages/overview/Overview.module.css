@@ -7,7 +7,18 @@
   align-content: center;
   padding-bottom: 1.5rem;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.overview > div {
+  width: 70%;
+  font-size: 1.3rem;
+  margin: 1rem auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.overview {
+  margin-bottom: 2rem;
 }
 
 .pie-chart__pie-chart {
@@ -44,6 +55,19 @@
 .pie-chart__selected-info div {
   display: flex;
   justify-content: space-between;
+}
+
+.top-tickets__container {
+  width: 80%;
+  margin: 0.5vh auto;
+}
+
+.red {
+  color: #ea526f;
+}
+
+.green {
+  color: #57cc99;
 }
 
 @media (min-width: 615px) {
