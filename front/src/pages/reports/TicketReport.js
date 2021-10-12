@@ -191,7 +191,7 @@ function TicketReport() {
   return (
     <div className={baseStyles.container}>
       <Header backButton caller={location.state?.caller || "/"}>
-        <h2>Ticker</h2>
+        <h2>Ação</h2>
       </Header>
       <main>
         <section className={styles.overview}>
@@ -215,36 +215,33 @@ function TicketReport() {
         />
         <section className={styles.info}>
           <div>
-            <p>Valor Pago</p>
+            <p>Custo Total</p>
             <p>{moneyFormatter.format(assetTotalValue)}</p>
           </div>
           <div>
-            <p>Situação Atual </p>
-            <p className={difCss}>
-              {difArrow}
-              {percentFormatterWithoutSign.format(profitVariation)} (
-              {moneyFormatter.format(profit)})
-            </p>
-          </div>
-
-          <div>
-            <p>Preço Médio</p>
+            <p>Custo Médio</p>
             <p>{moneyFormatter.format(averageValue)}</p>
           </div>
           <div>
-            <p>Qnt</p>
+            <p>Quantidade</p>
             <p>{Intl.NumberFormat("pt-BR").format(amount)}</p>
           </div>
+        </section>
+        <section className={styles.info}>
           <div>
             <p>Preço Atual</p>
             <p>{moneyFormatter.format(currentValue)}</p>
           </div>
           <div>
-            <p>Diferença</p>
+            <p>Valorização (%)</p>
             <p className={difCss}>
               {difArrow}
-              {moneyFormatter.format(currentValue - averageValue)}
+              {percentFormatterWithoutSign.format(profitVariation)}
             </p>
+          </div>
+          <div>
+            <p>Valorização (R$)</p>
+            <p className={difCss}>{moneyFormatter.format(profit)}</p>
           </div>
           <div>
             <p>Balanço Histórico </p>
@@ -288,19 +285,21 @@ function TicketReport() {
             <p>{moneyFormatter.format(currentValue / (1 + variation))}</p>
           </div>
           <div>
-            <p>Variação Ticker</p>
+            <p>Variação Ticker (%)</p>
             <p className={css}>
               <span>{arrow}</span>
               <span>{percentFormatterWithoutSign.format(variation)}</span>
-              <span>
-                (
-                {moneyFormatter.format(
-                  currentValue - currentValue / (1 + variation)
-                )}
-                )
-              </span>
             </p>
           </div>
+          <div>
+            <span>Variação Ticker (R$)</span>
+            <span className={css}>
+              {moneyFormatter.format(
+                currentValue - currentValue / (1 + variation)
+              )}
+            </span>
+          </div>
+
           <div>
             <p>Variação Posição</p>
             <p className={css}>

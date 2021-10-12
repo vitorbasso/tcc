@@ -174,16 +174,19 @@ function PerformanceReport() {
             />
             <section className={styles.info}>
               <div>
-                <p>Valor Pago </p>
+                <p>Custo Total </p>
                 <p>{moneyFormatter.format(paidForAssets)}</p>
               </div>
               <div>
-                <p>Situação Atual </p>
+                <p>Variação (%)</p>
                 <p className={difCss}>
                   {difArrow}{" "}
-                  {percentFormatterWithoutSign.format(profitVariation)} (
-                  {moneyFormatter.format(profit)})
+                  {percentFormatterWithoutSign.format(profitVariation)}
                 </p>
+              </div>
+              <div>
+                <p>Variação (R$)</p>
+                <p className={difCss}>{moneyFormatter.format(profit)}</p>
               </div>
               <div>
                 <p>Balanço Histórico </p>
@@ -227,13 +230,17 @@ function PerformanceReport() {
                 <p>{moneyFormatter.format(walletWorth / (1 + variation))}</p>
               </div>
               <div>
-                <p>Variação Posição</p>
+                <p>Variação Posição (%)</p>
                 <p className={css}>
-                  {arrow} {percentFormatterWithoutSign.format(variation)}(
+                  {arrow} {percentFormatterWithoutSign.format(variation)}
+                </p>
+              </div>
+              <div>
+                <p>Variação Posição (R$)</p>
+                <p className={css}>
                   {moneyFormatter.format(
                     walletWorth - walletWorth / (1 + variation)
                   )}
-                  )
                 </p>
               </div>
               <div>

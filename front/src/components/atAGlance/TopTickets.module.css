@@ -1,3 +1,7 @@
+:root {
+  --top-tickets-width: 0.5rem;
+}
+
 .top-tickets {
   width: 100%;
   height: 100%;
@@ -8,12 +12,11 @@
 }
 
 .chart-legend {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: var(--top-tickets-width);
+  height: var(--top-tickets-width);
   border-radius: 50%;
   position: relative;
   display: inline-block;
-  bottom: 3px;
   border: solid 1px rgba(0, 0, 0, 0.5);
 }
 
@@ -24,6 +27,7 @@ p {
 .value-change {
   display: flex;
   justify-content: space-between;
+  max-width: 250px;
 }
 
 .red {
@@ -32,4 +36,13 @@ p {
 
 .green {
   color: #57cc99;
+}
+
+@media (min-width: 615px) {
+  :root {
+    --top-tickets-width: 0.8rem;
+  }
+  .top-tickets {
+    font-size: 1.3rem;
+  }
 }

@@ -171,7 +171,7 @@ function TickerTable(props) {
           )}
         </button>
         <button data-sort={AVERAGE_VALUE} type="button">
-          PM{" "}
+          CM{" "}
           {sortBy === AVERAGE_VALUE ? (
             <BsArrowDown />
           ) : sortBy === AVERAGE_VALUE_INVERSE ? (
@@ -201,8 +201,8 @@ function TickerTable(props) {
             <div className={styles.th} data-tip="Quantidade">
               QNT
             </div>
-            <div className={styles.th} data-tip="Preço Médio (R$)">
-              PM
+            <div className={styles.th} data-tip="Custo Médio (R$)">
+              CM
             </div>
             <div className={styles.th} data-tip="Valor da Transação (R$)">
               VT

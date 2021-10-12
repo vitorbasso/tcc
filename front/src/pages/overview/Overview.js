@@ -159,9 +159,7 @@ function Overview() {
               <p>
                 {walletArrow} {percentFormatter.format(walletVariation)}
               </p>
-              <div>
-                ({moneyFormatter.format(walletValue - lastWalletValue)})
-              </div>
+              <p>({moneyFormatter.format(walletValue - lastWalletValue)})</p>
             </div>
           </section>
         )}
@@ -190,12 +188,12 @@ function Overview() {
             {wallet.stockAssets.length !== 0 && (
               <div>
                 <p>{numberFormatter.format(assetAmount ?? 0)}</p>
-                <div>
+                <p>
                   <Money value={assetAverageCost} />
-                </div>
-                <div>
+                </p>
+                <p>
                   <Money value={assetTotalValue} />
-                </div>
+                </p>
               </div>
             )}
           </div>

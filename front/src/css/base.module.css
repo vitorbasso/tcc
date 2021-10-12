@@ -1,6 +1,10 @@
+:root {
+  --port-size: 100vw;
+}
+
 .container {
   margin: 0 auto;
-  width: 88%;
+  width: calc(var(--port-size) * 0.88);
   padding: 5vh 0 5vh;
   color: var(--main-gray);
 }
@@ -26,15 +30,15 @@
 }
 
 .money {
-  font-size: 13.5vw;
+  font-size: calc(var(--port-size) * 0.135);
 }
 
 .money-7 {
-  font-size: 8.5vw;
+  font-size: calc(var(--port-size) * 0.085);
 }
 
 .money-10 {
-  font-size: 6.5vw;
+  font-size: calc(var(--port-size) * 0.065);
 }
 
 .money span > *:first-child,
@@ -278,9 +282,26 @@ div.delete-prompt-overlay {
   background-color: rgba(255, 255, 255, 0.7);
 }
 
+@media (min-width: 615px) {
+  :root {
+    --port-size: 615px;
+  }
+  .money span > *:first-child,
+  .money span > *:last-child {
+    font-size: 3rem;
+  }
+}
+
 @media (min-width: 1280px) {
+  :root {
+    --port-size: 1280px;
+  }
+  .money span > *:first-child,
+  .money span > *:last-child {
+    font-size: 4.5rem;
+  }
   .container {
-    width: 1024px; /* 80% de 690 */
+    width: calc(var(--port-size) * 0.8); /* 80% da viewport */
     margin: 0 auto;
   }
 }
