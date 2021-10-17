@@ -7,17 +7,27 @@
   align-content: center;
   padding-bottom: 1.5rem;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.section__assets {
-  margin: 0 auto;
+.overview > div {
+  width: 100%;
+  font-size: 1.3rem;
+  margin: 1rem auto;
+  display: flex;
+  justify-content: center;
+}
+
+.overview > div p {
+  margin-right: 0.5rem;
+}
+
+.overview {
+  margin-bottom: 2rem;
 }
 
 .pie-chart__pie-chart {
   width: var(--pie-dimension);
   height: var(--pie-dimension);
-  margin-bottom: 1rem;
 }
 
 .pie-chart__empty-phrase {
@@ -34,8 +44,12 @@
 .pie-chart__selected-legend {
   width: var(--pie-dimension);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+}
+
+.pie-chart__selected-legend p {
+  margin-right: 1rem;
 }
 
 .pie-chart__selected-info {
@@ -43,16 +57,42 @@
   flex-direction: column;
   width: var(--pie-dimension);
   justify-content: space-around;
+  align-items: center;
 }
 
 .pie-chart__selected-info div {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+}
+
+.pie-chart__selected-info div div {
+  margin-right: 1rem;
+}
+
+.top-tickets__container {
+  width: 80%;
+  margin: 0.5vh auto;
+}
+
+.red {
+  color: #ea526f;
+}
+
+.green {
+  color: #57cc99;
 }
 
 @media (min-width: 615px) {
   .section__pie-chart {
     --pie-dimension: calc(615px * 0.65);
+  }
+
+  .overview > div {
+    font-size: 1.8rem;
+  }
+
+  .overview > div p {
+    margin-right: 1.5rem;
   }
 
   .section__assets {
@@ -62,25 +102,35 @@
 
 @media (min-width: 1280px) {
   .section__pie-chart {
-    width: 800px;
-    margin: 5rem auto 0;
-    grid-template-columns: 2fr 1fr;
-    grid-template-rows: 5fr 0.5fr;
+    margin: 3rem auto 0;
+    grid-template-areas:
+      "graph tickets"
+      "selected tickets";
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 5fr 1fr;
   }
   .pie-chart__selected-info {
-    justify-self: flex-start;
     justify-content: center;
-    width: 250px;
+    grid-area: selected;
   }
-  .pie-chart__selected-legend {
-    width: 250px;
-    display: flex;
+
+  .pie-chart__pie-chart {
+    grid-area: graph;
   }
   .pie-chart__selected-info > div {
     margin-top: 1rem;
   }
 
+  .overview > div {
+    font-size: 2.3rem;
+  }
+
+  .overview > div p {
+    margin-right: 3rem;
+  }
+
   .asset-table {
+    grid-area: tickets;
     display: flex;
     flex-wrap: wrap;
   }

@@ -31,9 +31,14 @@ function TopTickets(props) {
             : [null, ""];
         return (
           <Link
-            to={`performance/${assetInfo.asset.stockSymbol}`}
+            to={{
+              pathname: `performance/${assetInfo.asset.stockSymbol}`,
+              state: {
+                caller: props.caller || "/",
+              },
+            }}
             key={`top-tickets-${assetInfo.asset.id}`}
-            className={`${styles["value-change"]} ${css}`}
+            className={`${styles["value-change"]} ${props.className} ${css}`}
           >
             <span>
               <div className={`${styles["chart-legend"]} ${colorCss}`}></div>

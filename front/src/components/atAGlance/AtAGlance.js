@@ -3,46 +3,69 @@ import styles from "./AtAGlance.module.css";
 import TopTickets from "./TopTickets";
 import PieSelected from "../piechart/PieSelected";
 import QuickSoldView from "./QuickSoldView";
-import { useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import WalletContext from "../../context/wallet-context";
-
-function compareAssetValue(first, second) {
-  const firstValue = first.amount * first.averageCost;
-  const secondValue = second.amount * second.averageCost;
-  if (firstValue > secondValue) return -1;
-  else if (firstValue < secondValue) return 1;
-  else return 0;
-}
+import StocksContext from "../../context/stock-context";
 
 function AtAGlance(props) {
   const { wallet } = useContext(WalletContext);
+  const { stocks } = useContext(StocksContext);
   const [selectedAsset, setSelectedAsset] = useState({});
+  const compareCallback = useCallback(
+    (first, second) => {
+      const stock1 = stocks.find((stock) => stock.ticker === first.stockSymbol);
+      const stock2 = stocks.find(
+        (stock) => stock.ticker === second.stockSymbol
+      );
+      const firstValue =
+        first.amount * (stock1?.currentValue ?? first.averageCost);
+      const secondValue =
+        second.amount * (stock2?.currentValue ?? second.averageCost);
+      if (firstValue > secondValue) return -1;
+      else if (firstValue < secondValue) return 1;
+      else return 0;
+    },
+    [stocks]
+  );
   const assetsMemo = useMemo(() => {
     if (wallet) {
       const sortedAssets = wallet.stockAssets
         .filter((asset) => asset.amount !== 0)
-        .sort(compareAssetValue);
+        .sort(compareCallback);
       const totalValue = sortedAssets.reduce((total, asset) => {
-        return total + asset.amount * asset.averageCost;
+        const stock = stocks.find(
+          (stock) => stock.ticker === asset.stockSymbol
+        );
+        return (
+          total + asset.amount * (stock?.currentValue ?? asset.averageCost)
+        );
       }, 0);
       const assets = sortedAssets.map((asset, index) => {
+        const stock = stocks.find(
+          (stock) => stock.ticker === asset.stockSymbol
+        );
+        const value = asset.amount * (stock?.currentValue ?? asset.averageCost);
         return {
           label: asset.stockSymbol,
           link: `/${asset.stockSymbol}`,
-          value: asset.amount * asset.averageCost,
+          value: value,
           asset: asset,
           index,
           percentage:
             totalValue && totalValue !== 0 && !Number.isNaN(totalValue)
-              ? (asset.amount * asset.averageCost) / totalValue
+              ? value / totalValue
               : 0,
         };
       });
       const restAsset = sortedAssets.slice(3)?.reduce(
           (assetRest, asset) => {
-            const totalValue = asset.amount * asset.averageCost;
+            const stock = stocks.find(
+              (stock) => stock.ticker === asset.stockSymbol
+            );
+            const assetValue =
+              asset.amount * (stock?.currentValue ?? asset.averageCost);
             const amount = assetRest.amount + asset.amount;
-            const value = assetRest.value + totalValue;
+            const value = assetRest.value + assetValue;
             return {
               amount,
               value,
@@ -67,7 +90,7 @@ function AtAGlance(props) {
         (asset) => asset.value && asset.value !== 0 && asset.percentage
       );
     }
-  }, [wallet]);
+  }, [wallet, stocks, compareCallback]);
   const labels = assetsMemo.map((asset) => asset.label);
   const data = assetsMemo.map((asset) => asset.value);
 

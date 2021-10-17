@@ -3,25 +3,31 @@ import PieSelected from "../../components/piechart/PieSelected";
 import Header from "../../components/header/Header";
 import baseStyles from "../../css/base.module.css";
 import styles from "./Overview.module.css";
-import { numberFormatter } from "../../utils/formatterUtils";
+import {
+  moneyFormatter,
+  numberFormatter,
+  percentFormatter,
+} from "../../utils/formatterUtils";
 import Money from "../../components/money/Money";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import WalletContext from "../../context/wallet-context";
 import { Link } from "react-router-dom";
 import StocksContext from "../../context/stock-context";
-import AssetTable from "../../components/table/assets/AssetTable";
+import TopTickets from "../../components/atAGlance/TopTickets";
+import { getMoneyClass } from "../../utils/cssUtils";
+import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 
-function compareAssetValue(first, second) {
-  const firstValue = first.amount * first.averageCost;
-  const secondValue = second.amount * second.averageCost;
-  if (firstValue > secondValue) return -1;
-  else if (firstValue < secondValue) return 1;
-  else return 0;
+function getVariationStyle(variation) {
+  return variation > 0
+    ? [<BsArrowUp />, styles.green]
+    : variation < 0
+    ? [<BsArrowDown />, styles.red]
+    : [null, ""];
 }
 
 function Overview() {
   const { wallet, fetchWallet } = useContext(WalletContext);
-  const { fetchStocks } = useContext(StocksContext);
+  const { stocks, fetchStocks } = useContext(StocksContext);
   const [selectedAsset, setSelectedAsset] = useState({});
   useEffect(() => {
     fetchWallet();
@@ -30,46 +36,83 @@ function Overview() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const compareCallback = useCallback(
+    (first, second) => {
+      const stock1 = stocks.find((stock) => stock.ticker === first.stockSymbol);
+      const stock2 = stocks.find(
+        (stock) => stock.ticker === second.stockSymbol
+      );
+      const firstValue =
+        first.amount * (stock1?.currentValue ?? first.averageCost);
+      const secondValue =
+        second.amount * (stock2?.currentValue ?? second.averageCost);
+      if (firstValue > secondValue) return -1;
+      else if (firstValue < secondValue) return 1;
+      else return 0;
+    },
+    [stocks]
+  );
   const assetsMemo = useMemo(() => {
     if (wallet) {
       const sortedAssets = wallet.stockAssets
         .filter((asset) => asset.amount !== 0)
-        .sort(compareAssetValue);
+        .sort(compareCallback);
       const totalValue = sortedAssets.reduce((total, asset) => {
-        return total + asset.amount * asset.averageCost;
+        const stock = stocks.find(
+          (stock) => stock.ticker === asset.stockSymbol
+        );
+        return (
+          total + asset.amount * (stock?.currentValue ?? asset.averageCost)
+        );
       }, 0);
       const assets = sortedAssets.map((asset, index) => {
+        const stock = stocks.find(
+          (stock) => stock.ticker === asset.stockSymbol
+        );
+        const value = asset.amount * (stock?.currentValue ?? asset.averageCost);
         return {
           label: asset.stockSymbol,
           link: `/${asset.stockSymbol}`,
-          value: asset.amount * asset.averageCost,
+          value: value,
+          currentPrice: stock?.currentValue ?? 0,
+          lastPrice: (stock?.lastClose ?? 0) * asset.amount,
           asset: asset,
           index,
           percentage:
             totalValue && totalValue !== 0 && !Number.isNaN(totalValue)
-              ? (asset.amount * asset.averageCost) / totalValue
+              ? value / totalValue
               : 0,
         };
       });
       const restAsset = sortedAssets.slice(9)?.reduce(
           (assetRest, asset) => {
-            const totalValue = asset.amount * asset.averageCost;
+            const stock = stocks.find(
+              (stock) => stock.ticker === asset.stockSymbol
+            );
+            const assetValue =
+              asset.amount * (stock?.currentValue ?? asset.averageCost);
             const amount = assetRest.amount + asset.amount;
-            const value = assetRest.value + totalValue;
+            const value = assetRest.value + assetValue;
+            const lastPrice =
+              assetRest.lastPrice + (stock?.lastClose ?? 0) * asset.amount;
             return {
               amount,
               value,
-              averageCost: value / amount,
+              currentPrice: value / amount,
+              lastPrice,
             };
           },
-          { amount: 0, value: 0 }
+          { amount: 0, value: 0, lastPrice: 0 }
         ),
         assetRest = {
           label: "Outros",
           link: "",
           value: restAsset.value,
           asset: restAsset,
-          index: 3,
+          currentPrice: restAsset.currentPrice,
+          lastPrice: restAsset.lastPrice,
+          index: 9,
           percentage:
             totalValue && totalValue !== 0 && !Number.isNaN(totalValue)
               ? restAsset.value / totalValue
@@ -80,13 +123,24 @@ function Overview() {
         (asset) => asset.value && asset.value !== 0 && asset.percentage
       );
     }
-  }, [wallet]);
+  }, [wallet, stocks, compareCallback]);
   const labels = assetsMemo.map((asset) => asset.label);
   const data = assetsMemo.map((asset) => asset.value);
 
   const assetAmount = selectedAsset?.asset?.amount;
-  const assetAverageCost = selectedAsset?.asset?.averageCost;
-  const assetTotalValue = assetAmount * assetAverageCost;
+  const assetAverageCost = selectedAsset?.currentPrice;
+  const assetTotalValue = selectedAsset?.value;
+  const walletValue = assetsMemo.reduce(
+    (total, asset) => total + asset.value,
+    0
+  );
+  const lastWalletValue = assetsMemo.reduce(
+    (total, asset) => total + asset.lastPrice,
+    0
+  );
+  const walletVariation = (walletValue - lastWalletValue) / lastWalletValue;
+  const [walletArrow, walletCss] = getVariationStyle(walletVariation);
+  const moneyStyle = getMoneyClass(walletValue);
 
   function chartClickHandler(selected) {
     setSelectedAsset(assetsMemo[selected[0]?.index ?? 0]);
@@ -98,6 +152,17 @@ function Overview() {
         <h2>Visão Geral</h2>
       </Header>
       <main>
+        <Money className={baseStyles[moneyStyle]} value={walletValue} />
+        {data.length !== 0 && (
+          <section className={styles.overview}>
+            <div className={walletCss}>
+              <p>
+                {walletArrow} {percentFormatter.format(walletVariation)}
+              </p>
+              <p>({moneyFormatter.format(walletValue - lastWalletValue)})</p>
+            </div>
+          </section>
+        )}
         <section className={styles["section__pie-chart"]}>
           {data.length !== 0 && (
             <PieChart
@@ -122,7 +187,7 @@ function Overview() {
             />
             {wallet.stockAssets.length !== 0 && (
               <div>
-                <p>{numberFormatter.format(assetAmount ?? 0)}</p>
+                <div>{numberFormatter.format(assetAmount ?? 0)}</div>
                 <div>
                   <Money value={assetAverageCost} />
                 </div>
@@ -132,11 +197,9 @@ function Overview() {
               </div>
             )}
           </div>
-        </section>
-        <section className={styles["section__assets"]}>
-          <AssetTable
-            assets={wallet.stockAssets}
-            className={styles["asset-table"]}
+          <TopTickets
+            className={styles["top-tickets__container"]}
+            assets={assetsMemo.slice(0, 9)}
             caller={"/overview"}
           />
         </section>

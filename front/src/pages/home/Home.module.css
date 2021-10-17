@@ -1,15 +1,3 @@
 .section {
   margin-bottom: 2rem;
 }
-
-@media (min-width: 1024px) {
-  .money {
-    font-size: 138.24px;
-  }
-  .money-7 {
-    font-size: 87.04px;
-  }
-  .money-10 {
-    font-size: 66.56px;
-  }
-}

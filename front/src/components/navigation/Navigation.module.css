@@ -3,5 +3,20 @@
   width: 100%;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: 2rem;
+  gap: 1.5rem;
+}
+
+@media (min-width: 615px) {
+  .navigation {
+    width: calc(615px * 0.9);
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1280px) {
+  .navigation {
+    width: 100%;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr;
+  }
 }

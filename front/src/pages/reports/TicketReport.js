@@ -3,7 +3,7 @@ import { BsArrowDown, BsArrowUp, BsTrash } from "react-icons/bs";
 import { useLocation, useParams, Redirect } from "react-router-dom";
 import Header from "../../components/header/Header";
 import Money from "../../components/money/Money";
-import TickerTable from "../../components/table/TickerTable";
+import TickerTable from "../../components/table/ticker/TickerTable";
 import { ASSET_URL } from "../../constants/paths";
 import StocksContext from "../../context/stock-context";
 import WalletContext from "../../context/wallet-context";
@@ -14,7 +14,6 @@ import useLogout from "../../hooks/useLogout";
 import { getMoneyClass } from "../../utils/cssUtils";
 import {
   moneyFormatter,
-  percentFormatter,
   percentFormatterWithoutSign,
 } from "../../utils/formatterUtils";
 import styles from "./TicketReport.module.css";
@@ -29,6 +28,7 @@ function updateNavSelected(id) {
 }
 
 function getVariationStyle(variation) {
+  if (typeof variation !== "number") return [null, ""];
   return variation > 0
     ? [<BsArrowUp />, styles.green]
     : variation < 0
@@ -43,7 +43,6 @@ function TicketReport() {
   const { stocks, fetchStocks } = useContext(StocksContext);
   const [deleted, setDeleted] = useState(false);
   const [variation, setVariation] = useState(0);
-  const [selection, setSelection] = useState("dia");
   const location = useLocation();
   const [sentRequest, setSentRequest] = useState(false);
   const { result, error, isLoading, sendRequest } = useHttp();
@@ -98,6 +97,7 @@ function TicketReport() {
   let variationMonth = 0;
   let variationYear = 0;
   let currentValue = 0;
+  let currentTotalValue = 0;
   let asset;
   if (wallet) {
     asset = wallet.stockAssets.find((asset) => asset.stockSymbol === id);
@@ -111,13 +111,15 @@ function TicketReport() {
           return (total +=
             asset.amount > 0 ? asset.averageCost * asset.amount : 0);
         }, 0);
-      lifetimeBalance = asset.lifetimeBalance;
+      lifetimeBalance =
+        Number.parseFloat(assetTotalValue.toFixed(2)) + asset.lifetimeBalance;
     }
   }
   if (stocks) {
     const stock = stocks.find((stock) => stock.ticker === id);
     if (stock) {
       currentValue = stock.currentValue;
+      currentTotalValue = currentValue * amount;
       variationDay = currentValue / stock.lastClose - 1;
       variationWeek = currentValue / stock.lastWeekClose - 1;
       variationMonth = currentValue / stock.lastMonthClose - 1;
@@ -154,7 +156,7 @@ function TicketReport() {
   const profit = currentValue * amount - assetTotalValue;
   const profitVariation = profit / assetTotalValue;
 
-  const moneyClass = getMoneyClass(currentValue);
+  const moneyClass = getMoneyClass(currentTotalValue);
 
   function filter(filterBy) {
     const lastSelected = document.querySelector(`.${styles.selected}`);
@@ -164,65 +166,34 @@ function TicketReport() {
       case DAY:
         setVariation(variationDay);
         updateNavSelected(DAY);
-        setSelection("dia");
         break;
       case WEEK:
         setVariation(variationWeek);
         updateNavSelected(WEEK);
-        setSelection("semana");
         break;
       case MONTH:
         setVariation(variationMonth);
         updateNavSelected(MONTH);
-        setSelection("mês");
         break;
       case YEAR:
         setVariation(variationYear);
         updateNavSelected(YEAR);
-        setSelection("ano");
         break;
       default:
         console.error(`cannot filter by ${filterBy} `);
     }
   }
   const [arrow, css] = getVariationStyle(variation);
+  const [balanceArrow, balanceCss] = getVariationStyle(lifetimeBalance);
 
   const [difArrow, difCss] = getVariationStyle(profit);
 
   return (
     <div className={baseStyles.container}>
       <Header backButton caller={location.state?.caller || "/"}>
-        <h2>Ticker</h2>
+        <h2>Ação</h2>
       </Header>
       <main>
-        <nav className={styles.nav}>
-          <ul>
-            <li>
-              <button
-                id={DAY}
-                className={styles.selected}
-                onClick={filter.bind(this, DAY)}
-              >
-                dia
-              </button>
-            </li>
-            <li>
-              <button id={WEEK} onClick={filter.bind(this, WEEK)}>
-                semana
-              </button>
-            </li>
-            <li>
-              <button id={MONTH} onClick={filter.bind(this, MONTH)}>
-                mês
-              </button>
-            </li>
-            <li>
-              <button id={YEAR} onClick={filter.bind(this, YEAR)}>
-                ano
-              </button>
-            </li>
-          </ul>
-        </nav>
         <section className={styles.overview}>
           <span>{id}</span>
           <span>
@@ -238,50 +209,111 @@ function TicketReport() {
             </i>
           </span>
         </section>
-        <Money value={currentValue} className={`${baseStyles[moneyClass]}`} />
+        <Money
+          value={currentTotalValue}
+          className={`${baseStyles[moneyClass]}`}
+        />
         <section className={styles.info}>
           <div>
-            <p>Qnt {Intl.NumberFormat("pt-BR").format(amount)}</p>
-            <p>
-              <span>Preço médio </span>
-              <span>{moneyFormatter.format(averageValue)}</span>
+            <p>Custo Total</p>
+            <p>{moneyFormatter.format(assetTotalValue)}</p>
+          </div>
+          <div>
+            <p>Custo Médio</p>
+            <p>{moneyFormatter.format(averageValue)}</p>
+          </div>
+          <div>
+            <p>Quantidade</p>
+            <p>{Intl.NumberFormat("pt-BR").format(amount)}</p>
+          </div>
+        </section>
+        <section className={styles.info}>
+          <div>
+            <p>Preço Atual</p>
+            <p>{moneyFormatter.format(currentValue)}</p>
+          </div>
+          <div>
+            <p>Valorização (%)</p>
+            <p className={difCss}>
+              {difArrow}
+              {percentFormatterWithoutSign.format(profitVariation)}
             </p>
           </div>
           <div>
-            <p>Valor Pago {moneyFormatter.format(assetTotalValue)}</p>
+            <p>Valorização (R$)</p>
+            <p className={difCss}>{moneyFormatter.format(profit)}</p>
           </div>
           <div>
-            <p>Valor Atual {moneyFormatter.format(currentValue * amount)}</p>
+            <p>Balanço Histórico </p>
+            <p className={balanceCss}>
+              {balanceArrow}
+              {moneyFormatter.format(lifetimeBalance)}
+            </p>
+          </div>
+        </section>
+        <section className={styles.info}>
+          <nav className={styles.nav}>
+            <ul>
+              <li>
+                <button
+                  id={DAY}
+                  className={styles.selected}
+                  onClick={filter.bind(this, DAY)}
+                >
+                  dia
+                </button>
+              </li>
+              <li>
+                <button id={WEEK} onClick={filter.bind(this, WEEK)}>
+                  semana
+                </button>
+              </li>
+              <li>
+                <button id={MONTH} onClick={filter.bind(this, MONTH)}>
+                  mês
+                </button>
+              </li>
+              <li>
+                <button id={YEAR} onClick={filter.bind(this, YEAR)}>
+                  ano
+                </button>
+              </li>
+            </ul>
+          </nav>
+          <div>
+            <p>Valor fechamento</p>
+            <p>{moneyFormatter.format(currentValue / (1 + variation))}</p>
           </div>
           <div>
-            <p>
-              Situação{" "}
-              <span className={difCss}>
-                {difArrow}
-                {percentFormatterWithoutSign.format(profitVariation)} - (
-                {moneyFormatter.format(profit)})
-              </span>
+            <p>Variação Ticker (%)</p>
+            <p className={css}>
+              <span>{arrow}</span>
+              <span>{percentFormatterWithoutSign.format(variation)}</span>
             </p>
           </div>
           <div>
-            <p>Balanço Histórico {moneyFormatter.format(lifetimeBalance)}</p>
-          </div>
-          <div>
-            <p>variação {selection}</p>
-          </div>
-          <div className={`${styles.variation} ${css}`}>
-            <span>{arrow}</span>
-            <span>{percentFormatter.format(variation)}</span>
-            <span>
-              (
+            <span>Variação Ticker (R$)</span>
+            <span className={css}>
               {moneyFormatter.format(
                 currentValue - currentValue / (1 + variation)
               )}
-              )
             </span>
+          </div>
+
+          <div>
+            <p>Variação Posição</p>
+            <p className={css}>
+              <span>{arrow}</span>
+              <span>
+                {moneyFormatter.format(
+                  currentTotalValue - currentTotalValue / (1 + variation)
+                )}
+              </span>
+            </p>
           </div>
         </section>
         <section>
+          <h3 className={styles["table-title"]}>Transações</h3>
           <TickerTable
             transactions={transactions}
             symbol={id}
