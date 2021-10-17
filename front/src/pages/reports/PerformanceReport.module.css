@@ -13,7 +13,7 @@
 .nav ul li button {
   border: none;
   border-radius: 10px;
-  min-width: 3rem;
+  min-width: 4.4rem;
   cursor: pointer;
   color: #fff;
   font-weight: normal;
@@ -39,10 +39,6 @@
   box-shadow: none;
 }
 
-.money {
-  margin-top: 2rem;
-}
-
 .empty-transaction-text {
   height: 35vh;
   display: flex;
@@ -53,11 +49,9 @@
   margin: 0 auto;
 }
 
-.money {
-  height: 5rem;
-}
-
 section.info {
+  --max-width-multiplier: 615px;
+  max-width: calc(var(--max-width-multiplier) * 0.9);
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
@@ -82,4 +76,30 @@ section h3.table-title {
   text-align: center;
   font-size: 1.5rem;
   margin-bottom: 2rem;
+}
+
+@media (min-width: 615px) {
+  section.info {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  section.info div {
+    font-size: 1.5rem;
+  }
+
+  section.section__assets h3.table-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  section.info {
+    --max-width-multiplier: 800px;
+  }
+  section.info div {
+    font-size: 1.8rem;
+  }
+  section.section__assets h3.table-title {
+    font-size: 2rem;
+  }
 }

@@ -168,10 +168,7 @@ function PerformanceReport() {
       <main>
         {assets.length !== 0 && (
           <Fragment>
-            <Money
-              value={walletWorth}
-              className={`${styles.money} ${baseStyles[moneyClass]}`}
-            />
+            <Money value={walletWorth} className={baseStyles[moneyClass]} />
             <section className={styles.info}>
               <div>
                 <p>Custo Total </p>
