@@ -1,7 +1,3 @@
-.money {
-  text-align: start;
-}
-
 .loss {
   color: var(--error-red);
 }
@@ -55,11 +51,19 @@ input.month-input:focus {
 }
 
 .glance h3 {
+  --max-width-multiplier: 615px;
+  max-width: calc(var(--max-width-multiplier) * 0.9);
+  margin-left: auto;
+  margin-right: auto;
   font-size: 1rem;
   margin-bottom: 1em;
 }
 
 .overview {
+  --max-width-multiplier: 615px;
+  max-width: calc(var(--max-width-multiplier) * 0.9);
+  margin-left: auto;
+  margin-right: auto;
   margin-bottom: 4rem;
   font-weight: bold;
 }
@@ -98,8 +102,79 @@ li.sub-list .inline-money {
 }
 
 .action {
+  --max-width-multiplier: 615px;
+  max-width: calc(var(--max-width-multiplier) * 0.9);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   height: 8rem;
+}
+
+@media (min-width: 615px) {
+  .glance h3 {
+    font-size: 1.5rem;
+  }
+  .glance .calendar-icon {
+    font-size: 2rem;
+  }
+  .inline-money {
+    font-size: 1.7rem;
+  }
+  .overview {
+    font-size: 1.5rem;
+  }
+  .overview ul li.sub-list {
+    font-size: 1rem;
+  }
+
+  li.sub-list .inline-money {
+    font-size: 1.2rem;
+  }
+
+  .overview p {
+    font-size: 1.7rem;
+  }
+
+  .overview > div {
+    font-size: 1.7rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .glance h3 {
+    font-size: 2rem;
+  }
+
+  .glance .calendar-icon {
+    font-size: 2.5rem;
+    left: -36px;
+    top: 10px;
+  }
+  .month-input {
+    width: 3.5rem;
+  }
+  .overview {
+    --max-width-multiplier: 800px;
+  }
+  .inline-money {
+    font-size: 2rem;
+  }
+  .overview {
+    font-size: 1.8rem;
+  }
+  .overview ul li.sub-list {
+    font-size: 1.4rem;
+  }
+
+  li.sub-list .inline-money {
+    font-size: 1.6rem;
+  }
+  .overview p {
+    font-size: 2rem;
+  }
+
+  .overview > div {
+    font-size: 2rem;
+  }
 }

@@ -252,6 +252,7 @@
 }
 
 .delete-prompt {
+  max-width: calc(615px * 0.8);
   width: 80%;
   margin: auto;
   padding: 1rem;

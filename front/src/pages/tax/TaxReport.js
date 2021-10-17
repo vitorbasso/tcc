@@ -157,10 +157,7 @@ function TaxReport() {
               <BiCalendarCheck />
             </span>
           </h3>
-          <Money
-            className={`${styles.money} ${baseStyles[moneyClass]}`}
-            value={totalTax}
-          />
+          <Money className={baseStyles[moneyClass]} value={totalTax} />
         </section>
         <section className={styles.overview} ref={printRef}>
           <ul>
