@@ -5,3 +5,22 @@
 .link {
   color: var(--main-gray);
 }
+
+@media (min-width: 615px) {
+  .money-size {
+    font-size: 1.8rem;
+  }
+  .link {
+    font-size: 1.3rem;
+    /* width: 80%; */
+  }
+}
+
+@media (min-width: 1280px) {
+  .money-size {
+    font-size: 2rem;
+  }
+  .link {
+    width: 80%;
+  }
+}

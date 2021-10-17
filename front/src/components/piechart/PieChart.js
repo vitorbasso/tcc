@@ -56,6 +56,11 @@ function PieChart(props) {
           onClick: (_, selected) => {
             props.onClick(selected);
           },
+          onHover: (event, chartElement) => {
+            event.native.target.style.cursor = chartElement[0]
+              ? "pointer"
+              : "default";
+          },
         }}
       ></Doughnut>
     </div>
