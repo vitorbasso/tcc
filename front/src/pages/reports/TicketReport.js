@@ -204,7 +204,11 @@ function TicketReport() {
             )}
           </span>
           <span>
-            <i onClick={deleteHandler} className={styles.red} data-id={id}>
+            <i
+              onClick={deleteHandler}
+              className={`${styles.red} ${styles.delete}`}
+              data-id={id}
+            >
               <BsTrash />
             </i>
           </span>
