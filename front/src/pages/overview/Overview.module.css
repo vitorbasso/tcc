@@ -65,7 +65,7 @@
   justify-content: center;
 }
 
-.pie-chart__selected-info div p {
+.pie-chart__selected-info div div {
   margin-right: 1rem;
 }
 

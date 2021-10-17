@@ -187,13 +187,13 @@ function Overview() {
             />
             {wallet.stockAssets.length !== 0 && (
               <div>
-                <p>{numberFormatter.format(assetAmount ?? 0)}</p>
-                <p>
+                <div>{numberFormatter.format(assetAmount ?? 0)}</div>
+                <div>
                   <Money value={assetAverageCost} />
-                </p>
-                <p>
+                </div>
+                <div>
                   <Money value={assetTotalValue} />
-                </p>
+                </div>
               </div>
             )}
           </div>

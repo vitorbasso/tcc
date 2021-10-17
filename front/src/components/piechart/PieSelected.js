@@ -23,9 +23,9 @@ function PieSelected(props) {
       }}
       className={`${styles.selected} ${props.className}`}
     >
-      <p>
+      <div>
         <div className={bar}></div>
-      </p>
+      </div>
       <p>{percentOfWallet}</p>
       {props.selected?.label && <p>{props.selected.label}</p>}
     </Link>
