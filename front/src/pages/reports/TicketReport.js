@@ -213,10 +213,15 @@ function TicketReport() {
             </i>
           </span>
         </section>
-        <Money
-          value={currentTotalValue}
-          className={`${baseStyles[moneyClass]}`}
-        />
+        <div className={styles.main}>
+          <Money
+            value={currentTotalValue}
+            className={`${baseStyles[moneyClass]}`}
+          />
+          <span className={`${styles.superscribed} ${difCss}`}>
+            {difArrow} {percentFormatterWithoutSign.format(profitVariation)}
+          </span>
+        </div>
         <section className={styles.info}>
           <div>
             <p>Custo Total</p>

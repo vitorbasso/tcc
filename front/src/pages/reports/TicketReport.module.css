@@ -39,6 +39,12 @@
   box-shadow: none;
 }
 
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
 .overview {
   --max-width-multiplier: 615px;
   max-width: calc(var(--max-width-multiplier) * 0.9);
@@ -105,6 +111,10 @@ section h3.table-title {
   section h3.table-title {
     font-size: 1.8rem;
   }
+  .superscribed {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -123,5 +133,9 @@ section h3.table-title {
   }
   section h3.table-title {
     font-size: 2rem;
+  }
+  .superscribed {
+    font-size: 1.4rem;
+    margin-top: 4rem;
   }
 }
