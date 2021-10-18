@@ -18,3 +18,23 @@
 .header i svg {
   display: block;
 }
+
+@media (min-width: 615px) {
+  .header h3 {
+    font-size: 2rem;
+    margin-right: 1rem;
+  }
+  .header h2 {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .header h3 {
+    font-size: 2.4rem;
+  }
+
+  .header h2 {
+    font-size: 3.5rem;
+  }
+}

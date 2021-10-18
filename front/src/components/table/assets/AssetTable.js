@@ -68,8 +68,9 @@ function AssetTable(props) {
   const [sortBy, setSortBy] = useState(NAME);
   const [assetsToDisplay, setAssetsToDisplay] = useState([]);
   const { stocks } = useContext(StocksContext);
+  const [isChecked, setIsChecked] = useState(true);
   useEffect(() => {
-    setAssetsToDisplay(props.assets);
+    setAssetsToDisplay(props.assets.filter((asset) => asset.amount !== 0));
   }, [props.assets]);
   const assets = assetsToDisplay.sort((first, second) => {
     switch (sortBy) {
@@ -92,8 +93,10 @@ function AssetTable(props) {
     }
   });
   function toggleZeroQuantityTransactions(event) {
-    if (event.currentTarget.checked)
-      setAssetsToDisplay(props.assets.filter((asset) => asset.amount > 0));
+    const checked = isChecked;
+    setIsChecked((state) => !state);
+    if (!checked)
+      setAssetsToDisplay(props.assets.filter((asset) => asset.amount !== 0));
     else setAssetsToDisplay(props.assets);
   }
 
@@ -120,6 +123,7 @@ function AssetTable(props) {
             id="hide-zero"
             type="checkbox"
             onChange={toggleZeroQuantityTransactions}
+            checked={isChecked}
           />
           Esconder ações com quantidade zero
         </span>
@@ -196,8 +200,9 @@ function AssetTable(props) {
               (stock) => stock.ticker === asset.stockSymbol
             );
             const currentValue = stock?.currentValue ?? 0;
-            const variation =
-              (currentValue - asset.averageCost) / asset.averageCost;
+            const variation = asset.averageCost
+              ? (currentValue - asset.averageCost) / asset.averageCost
+              : 0;
             const css = getVariationStyle(variation);
             const valorization = currentValue * asset.amount;
             return (
@@ -226,7 +231,7 @@ function AssetTable(props) {
                   <div className={`${css} ${styles.td}`}>
                     {percentFormatterClean(variation)}
                   </div>
-                  <div className={`${css} ${styles.td}`}>
+                  <div className={styles.td}>
                     {abbreviateNumber(valorization)}
                   </div>
                 </div>

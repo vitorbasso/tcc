@@ -168,10 +168,12 @@ function PerformanceReport() {
       <main>
         {assets.length !== 0 && (
           <Fragment>
-            <Money
-              value={walletWorth}
-              className={`${styles.money} ${baseStyles[moneyClass]}`}
-            />
+            <div className={styles.main}>
+              <Money value={walletWorth} className={baseStyles[moneyClass]} />
+              <span className={`${styles.superscribed} ${difCss}`}>
+                {difArrow} {percentFormatterWithoutSign.format(profitVariation)}
+              </span>
+            </div>
             <section className={styles.info}>
               <div>
                 <p>Custo Total </p>

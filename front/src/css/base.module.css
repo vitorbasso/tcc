@@ -252,6 +252,7 @@
 }
 
 .delete-prompt {
+  max-width: calc(615px * 0.8);
   width: 80%;
   margin: auto;
   padding: 1rem;
@@ -290,6 +291,17 @@ div.delete-prompt-overlay {
   .money span > *:last-child {
     font-size: 3rem;
   }
+  .form-control input {
+    font-size: 1.1rem;
+  }
+
+  .form-control input:focus {
+    font-size: 1.3rem;
+  }
+
+  .form-control input:focus::placeholder {
+    font-size: 1.3rem;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -303,5 +315,17 @@ div.delete-prompt-overlay {
   .container {
     width: calc(var(--port-size) * 0.8); /* 80% da viewport */
     margin: 0 auto;
+  }
+
+  .form-control input {
+    font-size: 1.3rem;
+  }
+
+  .form-control input:focus {
+    font-size: 1.5rem;
+  }
+
+  .form-control input:focus::placeholder {
+    font-size: 1.5rem;
   }
 }

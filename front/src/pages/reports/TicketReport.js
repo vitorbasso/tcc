@@ -154,7 +154,7 @@ function TicketReport() {
   }
 
   const profit = currentValue * amount - assetTotalValue;
-  const profitVariation = profit / assetTotalValue;
+  const profitVariation = assetTotalValue ? profit / assetTotalValue : 0;
 
   const moneyClass = getMoneyClass(currentTotalValue);
 
@@ -204,15 +204,24 @@ function TicketReport() {
             )}
           </span>
           <span>
-            <i onClick={deleteHandler} className={styles.red} data-id={id}>
+            <i
+              onClick={deleteHandler}
+              className={`${styles.red} ${styles.delete}`}
+              data-id={id}
+            >
               <BsTrash />
             </i>
           </span>
         </section>
-        <Money
-          value={currentTotalValue}
-          className={`${baseStyles[moneyClass]}`}
-        />
+        <div className={styles.main}>
+          <Money
+            value={currentTotalValue}
+            className={`${baseStyles[moneyClass]}`}
+          />
+          <span className={`${styles.superscribed} ${difCss}`}>
+            {difArrow} {percentFormatterWithoutSign.format(profitVariation)}
+          </span>
+        </div>
         <section className={styles.info}>
           <div>
             <p>Custo Total</p>

@@ -81,8 +81,10 @@ function Home() {
   return (
     <div className={`${baseStyles.container} ${styles.container}`}>
       <Header logout>
-        <h3>Bem Vindo,</h3>
-        <h2>{firstName}</h2>
+        <div className={styles.header}>
+          <h3>Bem Vindo,</h3>
+          <h2>{firstName}</h2>
+        </div>
       </Header>
       <main>
         <section className={styles.section}>

@@ -5,6 +5,9 @@
 }
 
 .container {
+  --max-width-multiplier: 615px;
+  max-width: calc(var(--max-width-multiplier) * 0.9);
+  margin: 0 auto;
   padding-bottom: 5rem;
 }
 
@@ -23,17 +26,17 @@
 }
 
 .container > div {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  justify-items: center;
+  display: flex;
+  justify-content: center;
   margin-bottom: 1rem;
 }
 
 .container > div button {
   border: none;
   border-radius: 10px;
-  width: 90%;
+  min-width: 4.4rem;
   min-height: 1.5rem;
+  margin: 0 5px;
   cursor: pointer;
   color: #fff;
   font-weight: normal;
@@ -141,4 +144,30 @@
 
 .delete {
   margin-left: 5px;
+  cursor: pointer;
+}
+
+@media (min-width: 615px) {
+  .container .table .thead .tr {
+    font-size: 1.4rem;
+  }
+
+  .container .table .tbody .tr {
+    font-size: 1.3rem;
+    height: 2.3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    --max-width-multiplier: 750px;
+  }
+  .container .table .thead .tr {
+    font-size: 1.8rem;
+  }
+
+  .container .table .tbody .tr {
+    font-size: 1.5rem;
+    height: 2.6rem;
+  }
 }

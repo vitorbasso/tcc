@@ -74,6 +74,11 @@
   margin: 0.5vh auto;
 }
 
+.top-tickets__container a {
+  width: 100%;
+  margin: 0 auto;
+}
+
 .red {
   color: #ea526f;
 }
@@ -88,7 +93,7 @@
   }
 
   .overview > div {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
 
   .overview > div p {
@@ -97,6 +102,20 @@
 
   .section__assets {
     width: calc(615px * 0.8);
+  }
+
+  .pie-chart__selected-legend p {
+    font-size: 1.5rem;
+  }
+
+  .pie-chart__selected-info {
+    font-size: 1.2rem;
+  }
+  .top-tickets__container a {
+    margin-bottom: 1rem;
+  }
+  .top-tickets__container a:last-child {
+    margin-bottom: 0;
   }
 }
 
@@ -114,34 +133,7 @@
     grid-area: selected;
   }
 
-  .pie-chart__pie-chart {
-    grid-area: graph;
-  }
-  .pie-chart__selected-info > div {
-    margin-top: 1rem;
-  }
-
-  .overview > div {
-    font-size: 2.3rem;
-  }
-
-  .overview > div p {
-    margin-right: 3rem;
-  }
-
-  .asset-table {
-    grid-area: tickets;
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .asset-table table {
-    width: 500px;
-    margin-right: 5px;
-    margin-left: 5px;
-  }
-
-  .section__assets {
-    width: 100%;
+  .top-tickets__container {
+    justify-content: center;
   }
 }

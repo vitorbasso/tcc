@@ -1,3 +1,7 @@
+:root {
+  --glance-pie-width: 100px;
+}
+
 .section {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -7,12 +11,38 @@
 }
 
 .pie-chart {
-  height: 100px;
-  width: 100px;
+  height: var(--glance-pie-width);
+  width: var(--glance-pie-width);
   justify-self: center;
 }
 
 .pie-chart-selected {
   align-self: center;
   justify-self: center;
+}
+
+@media (min-width: 615px) {
+  :root {
+    --glance-pie-width: 130px;
+  }
+  .pie-chart-selected p {
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --glance-pie-width: 180px;
+  }
+  .section {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  .pie-chart-selected {
+    display: flex;
+    width: 70%;
+    justify-content: space-around;
+    align-items: center;
+  }
 }

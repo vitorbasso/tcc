@@ -9,7 +9,7 @@ import StocksContext from "../../context/stock-context";
 function TopTickets(props) {
   const { stocks } = useContext(StocksContext);
   return (
-    <div className={styles["top-tickets"]}>
+    <div className={`${styles["top-tickets"]} ${props.className}`}>
       {props.assets.length === 0 && (
         <Link to={`/register-operation`}>
           Registre transações para ver um resumo da performance de suas ações
@@ -38,7 +38,7 @@ function TopTickets(props) {
               },
             }}
             key={`top-tickets-${assetInfo.asset.id}`}
-            className={`${styles["value-change"]} ${props.className} ${css}`}
+            className={`${styles["value-change"]} ${css}`}
           >
             <span>
               <div className={`${styles["chart-legend"]} ${colorCss}`}></div>

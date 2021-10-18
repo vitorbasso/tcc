@@ -35,7 +35,9 @@ h3,
 h4,
 h5,
 h6,
-p {
+p,
+div,
+span {
   user-select: none;
 }
 
@@ -45,9 +47,6 @@ h2 {
 
 body {
   height: 100vh;
-  /* background-color: #ebeae6; */
-  /* background-color: #e8e5d5; */
-  /* background-color: #faf4d4; */
   background: linear-gradient(
     0deg,
     var(--background-darker),

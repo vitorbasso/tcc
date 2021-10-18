@@ -22,12 +22,18 @@
 }
 
 .content {
+  max-width: 450px;
+  width: 100%;
+  margin: 0 auto;
   display: grid;
   grid-template-rows: 1fr 3fr;
   z-index: 1;
 }
 
 .rounded {
+  max-width: 450px;
+  width: 100%;
+  margin: 0 auto;
   z-index: 0;
   position: relative;
   top: 1vh;
