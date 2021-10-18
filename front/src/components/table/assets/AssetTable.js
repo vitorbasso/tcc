@@ -226,7 +226,7 @@ function AssetTable(props) {
                   <div className={`${css} ${styles.td}`}>
                     {percentFormatterClean(variation)}
                   </div>
-                  <div className={`${css} ${styles.td}`}>
+                  <div className={styles.td}>
                     {abbreviateNumber(valorization)}
                   </div>
                 </div>
