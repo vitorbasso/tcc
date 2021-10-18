@@ -154,7 +154,7 @@ function TicketReport() {
   }
 
   const profit = currentValue * amount - assetTotalValue;
-  const profitVariation = profit / assetTotalValue;
+  const profitVariation = assetTotalValue ? profit / assetTotalValue : 0;
 
   const moneyClass = getMoneyClass(currentTotalValue);
 
