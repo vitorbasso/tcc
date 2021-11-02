@@ -7,6 +7,7 @@ import com.vitorbasso.gerenciadorinvestimentos.enum.TransactionType
 import com.vitorbasso.gerenciadorinvestimentos.service.concrete.AccountingService
 import com.vitorbasso.gerenciadorinvestimentos.service.facade.WalletServiceFacadeImpl
 import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfDay
+import com.vitorbasso.gerenciadorinvestimentos.util.atStartOfMonth
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldHaveSize
@@ -19,8 +20,8 @@ import io.mockk.verify
 import utils.EasyRandomWrapper.random
 import utils.now
 import utils.shouldBeEqual
+import utils.transaction
 import java.math.BigDecimal
-import java.time.LocalDateTime
 
 class AccountingServiceTest : StringSpec() {
 
@@ -142,6 +143,7 @@ class AccountingServiceTest : StringSpec() {
             val staleTransaction = transaction(transactionDate = today)
             transactions.forAll { transaction ->
                 val result = service.accountFor(transaction, listOf(staleTransaction))
+                result.accountingOperation shouldBe AccountingOperation.ADD_TRANSACTION
                 when (transaction.type) {
                     TransactionType.BUY -> result.lifetimeBalanceChange shouldBe -transaction.value
                     TransactionType.SELL -> result.lifetimeBalanceChange shouldBe transaction.value
@@ -168,6 +170,7 @@ class AccountingServiceTest : StringSpec() {
                         staleTransactions = listOf(transaction, staleTransaction),
                         accountingOperation = AccountingOperation.REMOVE_TRANSACTION
                     )
+                result.accountingOperation shouldBe AccountingOperation.REMOVE_TRANSACTION
                 when (transaction.type) {
                     TransactionType.BUY -> result.lifetimeBalanceChange shouldBe transaction.value
                     TransactionType.SELL -> result.lifetimeBalanceChange shouldBe -transaction.value
@@ -191,11 +194,13 @@ class AccountingServiceTest : StringSpec() {
                 ), // add 10 daytrade
                 transaction(transactionDate = today, value = BigDecimal.TEN, asset = asset) // remove 10 daytrade
             )
-            service.accountFor(
+            val result = service.accountFor(
                 transaction = transaction,
                 staleTransactions = staleTransactions,
                 accountingOperation = AccountingOperation.REMOVE_ASSET
-            ).lifetimeBalanceChange shouldBe BigDecimal.TEN
+            )
+            result.lifetimeBalanceChange shouldBe BigDecimal.TEN
+            result.accountingOperation shouldBe AccountingOperation.REMOVE_ASSET
         }
 
         "should calculate correct asset average cost"{
@@ -254,6 +259,165 @@ class AccountingServiceTest : StringSpec() {
             result.assetReport shouldBeEqual BigDecimal("20") // transforma a transaction acima em daytrade e remove a alteração dela no preco medio
         }
 
+        "should not contribute to wallet balance if its buy operation" {
+            val result = service.accountFor(transaction(value = BigDecimal.TEN), listOf())
+            result.walletsReport.values.first().balanceContribution shouldBeEqual BigDecimal.ZERO
+        }
+
+        "should contribute to wallet balance if its sell operation" {
+
+            val now = if (now().minusDays(3).month == now().month) {
+                now()
+            } else now().plusDays(3)
+            var staleTransactions = listOf(
+                transaction(quantity = 10, value = BigDecimal.TEN, transactionDate = now.minusDays(1)),
+                transaction(quantity = 10, value = BigDecimal.TEN, transactionDate = now.minusDays(2))
+            )
+            var transaction = transaction(
+                quantity = 10,
+                value = BigDecimal("20"),
+                type = TransactionType.SELL,
+                transactionDate = now
+            )
+            var result = service.accountFor(transaction, staleTransactions)
+            var walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.TEN
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("20")
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
+            result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal("20"),
+                    type = TransactionType.SELL,
+                    transactionDate = now.minusDays(1)
+                ),
+                staleTransactions + transaction
+            )
+            walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.TEN
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal("20")
+            result = service.accountFor(
+                transaction(
+                    quantity = 15,
+                    value = BigDecimal("30"),
+                    type = TransactionType.SELL,
+                    transactionDate = now.minusDays(1)
+                ),
+                staleTransactions
+            )
+            walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual BigDecimal("5")
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.TEN
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("10")
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal("20")
+
+            val before = now().minusMonths(3)
+            staleTransactions = listOf(
+                transaction(quantity = 10, value = BigDecimal.TEN, transactionDate = before.minusDays(1)),
+                transaction(quantity = 10, value = BigDecimal.TEN, transactionDate = before.minusDays(2))
+            )
+            transaction = transaction(
+                quantity = 10,
+                value = BigDecimal("20"),
+                type = TransactionType.SELL,
+                transactionDate = before
+            )
+            result = service.accountFor(transaction, staleTransactions)
+            walletResult = result.walletsReport[before.atStartOfMonth()].shouldNotBeNull()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.TEN
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("20")
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
+            result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal("20"),
+                    type = TransactionType.SELL,
+                    transactionDate = before.minusDays(1)
+                ),
+                staleTransactions + transaction
+            )
+            walletResult = result.walletsReport[before.atStartOfMonth()].shouldNotBeNull()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.TEN
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal("20")
+            result = service.accountFor(
+                transaction(
+                    quantity = 15,
+                    value = BigDecimal("30"),
+                    type = TransactionType.SELL,
+                    transactionDate = before.minusDays(1)
+                ),
+                staleTransactions
+            )
+            walletResult = result.walletsReport[before.atStartOfMonth()].shouldNotBeNull()
+            walletResult.balanceContribution shouldBeEqual BigDecimal("5")
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.TEN
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("10")
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal("20")
+        }
+
+        "should contribute to wallet balance if sold first and bought later" {
+            val now = if (now().minusDays(3).month == now().month) {
+                now()
+            } else now().plusDays(3)
+            var result = service.accountFor(transaction(
+                quantity = 10,
+                value = BigDecimal("20"),
+                transactionDate = now.minusDays(1),
+                type = TransactionType.SELL
+            ), listOf())
+            var staleTransactions = result.transactionsReport
+            var walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("20")
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
+            var transaction =  transaction(
+                quantity = 10,
+                value = BigDecimal("20"),
+                transactionDate = now.minusDays(2),
+                type = TransactionType.SELL
+            )
+            result = service.accountFor(transaction, staleTransactions)
+            staleTransactions = result.transactionsReport
+            walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("20")
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
+
+            transaction =  transaction(
+                quantity = 10,
+                value = BigDecimal.TEN,
+                transactionDate = now,
+            )
+            result = service.accountFor(transaction, staleTransactions)
+            staleTransactions = result.transactionsReport
+            walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.TEN
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
+
+            transaction =  transaction(
+                quantity = 10,
+                value = BigDecimal.TEN,
+                transactionDate = now.minusDays(1),
+            )
+            result = service.accountFor(transaction, staleTransactions)
+            walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("-20") // it changed one of the sold from normal to daytrade
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.TEN
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal("20") // it changed one of the sold from normal to daytrade
+
+        }
+
     }
 
     private fun assertCorrectDaytradeQuantity(transactionReport: List<Transaction>, id: Long) {
@@ -278,26 +442,5 @@ class AccountingServiceTest : StringSpec() {
     private fun isDaytrade(newTransaction: Transaction, staleTransaction: Transaction) =
         newTransaction.transactionDate.atStartOfDay().isEqual(staleTransaction.transactionDate.atStartOfDay())
             && newTransaction.type != staleTransaction.type
-
-    private fun transaction(
-        type: TransactionType = TransactionType.BUY,
-        quantity: Long = (1..100L).random(),
-        value: BigDecimal = BigDecimal.TEN,
-        transactionDate: LocalDateTime = random(),
-        checkingValue: BigDecimal = BigDecimal.ZERO,
-        checkingQuantity: Long = 0,
-        daytradeQuantity: Long = 0,
-        asset: Asset = random()
-    ) = Transaction(
-        id = random(),
-        type = type,
-        quantity = quantity,
-        value = value,
-        transactionDate = transactionDate,
-        checkingValue = checkingValue,
-        checkingQuantity = checkingQuantity,
-        daytradeQuantity = daytradeQuantity,
-        asset = asset
-    )
 
 }
