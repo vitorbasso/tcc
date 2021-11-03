@@ -226,6 +226,7 @@ class AccountingServiceTest : StringSpec() {
                 transactionDate = date.plusDays(2),
                 asset = asset
             ) // 30 cada
+            val transactionToRemove = transaction
             result = service.accountFor(transaction, staleTransactions)
             result.assetReport shouldBeEqual BigDecimal("20") // 25 por 400 e 10 por 300 -> 35 por 700
             staleTransactions = result.transactionsReport
@@ -257,6 +258,22 @@ class AccountingServiceTest : StringSpec() {
             ) //50 cada
             result = service.accountFor(transaction, staleTransactions)
             result.assetReport shouldBeEqual BigDecimal("20") // transforma a transaction acima em daytrade e remove a alteração dela no preco medio
+            staleTransactions = result.transactionsReport
+            result = service.accountFor(
+                transactionToRemove,
+                staleTransactions,
+                AccountingOperation.REMOVE_TRANSACTION
+            ) // remove a transação anterior
+            // remove a transação, precisando recalcular o valor médio como se ela não tivesse existido
+            // antes dela tinhamos 25 por 400, em seguida, vendemos 15, e depois temos duas em daytrade
+            // dessa forma sobraram 10 por 160
+            result.assetReport shouldBeEqual BigDecimal("16")
+            staleTransactions = result.transactionsReport
+            result = service.accountFor(
+                transaction(transactionDate = date, type = TransactionType.SELL, quantity = 10, value = BigDecimal.TEN, asset = asset),
+                staleTransactions
+            )
+            result.assetReport shouldBeEqual BigDecimal.ZERO // when all is sold
         }
 
         "should not contribute to wallet balance if its buy operation" {
@@ -365,19 +382,21 @@ class AccountingServiceTest : StringSpec() {
             val now = if (now().minusDays(3).month == now().month) {
                 now()
             } else now().plusDays(3)
-            var result = service.accountFor(transaction(
-                quantity = 10,
-                value = BigDecimal("20"),
-                transactionDate = now.minusDays(1),
-                type = TransactionType.SELL
-            ), listOf())
+            var result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal("20"),
+                    transactionDate = now.minusDays(1),
+                    type = TransactionType.SELL
+                ), listOf()
+            )
             var staleTransactions = result.transactionsReport
             var walletResult = result.walletsReport.values.last()
             walletResult.balanceContribution shouldBeEqual BigDecimal.ZERO
             walletResult.withdrawnContribution shouldBeEqual BigDecimal("20")
             walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
             walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
-            var transaction =  transaction(
+            var transaction = transaction(
                 quantity = 10,
                 value = BigDecimal("20"),
                 transactionDate = now.minusDays(2),
@@ -391,7 +410,7 @@ class AccountingServiceTest : StringSpec() {
             walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
             walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
 
-            transaction =  transaction(
+            transaction = transaction(
                 quantity = 10,
                 value = BigDecimal.TEN,
                 transactionDate = now,
@@ -404,7 +423,7 @@ class AccountingServiceTest : StringSpec() {
             walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
             walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
 
-            transaction =  transaction(
+            transaction = transaction(
                 quantity = 10,
                 value = BigDecimal.TEN,
                 transactionDate = now.minusDays(1),
@@ -418,6 +437,120 @@ class AccountingServiceTest : StringSpec() {
 
         }
 
+        "should correctly calculate walletReport when transaction is removed" {
+
+            val now = if (now().minusDays(3).month == now().month) {
+                now()
+            } else now().plusDays(3)
+            var result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal.TEN,
+                    transactionDate = now.minusDays(1)
+                ), listOf()
+            )
+            var staleTransactions = result.transactionsReport
+            result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal.TEN,
+                    transactionDate = now.minusDays(2)
+                ), staleTransactions
+            )
+            staleTransactions = result.transactionsReport
+            val transaction = transaction(
+                quantity = 10,
+                value = BigDecimal("20"),
+                type = TransactionType.SELL,
+                transactionDate = now
+            )
+            result = service.accountFor(transaction, staleTransactions)
+            staleTransactions = result.transactionsReport
+            result = service.accountFor(transaction, staleTransactions, AccountingOperation.REMOVE_TRANSACTION)
+            staleTransactions = result.transactionsReport
+            var walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual -BigDecimal.TEN
+            walletResult.daytradeBalanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("-20")
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal.ZERO
+            val daytradeTransaction = transaction(
+                quantity = 10,
+                value = BigDecimal("20"),
+                type = TransactionType.SELL,
+                transactionDate = now.minusDays(1)
+            )
+            result = service.accountFor(
+                daytradeTransaction,
+                staleTransactions
+            )
+            staleTransactions = result.transactionsReport
+            result = service.accountFor(
+                daytradeTransaction,
+                staleTransactions,
+                AccountingOperation.REMOVE_TRANSACTION
+            )
+            walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeBalanceContribution shouldBeEqual -BigDecimal.TEN
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal.ZERO
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal("-20")
+        }
+
+        "should correctly calculate walletReport when asset is removed" {
+            val asset = random<Asset>()
+            val now = if (now().minusDays(3).month == now().month) {
+                now()
+            } else now().plusDays(3)
+            var result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal.TEN,
+                    transactionDate = now.minusDays(1),
+                    asset = asset
+                ), listOf()
+            )
+            var staleTransactions = result.transactionsReport
+            result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal.TEN,
+                    transactionDate = now.minusDays(2),
+                    asset = asset
+                ), staleTransactions
+            )
+            staleTransactions = result.transactionsReport
+            result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal("20"),
+                    type = TransactionType.SELL,
+                    transactionDate = now,
+                    asset = asset
+                ), staleTransactions
+            )
+            staleTransactions = result.transactionsReport
+            result = service.accountFor(
+                transaction(
+                    quantity = 10,
+                    value = BigDecimal("20"),
+                    type = TransactionType.SELL,
+                    transactionDate = now.minusDays(1),
+                    asset = asset
+                ),
+                staleTransactions
+            )
+            staleTransactions = result.transactionsReport
+            result = service.accountFor(
+                transaction(asset = asset),
+                staleTransactions,
+                AccountingOperation.REMOVE_ASSET
+            )
+            val walletResult = result.walletsReport.values.last()
+            walletResult.balanceContribution shouldBeEqual -BigDecimal.TEN
+            walletResult.daytradeBalanceContribution shouldBeEqual -BigDecimal.TEN
+            walletResult.withdrawnContribution shouldBeEqual BigDecimal("-20")
+            walletResult.daytradeWithdrawnContribution shouldBeEqual BigDecimal("-20")
+        }
     }
 
     private fun assertCorrectDaytradeQuantity(transactionReport: List<Transaction>, id: Long) {
