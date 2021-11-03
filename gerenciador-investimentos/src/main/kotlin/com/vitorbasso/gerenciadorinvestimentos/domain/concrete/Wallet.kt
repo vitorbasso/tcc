@@ -19,8 +19,8 @@ data class Wallet(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-    override val balanceDaytrade: BigDecimal = BigDecimal.ZERO,
     override val balance: BigDecimal = BigDecimal.ZERO,
+    override val balanceDaytrade: BigDecimal = BigDecimal.ZERO,
     override val withdrawn: BigDecimal = BigDecimal.ZERO,
     override val withdrawnDaytrade: BigDecimal = BigDecimal.ZERO,
     override val walletMonth: LocalDate = LocalDate.now().atStartOfMonth(),
