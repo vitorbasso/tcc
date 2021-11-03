@@ -10,7 +10,7 @@ interface IMonthlyWalletRepository : JpaRepository<MonthlyWallet, Long> {
 
     fun findAllByClientId(clientId: Long): List<MonthlyWallet>
 
-    fun findByWalletMonth(walletMonth: LocalDate): MonthlyWallet?
+    fun findByWalletMonthAndClientId(walletMonth: LocalDate, clientId: Long): MonthlyWallet?
 
     fun existsByWalletIdAndWalletMonth(walletId: Long, walletMonth: LocalDate): Boolean
 }
