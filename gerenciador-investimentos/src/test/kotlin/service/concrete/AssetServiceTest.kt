@@ -30,7 +30,7 @@ class AssetServiceTest : StringSpec() {
     init {
 
         "should find asset" {
-            val asset = random<Asset>()
+            val asset = asset()
             every { assetRespository.findByWalletAndStock(any(), any()) } returns asset
             shouldNotThrowAny {
                 val result = service.getAsset(random(), random())
@@ -46,7 +46,7 @@ class AssetServiceTest : StringSpec() {
         }
 
         "should find asset through getAssetNullable" {
-            val asset = random<Asset>()
+            val asset = asset()
             every { assetRespository.findByWalletAndStock(any(), any()) } returns asset
             shouldNotThrowAny {
                 val result = service.getAssetNullable(random(), random())
@@ -64,7 +64,7 @@ class AssetServiceTest : StringSpec() {
         }
 
         "should pass to repository to delete asset" {
-            val asset = random<Asset>()
+            val asset = asset()
             every { assetRespository.delete(any()) } just runs
             service.deleteAsset(asset)
             val slot = slot<Asset>()
@@ -73,7 +73,7 @@ class AssetServiceTest : StringSpec() {
         }
 
         "should pass to repository to save asset"{
-            val asset = random<Asset>()
+            val asset = asset()
             every { assetRespository.save(any()) } returns asset
             service.saveAsset(asset)
             val slot = slot<Asset>()
@@ -82,7 +82,7 @@ class AssetServiceTest : StringSpec() {
         }
 
         "should pass to repository to save asset with amount 0"{
-            val asset = random<Asset>().copy(amount = 0)
+            val asset = asset().copy(amount = 0)
             every { assetRespository.save(any()) } returns asset
             service.saveAsset(asset)
             val slot = slot<Asset>()
@@ -96,5 +96,10 @@ class AssetServiceTest : StringSpec() {
     override fun afterEach(testCase: TestCase, result: TestResult) {
         clearAllMocks()
     }
+
+    private fun asset() = random<Asset>().copy(
+        averageCost = random(),
+        lifetimeBalance = random()
+    )
 
 }

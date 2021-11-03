@@ -28,7 +28,7 @@ class StockServiceTest : StringSpec() {
 
     init {
         "should get stock" {
-            val stock = random<Stock>()
+            val stock = stock()
             every { repository.findByTicker(any()) } returns stock
             shouldNotThrowAny {
                 val result = service.getStock(random())
@@ -46,7 +46,11 @@ class StockServiceTest : StringSpec() {
         }
 
         "should get stocks batch" {
-            val stocks = random<List<Stock>>()
+            val stocks = listOf<Stock>(
+                stock(),
+                stock(),
+                stock(),
+            )
             val tickers = random<List<String>>()
             every { repository.findByTickerBatch(any()) } returns stocks
             shouldNotThrowAny {
@@ -69,7 +73,11 @@ class StockServiceTest : StringSpec() {
 
         "should get all stocks from a wallet" {
             val wallet = random<WalletDto>()
-            val stocks = random<List<Stock>>()
+            val stocks = listOf<Stock>(
+                stock(),
+                stock(),
+                stock(),
+            )
             every { walletService.getWallet() } returns wallet
             every { repository.findByTickerBatch(any()) } returns stocks
 
@@ -91,7 +99,11 @@ class StockServiceTest : StringSpec() {
         }
 
         "should get stocks starting with" {
-            val stocks = random<List<Stock>>()
+            val stocks = listOf<Stock>(
+                stock(),
+                stock(),
+                stock(),
+            )
             every { repository.findByTickerStartsWith(any()) } returns stocks
             service.getStockStartingWith(random()) shouldBe stocks
             verify(exactly = 1) { repository.findByTickerStartsWith(any()) }
@@ -101,5 +113,13 @@ class StockServiceTest : StringSpec() {
     override fun afterEach(testCase: TestCase, result: TestResult) {
         clearAllMocks()
     }
+
+    private fun stock() = random<Stock>().copy(
+        currentValue = random(),
+        lastClose = random(),
+        lastWeekClose = random(),
+        lastMonthClose = random(),
+        lastYearClose = random()
+    )
 
 }

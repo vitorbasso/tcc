@@ -32,7 +32,11 @@ class MonthlyWalletServiceTest : StringSpec() {
     init {
 
         "should get all monthly wallets by id" {
-            val monthlyWallets = random<List<MonthlyWallet>>()
+            val monthlyWallets = listOf<MonthlyWallet>(
+                monthlyWallet(),
+                monthlyWallet(),
+                monthlyWallet(),
+            )
             every { repository.findAllByClientId(any()) } returns monthlyWallets
             val result = service.getMonthlyWallets(random())
             result shouldBe monthlyWallets
@@ -41,7 +45,7 @@ class MonthlyWalletServiceTest : StringSpec() {
 
         "should get specific monthly wallet by id" {
             val clientId = random<Long>()
-            val monthlyWallet = random<MonthlyWallet>().copy(
+            val monthlyWallet = monthlyWallet().copy(
                 client = random<Client>().copy(
                     id = clientId
                 )
@@ -70,7 +74,7 @@ class MonthlyWalletServiceTest : StringSpec() {
 
         "should throw when specific monthly wallet does not match clientId" {
             val clientId = random<Long>()
-            every { repository.findByIdOrNull(any()) } returns random<MonthlyWallet>()
+            every { repository.findByIdOrNull(any()) } returns monthlyWallet()
             shouldThrow<CustomEntityNotFoundException> {
                 service.getMonthlyWallet(
                     random(),
@@ -83,7 +87,7 @@ class MonthlyWalletServiceTest : StringSpec() {
         "should get specific monthly wallet by month" {
             val clientId = random<Long>()
             val month = random<LocalDate>()
-            val monthlyWallet = random<MonthlyWallet>().copy(
+            val monthlyWallet = monthlyWallet().copy(
                 client = random<Client>().copy(
                     id = clientId
                 ),
@@ -124,7 +128,7 @@ class MonthlyWalletServiceTest : StringSpec() {
         }
 
         "should pass to repository to delete" {
-            val toDelete = random<MonthlyWallet>()
+            val toDelete = monthlyWallet()
             every { repository.delete(any()) } just runs
             service.deleteMonthlyWallet(toDelete)
             val slot = slot<MonthlyWallet>()
@@ -137,5 +141,12 @@ class MonthlyWalletServiceTest : StringSpec() {
     override fun afterEach(testCase: TestCase, result: TestResult) {
         clearAllMocks()
     }
+
+    private fun monthlyWallet() = random<MonthlyWallet>().copy(
+        balanceDaytrade = random(),
+        balance = random(),
+        withdrawn = random(),
+        withdrawnDaytrade = random()
+    )
 
 }

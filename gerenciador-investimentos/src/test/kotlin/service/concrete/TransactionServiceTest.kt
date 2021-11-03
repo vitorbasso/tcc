@@ -21,6 +21,7 @@ import io.mockk.runs
 import io.mockk.verify
 import org.springframework.data.repository.findByIdOrNull
 import utils.EasyRandomWrapper.random
+import utils.transaction
 
 class TransactionServiceTest : StringSpec() {
 
@@ -30,7 +31,7 @@ class TransactionServiceTest : StringSpec() {
     init {
         "should get transaction" {
             val clientId = random<Long>()
-            val transaction = random<Transaction>().copy(
+            val transaction = transaction().copy(
                 asset = random<Asset>().copy(
                     wallet = random<Wallet>().copy(
                         client = random<Client>().copy(id = clientId)
@@ -47,7 +48,7 @@ class TransactionServiceTest : StringSpec() {
 
         "should throw when not same clientId" {
             val clientId = random<Long>()
-            every { repository.findByIdOrNull(any()) } returns random<Transaction>()
+            every { repository.findByIdOrNull(any()) } returns transaction()
             shouldThrow<CustomEntityNotFoundException> {
                 service.getTransaction(random(), clientId)
             }
@@ -63,7 +64,7 @@ class TransactionServiceTest : StringSpec() {
         }
 
         "should save transaction" {
-            val transaction = random<Transaction>()
+            val transaction = transaction()
             every { repository.save(any()) } answers { firstArg() }
             val result = service.save(transaction)
             result shouldBe transaction
@@ -71,10 +72,10 @@ class TransactionServiceTest : StringSpec() {
         }
 
         "should save all transactions" {
-            val transactions = listOf<Transaction>(
-                random(),
-                random(),
-                random()
+            val transactions = listOf(
+                transaction(),
+                transaction(),
+                transaction(),
             )
             every { repository.saveAll(any<List<Transaction>>()) } returns transactions
             val result = service.saveAll(transactions)
@@ -90,10 +91,10 @@ class TransactionServiceTest : StringSpec() {
         }
 
         "should find from one before transaction date" {
-            val transactions = listOf<Transaction>(
-                random(),
-                random(),
-                random()
+            val transactions = listOf(
+                transaction(),
+                transaction(),
+                transaction()
             )
             every { repository.findAllFromTransactionBeforeTransactionDate(any(), any()) } returns transactions
             val result = service.findFromOneBeforeTransactionDate(random())
@@ -103,10 +104,10 @@ class TransactionServiceTest : StringSpec() {
         }
 
         "should not find from one before transaction date" {
-            val transactions = listOf<Transaction>(
-                random(),
-                random(),
-                random()
+            val transactions = listOf(
+                transaction(),
+                transaction(),
+                transaction(),
             )
             every { repository.findAllByAssetOrderByTransactionDate(any()) } returns transactions
             every { repository.findAllFromTransactionBeforeTransactionDate(any(), any()) } returns emptyList()
