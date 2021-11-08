@@ -275,6 +275,12 @@ internal class AccountingService(
                         )
                     ).multiply(BigDecimal(normalQuantity))
                 )
+                accountantNotes.valueForAverage = accountantNotes.valueForAverage.minus(
+                    Util.getAverageCost(accountantNotes.valueForAverage, accountantNotes.quantityForAverage).multiply(
+                        BigDecimal(normalQuantity)
+                    )
+                )
+                accountantNotes.quantityForAverage -= normalQuantity
             }
         }
         accountantNotes.quantityCount -= normalQuantity

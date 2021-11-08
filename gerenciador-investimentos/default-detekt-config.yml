@@ -82,6 +82,7 @@ complexity:
     active: true
     threshold: 60
   LongParameterList:
+    excludes: ['**/test/**']
     active: true
     functionThreshold: 8
     constructorThreshold: 8
@@ -534,6 +535,7 @@ style:
   MandatoryBracesLoops:
     active: false
   MaxLineLength:
+    excludes: ['**/test/**']
     active: true
     maxLineLength: 120
     excludePackageStatements: true
