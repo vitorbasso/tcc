@@ -77,10 +77,12 @@ class TransactionServiceFacadeImplTest : StringSpec() {
 
         "should throw exception if date outside of allowed"{
             val now = LocalDateTime.now().withHour(16)
+            val dayOfWeek = now.dayOfWeek.value
+            val future = if (dayOfWeek == 6 || dayOfWeek == 7) now.plusDays(4) else now.plusDays(2)
             val dates = listOf(
                 LocalDateTime.of(2021, Month.SEPTEMBER, 11, 16, 34), // saturday
                 LocalDateTime.of(2021, Month.SEPTEMBER, 12, 16, 34), // sunday
-                now.plusDays((5 % now.dayOfWeek.value).toLong()), // future in a weekday
+                future, // future in a weekday
             )
 
             dates.forAll { date ->
